@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-const AuthTemplate = ({ children }) => {
+const AuthLayout = ({ children }) => {
   return (
     <>
       <div className="bg-white mt-10 mx-5 flex justify-center items-center">
@@ -11,8 +11,8 @@ const AuthTemplate = ({ children }) => {
   );
 };
 
-export default AuthTemplate;
+export default AuthLayout;
 
-AuthTemplate.propTypes = {
+AuthLayout.propTypes = {
   children: PropTypes.node.isRequired,
 };

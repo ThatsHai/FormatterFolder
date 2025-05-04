@@ -7,13 +7,13 @@ const Login = () => {
   const navigate = useNavigate();
 
   const fields = [
-    // { label: "Họ và tên sinh viên", minLength: 5 },
+    { label: "Họ và tên sinh viên", minLength: 5 },
     { label: "Mã số sinh viên", minLength: 8 },
-    // { label: "Ngành", minLength: 2 },
-    // { label: "Đơn vị (Khoa/Bộ môn)", minLength: 2 },
-    // { label: "Khoa/Trường", minLength: 2 },
+    { label: "Ngành", minLength: 2 },
+    { label: "Đơn vị (Khoa/Bộ môn)", minLength: 2 },
+    { label: "Khoa/Trường", minLength: 2 },
     { label: "Mật khẩu", minLength: 8, type: "password" },
-    // { label: "Nhập lại mật khẩu", minLength: 8, type: "password" },
+    { label: "Nhập lại mật khẩu", minLength: 8, type: "password" },
   ];
 
   const [formInfo, setFormInfo] = useState(
@@ -57,7 +57,7 @@ const Login = () => {
       console.log("Form submitted:", formInfo);
       setFormInfo(Object.fromEntries(fields.map((f) => [f.label, ""])));
       setResetSignal((prev) => prev + 1);
-      navigate("/");
+      navigate("/login");
     }
   };
 

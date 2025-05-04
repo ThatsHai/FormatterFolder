@@ -9,12 +9,15 @@ export default {
       colors: {
         lightBlue: "#23A9E1",
         darkBlue: "#0249AE",
-        gray: "#595A4A",
+        gray: "#D9D9D9",
+        lightGray: "#f0f0f0",
+        redError: "#ef4444"
       },
       fontFamily: {
-        headerFont: ["baloo2"],
-        textFont: ["bai-jamjuree"],
+        headerFont: ["CustomFont_Baloo2", "cursive"],
+        textFont: ["BaiJamjuree", "sans-serif"],
       },
+      
     },
   },
   plugins: [],

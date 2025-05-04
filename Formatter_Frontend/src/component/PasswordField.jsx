@@ -17,11 +17,10 @@ const FieldInfo = ({
           value={value}
           onChange={(e) => onChange(label, e.target.value)}
           name={label}
+          type="password"
         />
         {value.length >= minLength && (
-          <CheckIcon
-            sx={{ marginLeft: "8px", color: "green", paddingBottom: "2px" }}
-          />
+          <CheckIcon sx={{ marginLeft: "8px", color: "green", paddingBottom: "2px" }} />
         )}
         <div className="absolute bottom-0 left-0 w-full after:content-[''] after:block after:w-full after:h-[1px] after:bg-darkBlue"></div>
       </div>
@@ -29,6 +28,7 @@ const FieldInfo = ({
     </div>
   );
 };
+
 
 export default FieldInfo;
 

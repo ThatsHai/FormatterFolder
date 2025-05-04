@@ -1,10 +1,11 @@
 // App.jsx
 import React from "react";
-import { RouterProvider } from "react-router-dom"; // Correct import
-import router from "./router/router"; // Import the router from the router.js file
+import { RouterProvider } from "react-router-dom"; 
+//Ignore spelling warning in the following line
+import Router from "./router/Router.jsx"; 
 
 const App = () => {
-  return <RouterProvider router={router}></RouterProvider>;
+  return <RouterProvider router={Router}></RouterProvider>;
 };
 
 export default App;
