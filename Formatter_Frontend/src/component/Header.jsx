@@ -1,4 +1,3 @@
-import React from "react";
 import { IconButton, Badge } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import NotificationsIcon from "@mui/icons-material/Notifications";
