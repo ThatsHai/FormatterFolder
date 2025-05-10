@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Button from "../component/Button";
+import SubmitThesisForm from "../component/forms/SubmitThesisForm";
 
 const ContentHomepage = () => {
   return <div className="min-h-[400px] bg-lightGray m-5 rounded-md"></div>
@@ -24,6 +25,7 @@ const HomePage = () => {
       </div>
 
       <ContentHomepage></ContentHomepage>
+      {thesisFormOpen && <SubmitThesisForm handleFormToggle={handleFormToggle}/>}
     </div>
   );
 };
