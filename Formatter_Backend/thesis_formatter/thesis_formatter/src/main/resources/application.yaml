@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: thesis_formatter
+  datasource:
+    url: "jdbc:mysql://localhost:3306/Formatter"
+    password: root
+    username: root
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+server:
+  port: 8080
