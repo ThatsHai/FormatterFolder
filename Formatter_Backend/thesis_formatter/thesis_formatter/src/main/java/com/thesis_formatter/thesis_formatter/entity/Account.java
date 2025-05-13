@@ -37,4 +37,8 @@ public class Account {
     @JoinColumn(name = "faculty", referencedColumnName = "facultyId")
     Faculty faculty;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "department", referencedColumnName = "DP_id")
+    Department department;
+
 }

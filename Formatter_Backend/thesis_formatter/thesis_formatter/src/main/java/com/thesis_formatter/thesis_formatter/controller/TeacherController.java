@@ -22,7 +22,7 @@ public class TeacherController {
     TeacherRepo teacherRepo;
     TeacherService teacherService;
 
-    @GetMapping("/getTeacherByFilters")
+    @GetMapping("teachers/getTeacherByFilters")
     public ResponseEntity<?> getTeacherById(@RequestBody TeacherFiltersDTO teacherFiltersDTO) {
             return teacherService.findTeacherByFilters(teacherFiltersDTO);
     }

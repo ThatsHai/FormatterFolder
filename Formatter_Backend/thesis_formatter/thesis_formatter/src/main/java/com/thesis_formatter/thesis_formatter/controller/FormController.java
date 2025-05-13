@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class FormController {
     FormService formService;
 
-    @PostMapping("/api/submitForm")
+    @PostMapping("/forms/submitForm")
     public ResponseEntity<?> submitForm(@RequestBody Form form) {
         System.out.println(form.toString());
         formService.saveForm(form);

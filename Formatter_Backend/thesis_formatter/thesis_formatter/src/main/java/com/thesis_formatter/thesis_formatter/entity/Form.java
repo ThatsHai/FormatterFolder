@@ -29,6 +29,6 @@ public class Form {
     String unit;
     String school;
     String year;
-//    List <String> CBHD;
+    List <String> teacherIds;
     String introduction;
 }

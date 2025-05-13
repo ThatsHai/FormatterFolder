@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -22,5 +23,5 @@ public class Department {
     String DP_name;
 
     @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
-    List<Teacher> teachers;
+    List<Account> accounts = new ArrayList<>();
 }

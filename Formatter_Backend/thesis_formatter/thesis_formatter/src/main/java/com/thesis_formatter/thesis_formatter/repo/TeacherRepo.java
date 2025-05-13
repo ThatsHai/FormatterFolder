@@ -7,9 +7,9 @@ import org.springframework.data.repository.query.Param;
 
 public interface TeacherRepo extends JpaRepository<Teacher, String> {
 
-    @Query("SELECT t FROM Teacher t WHERE t.department.DP_name = :departmentName " +
+    @Query("SELECT t FROM Teacher t WHERE t.account.department.DP_name = :departmentName " +
             "AND t.account.faculty.facultyName = :faculty AND t.account.name = :teacherName " +
-            "AND t.account.AC_id = :teacherId")
+            "AND t.TC_id= :teacherId")
     Teacher findTeachersByFilters(@Param("faculty") String faculty,
                                   @Param("departmentName") String departmentName,
                                   @Param("teacherId") String teacherId,

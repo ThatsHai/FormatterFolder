@@ -24,7 +24,6 @@ public class TeacherService {
             String teacherName = teacherFiltersDTO.teacherName();
             String teacherId = teacherFiltersDTO.teacherId();
             Teacher teacher = teacherRepo.findTeachersByFilters(faculty, departmentName, teacherId, teacherName);
-            System.out.println("QUERY: " + faculty + ", " + departmentName + ", " + teacherId + ", " + teacherName);
             if (teacher == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy giảng viên phù hợp");
             }

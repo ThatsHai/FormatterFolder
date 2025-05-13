@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,5 +22,7 @@ public class Faculty {
     String facultyName;
 
     @OneToMany(mappedBy = "faculty", cascade = CascadeType.ALL)
-    List<Account> accountts;
+    List<Account> accounts = new ArrayList<>();
+
+    //Chưa liên kết giữa khoa và bộ môn
 }

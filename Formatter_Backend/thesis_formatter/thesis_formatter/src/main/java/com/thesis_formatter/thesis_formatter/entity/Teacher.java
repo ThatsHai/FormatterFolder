@@ -18,17 +18,12 @@ public class Teacher {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String TC_id;
-    String expertise;
     String degree;
     String position;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "TC_id",referencedColumnName = "AC_id")
     Account account;
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "TC_department", referencedColumnName = "DP_id")
-    Department department;
 
 
 }
