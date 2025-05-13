@@ -1,19 +1,15 @@
 import { useState } from "react";
 import Button from "../component/Button";
 import SubmitThesisForm from "../component/forms/SubmitThesisForm";
-
-const ContentHomepage = () => {
-  return <div className="min-h-[400px] bg-lightGray m-5 rounded-md"></div>
-}
+import ContentHomepage from "../component/pageComponents/homepage/ContentHomepage";
 
 const HomePage = () => {
   const [thesisFormOpen, setIsThesisFormOpen] = useState(false);
 
   const handleFormToggle = () => {
     setIsThesisFormOpen(!thesisFormOpen);
-    console.log(thesisFormOpen)
-  }
-
+    console.log(thesisFormOpen);
+  };
 
   return (
     <div className="pt-6">
@@ -24,8 +20,10 @@ const HomePage = () => {
         </div>
       </div>
 
-      <ContentHomepage></ContentHomepage>
-      {thesisFormOpen && <SubmitThesisForm handleFormToggle={handleFormToggle}/>}
+      <ContentHomepage year={2025}></ContentHomepage>
+      {thesisFormOpen && (
+          <SubmitThesisForm handleFormToggle={handleFormToggle} />
+      )}
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 
 import ShortAnswer from "./SubmitThesisFormComponents/ShortAnswer";
 import DisabledField from "./SubmitThesisFormComponents/DisabledField";
+import AddTeacherTable from "./SubmitThesisFormComponents/AddTeacherTable";
 
 const SubmitThesisForm = ({ handleFormToggle = () => {} }) => {
   const currentYear = new Date().getFullYear();
@@ -10,13 +11,29 @@ const SubmitThesisForm = ({ handleFormToggle = () => {} }) => {
   // Initialize form data state
   const [formData, setFormData] = useState({
     title: "Tên đề tài",
-    studentName: "Nguyễn Văn A", // Static for now
-    studentId: "B2111111", // Static for now
-    department: "Tên ngành", // Static for now
-    unit: "Tên đơn vị", // Static for now
-    school: "Tên Khoa/Trường", // Static for now
+    studentName: "Nguyễn Văn A",
+    studentId: "B2111111",
+    department: "Tên ngành",
+    unit: "Tên đơn vị",
+    school: "Tên Khoa/Trường",
     year: currentYear,
+    teachersList: [
+      {
+        Khoa: "Trường CNTT",
+        MaBM: "Khoa CNTT",
+        TenCB: "Nguyen V",
+        MaCB: "0111",
+      },
+      {
+        Khoa: "Trường CNTT",
+        MaBM: "Khoa CNTT",
+        TenCB: "Nguyen Y",
+        MaCB: "0122",
+      },
+    ],
+    introduction: "Giới thiệu",
   });
+  const [openAddTeacherTable, setOpenAddTeacherTable] = useState(false);
 
   // Handle form field changes
   const handleChange = (e) => {
@@ -31,6 +48,15 @@ const SubmitThesisForm = ({ handleFormToggle = () => {} }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(formData);
+  };
+
+  const handleRemoveTeacher = (MaCB) => {
+    setFormData((prev) => ({
+      ...prev,
+      teachersList: prev.teachersList.filter(
+        (teacher) => teacher.MaCB !== MaCB
+      ),
+    }));
   };
 
   useEffect(() => {
@@ -51,7 +77,7 @@ const SubmitThesisForm = ({ handleFormToggle = () => {} }) => {
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black bg-opacity-50 p-6">
+    <div className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-black bg-opacity-50 p-6">
       {/* Modal content wrapper */}
       <div className="relative z-10 mt-10 w-full max-w-3xl bg-white rounded shadow-lg p-6">
         {/* Close button just outside modal corner */}
@@ -76,7 +102,7 @@ const SubmitThesisForm = ({ handleFormToggle = () => {} }) => {
             handleChange={handleChange}
           ></ShortAnswer>
 
-          {/* Static Student Information */}
+          {/* Student Information */}
           <div className="relative text-start w-full font-textFont text-lg mb-8 px-10">
             <h3 className="text-black font-semibold mb-3">
               2. NGƯỜI THỰC HIỆN
@@ -129,13 +155,38 @@ const SubmitThesisForm = ({ handleFormToggle = () => {} }) => {
           <div className="relative text-start w-full font-textFont text-lg mb-6 px-10">
             <div className="flex items-center mb-2">
               <h3 className="text-black font-semibold">3. CÁN BỘ HƯỚNG DẪN</h3>
-              <button className="border text-xs rounded-md p-1 px-2 mx-3">
-                + Thêm CBHD
+              <button
+                className="border text-xs rounded-md p-1 px-2 mx-3"
+                onClick={() => setOpenAddTeacherTable(!openAddTeacherTable)}
+              >
+                {openAddTeacherTable ? "- Ẩn bảng chọn" : "+ Thêm CBHD"}
               </button>
             </div>
-            <ul className="list-disc ml-5">
-              <li>CBHD1</li>
-              <li>CBHD1</li>
+            {openAddTeacherTable && (
+              <AddTeacherTable
+                name="teacher"
+                formData={formData}
+                setFormData={setFormData}
+              ></AddTeacherTable>
+            )}
+            <ul className="list-disc ml-5 space-y-1">
+              {formData.teachersList?.map((teacher, index) => (
+                <li key={index}>
+                  <div className="flex justify-between items-center">
+                    <span>
+                      {teacher.TenCB} ({teacher.MaCB}) - {teacher.Khoa},{" "}
+                      {teacher.MaBM}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveTeacher(teacher.MaCB)}
+                      className="text-redError font-bold ml-4"
+                    >
+                      X
+                    </button>
+                  </div>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -147,6 +198,7 @@ const SubmitThesisForm = ({ handleFormToggle = () => {} }) => {
               id=""
               placeholder="Nội dung giới thiệu"
               className="border w-full p-3 rounded-md resize-none"
+              onChange={handleChange}
             ></textarea>
           </div>
 

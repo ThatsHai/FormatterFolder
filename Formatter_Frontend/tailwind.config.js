@@ -11,7 +11,8 @@ export default {
         darkBlue: "#0249AE",
         gray: "#D9D9D9",
         lightGray: "#f0f0f0",
-        redError: "#ef4444"
+        redError: "#ef4444",
+        greenCorrect: "#22c55e",
       },
       fontFamily: {
         headerFont: ["CustomFont_Baloo2", "cursive"],

@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const DisabledField = ({
   VNTitle = "Tựa Việt",
   ENTitle = "English Title",
@@ -17,3 +19,9 @@ const DisabledField = ({
 };
 
 export default DisabledField;
+
+DisabledField.propTypes = {
+  VNTitle: PropTypes.string,
+  ENTitle: PropTypes.string,
+  formData: PropTypes.object,
+}
