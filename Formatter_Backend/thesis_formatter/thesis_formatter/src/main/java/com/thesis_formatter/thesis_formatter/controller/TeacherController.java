@@ -20,5 +20,10 @@ public class TeacherController {
 
     TeacherRepo teacherRepo;
 
-   
+    @GetMapping("/getTeacherByFilter")
+    public ResponseEntity<?> getTeacherById(@RequestParam String id) {
+        Teacher teacher = teacherRepo.findTeachersByTC_id(id);
+        Account account = teacher.getAccount();
+
+    }
 }
