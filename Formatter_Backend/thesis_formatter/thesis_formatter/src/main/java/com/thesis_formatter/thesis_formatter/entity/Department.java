@@ -1,0 +1,24 @@
+package com.thesis_formatter.thesis_formatter.entity;
+
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
+
+import java.util.List;
+
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class Department {
+    @Id
+    String DP_id;
+    String DP_name;
+
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
+    List<Teacher> teachers;
+}
