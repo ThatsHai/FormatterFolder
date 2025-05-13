@@ -1,5 +1,6 @@
 package com.thesis_formatter.thesis_formatter.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Department {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     String DP_id;
     String DP_name;
 

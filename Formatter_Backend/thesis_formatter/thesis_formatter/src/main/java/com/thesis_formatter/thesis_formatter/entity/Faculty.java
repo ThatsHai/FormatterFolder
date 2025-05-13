@@ -7,21 +7,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Student {
+public class Faculty {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    String ST_id;
-    String className;
-    String major;
-    String course;
+    String facultyId;
+    String facultyName;
 
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "ST_id",referencedColumnName = "AC_id")
-    Account account;
+    @OneToMany(mappedBy = "faculty", cascade = CascadeType.ALL)
+    List<Account> accountts;
 }

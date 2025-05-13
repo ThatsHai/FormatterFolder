@@ -1,9 +1,7 @@
 package com.thesis_formatter.thesis_formatter.entity;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,13 +16,13 @@ import org.springframework.format.annotation.DateTimeFormat;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Account {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     String AC_id;
     String password;
     String name;
     String dateOfBirth;
     String gender;
     String address;
-    String faculty;
     String phoneNumber;
     String email;
     String avatar;
@@ -35,5 +33,8 @@ public class Account {
     @OneToOne(mappedBy = "account",cascade = CascadeType.ALL)
     Teacher teacher;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "faculty", referencedColumnName = "facultyId")
+    Faculty faculty;
 
 }
