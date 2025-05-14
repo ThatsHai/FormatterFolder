@@ -1,7 +1,10 @@
 package com.thesis_formatter.thesis_formatter.entity;
 
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,9 +23,12 @@ public class Form {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     String title;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "student")
-
+    String studentName;
+    String studentID;
+    String department;
+    String unit;
+    String school;
+    String year;
+    List <String> teacherIds;
     String introduction;
 }
