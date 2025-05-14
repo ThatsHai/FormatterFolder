@@ -11,12 +11,14 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Student {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    String ST_id;
     String className;
     String major;
     String course;
 
-    @Id
-    String ST_id;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "ST_id",referencedColumnName = "AC_id")
     Account account;
