@@ -14,7 +14,9 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
+@PrimaryKeyJoinColumn(name = "acId")
 public class Teacher extends Account {
+    @Column(unique = true)
     String tcId;
     String degree;
     String position;

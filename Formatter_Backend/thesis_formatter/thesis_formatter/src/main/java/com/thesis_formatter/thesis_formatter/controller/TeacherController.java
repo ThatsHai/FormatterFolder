@@ -34,9 +34,9 @@ public class TeacherController {
     public APIResponse<List<Teacher>> getTeachers() {
         return teacherService.getAll();
     }
-//
-//    @GetMapping("teachers/getTeacherByFilters")
-//    public ResponseEntity<?> getTeacherById(@RequestBody TeacherFiltersDTO teacherFiltersDTO) {
-//            return teacherService.findTeacherByFilters(teacherFiltersDTO);
-//    }
+
+    @GetMapping("teachers/getTeacherByFilters")
+    public ResponseEntity<?> getTeacherById(@RequestBody TeacherFiltersDTO teacherFiltersDTO) {
+            return teacherService.findTeacherByFilters(teacherFiltersDTO);
+    }
 }

@@ -13,6 +13,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Inheritance(strategy = InheritanceType.JOINED)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Account {
     @Id
@@ -27,18 +28,13 @@ public class Account {
     String email;
     String avatar;
     String Status;
-    @OneToOne(mappedBy = "account",cascade = CascadeType.ALL)
-    Student student;
-
-    @OneToOne(mappedBy = "account",cascade = CascadeType.ALL)
-    Teacher teacher;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "faculty", referencedColumnName = "facultyId")
+    @JoinColumn(name = "facultyId", referencedColumnName = "facultyId")
     Faculty faculty;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "department", referencedColumnName = "DP_id")
+    @JoinColumn(name = "departmentId", referencedColumnName = "departmentId")
     Department department;
 
 }

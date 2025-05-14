@@ -18,10 +18,10 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Department {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String DP_id;
-    String DP_name;
+//    @GeneratedValue(strategy = GenerationType.UUID)
+    String departmentId;
+    String departmentName;
 
-    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
-    List<Account> accounts = new ArrayList<>();
+//    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
+//    List<Account> accounts = new ArrayList<>();
 }

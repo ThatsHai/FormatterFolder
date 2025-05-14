@@ -1,6 +1,10 @@
 package com.thesis_formatter.thesis_formatter.service;
 
+import com.thesis_formatter.thesis_formatter.entity.Department;
+import com.thesis_formatter.thesis_formatter.entity.Faculty;
 import com.thesis_formatter.thesis_formatter.entity.Student;
+import com.thesis_formatter.thesis_formatter.repo.DepartmentRepo;
+import com.thesis_formatter.thesis_formatter.repo.FacultyRepo;
 import com.thesis_formatter.thesis_formatter.repo.StudentRepo;
 import com.thesis_formatter.thesis_formatter.response.APIResponse;
 import lombok.AccessLevel;
@@ -16,8 +20,14 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class StudentService {
     StudentRepo studentRepo;
+    FacultyRepo facultyRepo;
+    DepartmentRepo departmentRepo;
 
     public APIResponse<Student> addStudent(Student student) {
+        Faculty faculty = facultyRepo.findByFacultyId(student.getFaculty().getFacultyId());
+        Department department = departmentRepo.findByDepartmentId(student.getDepartment().getDepartmentId());
+        student.setDepartment(department);
+        student.setFaculty(faculty);
         studentRepo.save(student);
         return APIResponse
                 .<Student>builder()
