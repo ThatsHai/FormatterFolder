@@ -23,12 +23,12 @@ public class Form {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     String title;
-    String studentName;
-    String studentID;
-    String department;
-    String unit;
-    String school;
+//    String studentName;
+//    String studentID;
+//    String department;
+//    String unit;
+//    String school;
     String year;
-    List <String> teacherIds;
+//    List <String> teacherIds;
     String introduction;
 }

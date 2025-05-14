@@ -5,21 +5,14 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Entity
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Student {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String ST_id;
+@Data
+public class Student extends Account{
+    String stId;
     String className;
     String major;
     String course;
-
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "ST_id",referencedColumnName = "AC_id")
-    Account account;
 }

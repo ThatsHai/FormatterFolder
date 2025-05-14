@@ -28,6 +28,7 @@ public class FormController {
     @PostMapping("/form/download")
     public APIResponse<?> downloadForm(@RequestBody Form form) {
         System.out.println(form.toString());
+
         return APIResponse.<String>builder()
                 .code("200")
                 .result(form.toString())
