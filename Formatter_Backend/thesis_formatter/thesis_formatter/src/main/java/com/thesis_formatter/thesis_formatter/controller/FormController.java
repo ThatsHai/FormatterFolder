@@ -2,6 +2,7 @@ package com.thesis_formatter.thesis_formatter.controller;
 
 import com.thesis_formatter.thesis_formatter.entity.Form;
 import com.thesis_formatter.thesis_formatter.repo.FormRepo;
+import com.thesis_formatter.thesis_formatter.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.service.FormService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,15 @@ public class FormController {
         System.out.println(form.toString());
         formService.saveForm(form);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/form/download")
+    public APIResponse<?> downloadForm(@RequestBody Form form) {
+        System.out.println(form.toString());
+        return APIResponse.<String>builder()
+                .code("200")
+                .result(form.toString())
+                .build();
     }
 
 }
