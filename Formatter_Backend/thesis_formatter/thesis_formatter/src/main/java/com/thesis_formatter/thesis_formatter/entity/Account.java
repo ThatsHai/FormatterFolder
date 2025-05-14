@@ -27,18 +27,18 @@ public class Account {
     String email;
     String avatar;
     String Status;
-    @OneToOne(mappedBy = "account",cascade = CascadeType.ALL)
-    Student student;
+//    @OneToOne(mappedBy = "account",cascade = CascadeType.ALL)
+//    Student student;
+//
+//    @OneToOne(mappedBy = "account",cascade = CascadeType.ALL)
+//    Teacher teacher;
 
-    @OneToOne(mappedBy = "account",cascade = CascadeType.ALL)
-    Teacher teacher;
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "faculty", referencedColumnName = "facultyId")
-    Faculty faculty;
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "department", referencedColumnName = "DP_id")
-    Department department;
+//    @ManyToOne(cascade = CascadeType.ALL)
+//    @JoinColumn(name = "faculty", referencedColumnName = "facultyId")
+//    Faculty faculty;
+//
+//    @ManyToOne(cascade = CascadeType.ALL)
+//    @JoinColumn(name = "department", referencedColumnName = "DP_id")
+//    Department department;
 
 }

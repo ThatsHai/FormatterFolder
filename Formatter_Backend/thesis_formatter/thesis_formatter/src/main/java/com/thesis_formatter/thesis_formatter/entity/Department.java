@@ -22,6 +22,6 @@ public class Department {
     String DP_id;
     String DP_name;
 
-    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
-    List<Account> accounts = new ArrayList<>();
+//    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
+//    List<Account> accounts = new ArrayList<>();
 }
