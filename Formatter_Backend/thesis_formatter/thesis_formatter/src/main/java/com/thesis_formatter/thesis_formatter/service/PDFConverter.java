@@ -36,7 +36,7 @@ public class PDFConverter {
             int rowSpan,
             int totalColumns
     ) {
-        addCellWithSpanAndDescription(font, table, text, 3, rowSpan, totalColumns, null, null);
+        addCellWithSpanAndDescription(font, table, text, 12, rowSpan, totalColumns, null, null);
     }
 
     public static void addCellWithSpanAndDescription(
@@ -61,7 +61,7 @@ public class PDFConverter {
         mainCell.setHorizontalAlignment(Element.ALIGN_LEFT);
         mainCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         mainCell.setBorderWidth(0.5f);
-        mainCell.setPaddingBottom(2.5f);
+        mainCell.setPaddingBottom(5f);
         if (rowSpan > 1) {
             mainCell.setBorder(Rectangle.LEFT | Rectangle.RIGHT);
         }
@@ -106,7 +106,7 @@ public class PDFConverter {
             Font leftFont,
             Font rightFont,
             PdfPTable table,
-            java.util.List<String> rightTexts,  // Each right cell goes to its own row
+            List<String> rightTexts,
             int totalColumns,
             String leftText,
             String description,
@@ -116,11 +116,11 @@ public class PDFConverter {
             return;
         }
 
-        int leftColSpan = 1;
+        //Basically one-third of full row
+        int leftColSpan = 4;
         int leftRowSpan = rightTexts.size();
         int rightColSpan = totalColumns - leftColSpan;
 
-        // 1. Add the left cell (rowspan)
         Paragraph leftParagraph = new Paragraph();
         leftParagraph.add(new Phrase(leftText, leftFont));
         if (description != null && descriptionFont != null) {
@@ -133,10 +133,11 @@ public class PDFConverter {
         leftCell.setHorizontalAlignment(Element.ALIGN_LEFT);
         leftCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         leftCell.setBorderWidth(0.5f);
-        leftCell.setPaddingBottom(2.5f);
+        leftCell.setPaddingBottom(5f);
         table.addCell(leftCell);
 
-        for (String rightText : rightTexts) {
+        for (int i = 0; i < rightTexts.size(); i++) {
+            String rightText = rightTexts.get(i);
             Paragraph rightParagraph = new Paragraph();
             rightParagraph.add(new Phrase(rightText, rightFont));
             if (description != null && descriptionFont != null) {
@@ -148,7 +149,15 @@ public class PDFConverter {
             rightCell.setHorizontalAlignment(Element.ALIGN_LEFT);
             rightCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
             rightCell.setBorderWidth(0.5f);
-            rightCell.setPaddingBottom(2.5f);
+            rightCell.setPaddingBottom(5f);
+            if (i > 0 && i < rightTexts.size() - 1) {
+                rightCell.setBorder(Rectangle.LEFT | Rectangle.RIGHT);
+            } else if (i == rightTexts.size() - 1) {
+                rightCell.setBorder(Rectangle.LEFT | Rectangle.RIGHT | Rectangle.BOTTOM);
+            } else {
+                rightCell.setBorder(Rectangle.LEFT | Rectangle.RIGHT | Rectangle.TOP);
+            }
+
             table.addCell(rightCell);
         }
     }
@@ -177,44 +186,61 @@ public class PDFConverter {
         Font unicodeFontItalic = new Font(unicodeBaseFont, 13, Font.ITALIC, BaseColor.BLACK);
 
         printTitle(unicodeFontBold, document, "ĐỀ CƯƠNG LUẬN VĂN LUẬN ÁN");
-        PdfPTable table = new PdfPTable(3);
+        int totalTableColumns = 12;
+        int fullRow = totalTableColumns;
+        int oneThird = totalTableColumns / 3;
+        int half = totalTableColumns / 2;
+        PdfPTable table = new PdfPTable(totalTableColumns);
 
         table.setWidthPercentage(100);
 
-        addCellWithSpanAndDescription(unicodeFontBold, table, " 1. TÊN ĐỀ TÀI", 3, 1, 3, " (Không quá ... từ):", unicodeFont);
-        addCellWithColSpan(unicodeFontItalic, table, " Điền tên đề tài tại đây", 3, 3);
+        addCellWithSpanAndDescription(unicodeFontBold, table, " 1. TÊN ĐỀ TÀI", fullRow, 1, totalTableColumns, " (Không quá ... từ):", unicodeFont);
+        addCellWithColSpan(unicodeFontItalic, table, " Điền tên đề tài tại đây", fullRow, totalTableColumns);
 
-        addCellWithColSpan(unicodeFontBold, table, " 2. NGƯỜI THỰC HIỆN", 3, 3);
-        addCellWithColSpan(unicodeFont, table, " - Tên sinh viên", 1, 3);
-        addCellWithColSpan(unicodeFont, table, " - Khóa (Mã số sinh viên)", 1, 3);
-        addCellWithColSpan(unicodeFont, table, " - Ngành:", 1, 3);
-        addCellWithColSpan(unicodeFont, table, " - Đơn vị (Khoa/Bộ môn)", 1, 3);
-        addCellWithColSpan(unicodeFont, table, " - Khoa/Trường", 1, 3);
-        addCellWithColSpan(unicodeFont, table, " - Năm", 1, 3);
+        addCellWithColSpan(unicodeFontBold, table, " 2. NGƯỜI THỰC HIỆN", oneThird, totalTableColumns);
+        addCellWithColSpan(unicodeFont, table, " - Tên sinh viên", oneThird, totalTableColumns);
+        addCellWithColSpan(unicodeFont, table, " - Khóa (Mã số sinh viên)", oneThird, totalTableColumns);
+        addCellWithColSpan(unicodeFont, table, " - Ngành:", oneThird, totalTableColumns);
+        addCellWithColSpan(unicodeFont, table, " - Đơn vị (Khoa/Bộ môn)", oneThird, totalTableColumns);
+        addCellWithColSpan(unicodeFont, table, " - Khoa/Trường", oneThird, totalTableColumns);
+        addCellWithColSpan(unicodeFont, table, " - Năm", oneThird, totalTableColumns);
 
 
         List<String> names = Arrays.asList("GVHD 1", "GVHD 2");
         addLeftRowspanAndRightColspanCells(unicodeFontBold, unicodeFont, table,
                 Arrays.asList("1. GVHD", "2. GVHD"),
-                3, " 3. CÁN BỘ HƯỚNG DẪN", null, null);
+                totalTableColumns, " 3. CÁN BỘ HƯỚNG DẪN", null, null);
 
-        addCellWithColSpan(unicodeFontBold, table, " 4. GIỚI THIỆU", 3, 3);
-        addCellWithColSpan(unicodeFontItalic, table, " Điền hay copy dán vào đây", 3, 3);
+        addCellWithColSpan(unicodeFontBold, table, " 4. GIỚI THIỆU", fullRow, totalTableColumns);
+        addCellWithColSpan(unicodeFontItalic, table, " Điền hay copy dán vào đây", fullRow, totalTableColumns);
 
-        addCellWithColSpan(unicodeFontBold, table, " 5. MỤC TIÊU CỦA ĐỀ TÀI", 3, 3);
-        addCellWithColSpan(unicodeFont, table, " 5.1 Mục tiêu tổng quát nếu có", 3, 3);
-        addCellWithColSpan(unicodeFontBold, table, "\u00A0", 3, 3);
-        addCellWithColSpan(unicodeFont, table, " 5.2 Mục tiêu cụ thể (liệt kê không quá 3 mục tiêu)", 3, 3);
-        addCellWithRowSpan(unicodeFont, table, "\u00A0", 3, 3);
+        addCellWithColSpan(unicodeFontBold, table, " 5. MỤC TIÊU CỦA ĐỀ TÀI", fullRow, totalTableColumns);
+        addCellWithColSpan(unicodeFont, table, " 5.1 Mục tiêu tổng quát (nếu có)", fullRow, totalTableColumns);
+        addCellWithColSpan(unicodeFontBold, table, "\u00A0", fullRow, totalTableColumns);
+        addCellWithSpanAndDescription(unicodeFont, table, " 5.2 Mục tiêu cụ thể", fullRow, 1, totalTableColumns, " (liệt kê không quá 3 mục tiêu)", unicodeFontItalic);
+        addCellWithRowSpan(unicodeFont, table, "\u00A0", fullRow, totalTableColumns);
 
-        addCellWithSpanAndDescription(unicodeFontBold, table, " 6. LƯỢC KHẢO TÀI LIỆU", 3, 1, 3, " (Không quá 5 trang)", unicodeFont);
-        addCellWithRowSpan(unicodeFont, table, " \u00A0", 7, 3);
+        addCellWithSpanAndDescription(unicodeFontBold, table, " 6. LƯỢC KHẢO TÀI LIỆU", fullRow, 1, totalTableColumns, " (Không quá 5 trang)", unicodeFontItalic);
+        addCellWithRowSpan(unicodeFont, table, " \u00A0", 7, totalTableColumns);
 
-        addCellWithSpanAndDescription(unicodeFontBold, table, " 7. PHƯƠNG PHÁP NGHIÊN CỨU", 3, 1, 3, " (Không quá 5 trang)", unicodeFont);
-        addCellWithRowSpan(unicodeFont, table, " \u00A0", 3, 3);
+        addCellWithColSpan(unicodeFontBold, table, " 7. PHƯƠNG PHÁP NGHIÊN CỨU", fullRow, totalTableColumns);
+        addCellWithRowSpan(unicodeFont, table, " \u00A0", 3, totalTableColumns);
 
-        addCellWithSpanAndDescription(unicodeFontBold, table, " 8. KẾ HOẠCH THỰC HIỆN", 3, 1, 3, " (Không quá 5 trang)", unicodeFont);
-        addCellWithRowSpan(unicodeFont, table, " \u00A0", 3, 3);
+        addCellWithColSpan(unicodeFontBold, table, " 8. KẾ HOẠCH THỰC HIỆN", fullRow, totalTableColumns);
+        addCellWithRowSpan(unicodeFont, table, " \u00A0", 3, totalTableColumns);
+
+        addCellWithColSpan(unicodeFontBold, table, " 9. DỰ TOÁN KINH PHÍ", fullRow, totalTableColumns);
+        addCellWithRowSpan(unicodeFont, table, " \u00A0", 3, totalTableColumns);
+
+        addCellWithColSpan(unicodeFontBold, table, " 10. TÀI LIỆU THAM KHẢO", fullRow, totalTableColumns);
+        addCellWithRowSpan(unicodeFont, table, " \u00A0", 3, totalTableColumns);
+
+        addCellWithColSpan(unicodeFontBold, table, " 11. PHÊ DUYỆT", fullRow, totalTableColumns);
+        addCellWithColSpan(unicodeFont, table, " Cán bộ hướng dẫn", half, half);
+        addCellWithColSpan(unicodeFont, table, " Người thực hiện", half, half);
+        addCellWithColSpan(unicodeFont, table, " \u00A0", half, half);
+        addCellWithColSpan(unicodeFont, table, " \u00A0", half, half);
+
 
         document.add(table);
 
