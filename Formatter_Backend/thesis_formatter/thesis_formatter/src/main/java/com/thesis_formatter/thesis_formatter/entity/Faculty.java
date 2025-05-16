@@ -21,8 +21,5 @@ public class Faculty {
     String facultyId;
     String facultyName;
 
-//    @OneToMany(mappedBy = "faculty", cascade = CascadeType.ALL)
-//    List<Account> accounts = new ArrayList<>();
 
-    //Chưa liên kết giữa khoa và bộ môn
 }

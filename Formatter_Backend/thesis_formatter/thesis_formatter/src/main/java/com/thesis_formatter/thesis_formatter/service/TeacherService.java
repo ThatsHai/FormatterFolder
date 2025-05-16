@@ -23,14 +23,11 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TeacherService {
     TeacherRepo teacherRepo;
-    FacultyRepo facultyRepo;
     DepartmentRepo departmentRepo;
 
     public APIResponse<Teacher> addTeacher(Teacher teacher) {
-        Faculty faculty = facultyRepo.findByFacultyId(teacher.getFaculty().getFacultyId());
         Department department = departmentRepo.findByDepartmentId(teacher.getDepartment().getDepartmentId());
         teacher.setDepartment(department);
-        teacher.setFaculty(faculty);
         teacherRepo.save(teacher);
         return APIResponse
                 .<Teacher>builder()

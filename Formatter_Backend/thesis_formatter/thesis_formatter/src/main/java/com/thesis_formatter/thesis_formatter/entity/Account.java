@@ -28,10 +28,10 @@ public class Account {
     String email;
     String avatar;
     String Status;
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "facultyId", referencedColumnName = "facultyId")
-    Faculty faculty;
+//
+//    @ManyToOne(cascade = CascadeType.ALL)
+//    @JoinColumn(name = "facultyId", referencedColumnName = "facultyId")
+//    Faculty faculty;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "departmentId", referencedColumnName = "departmentId")

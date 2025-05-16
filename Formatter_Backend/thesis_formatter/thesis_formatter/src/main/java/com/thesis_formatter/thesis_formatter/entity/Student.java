@@ -1,5 +1,6 @@
 package com.thesis_formatter.thesis_formatter.entity;
 
+import com.thesis_formatter.thesis_formatter.enums.EducationLevel;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -17,4 +18,7 @@ public class Student extends Account{
     String className;
     String major;
     String course;
+
+    @Enumerated(EnumType.STRING)
+    EducationLevel educationLevel;
 }
