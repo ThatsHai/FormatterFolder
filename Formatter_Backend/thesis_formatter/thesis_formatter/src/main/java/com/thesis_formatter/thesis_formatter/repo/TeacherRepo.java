@@ -12,7 +12,7 @@ import java.util.List;
 public interface TeacherRepo extends JpaRepository<Teacher, String> {
 
     @Query("SELECT t FROM Teacher t WHERE t.department.departmentName = :departmentName " +
-            "AND t.faculty.facultyName = :faculty AND t.name = :teacherName " +
+            "AND t.department.faculty.facultyName = :faculty AND t.name = :teacherName " +
             "AND t.tcId= :teacherId")
     Teacher findTeachersByFilters(@Param("faculty") String faculty,
                                   @Param("departmentName") String departmentName,

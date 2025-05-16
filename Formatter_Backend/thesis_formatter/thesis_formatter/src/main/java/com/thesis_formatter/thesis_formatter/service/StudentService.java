@@ -20,14 +20,12 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class StudentService {
     StudentRepo studentRepo;
-    FacultyRepo facultyRepo;
+
     DepartmentRepo departmentRepo;
 
     public APIResponse<Student> addStudent(Student student) {
-        Faculty faculty = facultyRepo.findByFacultyId(student.getFaculty().getFacultyId());
         Department department = departmentRepo.findByDepartmentId(student.getDepartment().getDepartmentId());
         student.setDepartment(department);
-        student.setFaculty(faculty);
         studentRepo.save(student);
         return APIResponse
                 .<Student>builder()

@@ -22,6 +22,7 @@ public class Department {
     String departmentId;
     String departmentName;
 
-//    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
-//    List<Account> accounts = new ArrayList<>();
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "facultyId",referencedColumnName = "facultyId")
+    Faculty faculty;
 }
