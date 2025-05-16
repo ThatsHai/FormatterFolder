@@ -10,6 +10,7 @@ import com.thesis_formatter.thesis_formatter.response.APIResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -66,4 +67,10 @@ public class FormService {
                 .build();
     }
 
+    public APIResponse<Form> downloadForm(Form form) {
+        return APIResponse.<Form>builder()
+                .code("200")
+                .result(form)
+                .build();
+    }
 }
