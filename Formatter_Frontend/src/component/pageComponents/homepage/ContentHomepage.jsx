@@ -1,20 +1,28 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ThesisCard from "../../ThesisCard";
 import PropTypes from "prop-types";
+import api from "../../../services/api";
 
-const ContentHomepage = ({ year = new Date().getFullYear() }) => {
-  const [thesisList, setThesisList] = useState([
-    {
-      title: "De tai A",
-      introduction: "Gioi thieu ve nhung thong tin lien quan den de tai A",
-      status: "Đã duyệt",
-    },
-    {
-      title: "De tai B",
-      introduction: "Gioi thieu",
-      status: "Chưa duyệt",
-    },
-  ]);
+const ContentHomepage = ({
+  year = new Date().getFullYear(),
+  refreshTrigger,
+}) => {
+  const [thesisList, setThesisList] = useState([]);
+
+  useEffect(() => {
+    const result = async () => {
+      const result = await api.get("/form");
+      setThesisList(result.data.result);
+      console.log(result);
+    };
+    result();
+  }, [refreshTrigger]);
+
+  if (!thesisList) {
+    <div className="bg-lightGray m-5 p-6 rounded-md">
+      <p className="mb-3 text-2xl">Năm {year}</p>
+    </div>;
+  }
 
   return (
     <div className="bg-lightGray m-5 p-6 rounded-md">
@@ -37,4 +45,5 @@ export default ContentHomepage;
 
 ContentHomepage.propTypes = {
   year: PropTypes.number,
-}
+  refreshTrigger: PropTypes.number,
+};

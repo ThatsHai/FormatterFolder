@@ -1,6 +1,7 @@
 package com.thesis_formatter.thesis_formatter.entity;
 
 
+import com.thesis_formatter.thesis_formatter.enums.FormStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -27,16 +28,17 @@ public class Form {
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
-        name = "teacher_form_map",
+            name = "teacher_form_map",
             joinColumns = @JoinColumn(
-                name = "formId",
-                referencedColumnName = "formId"
-            ),inverseJoinColumns = @JoinColumn(
-                name = "tcId",
-                referencedColumnName = "tcId"
-
-            )
+                    name = "formId",
+                    referencedColumnName = "formId"
+            ), inverseJoinColumns = @JoinColumn(
+            name = "tcId",
+            referencedColumnName = "tcId"
     )
-    List <Teacher> teachers;
+    )
+    List<Teacher> teachers;
     String introduction;
+    @Enumerated(EnumType.STRING)
+    FormStatus status = FormStatus.WAITING;
 }

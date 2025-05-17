@@ -16,16 +16,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@CrossOrigin
 public class FormController {
     FormService formService;
 
     @PostMapping("/form/submit")
     public APIResponse<Form> submitForm(@RequestBody Form form) {
-//        System.out.println(form.toString());
-       return formService.saveForm(form);
-
-
+        return formService.saveForm(form);
     }
+
     @GetMapping("/form")
     public APIResponse<?> getAllForm() {
         return formService.getAllForms();

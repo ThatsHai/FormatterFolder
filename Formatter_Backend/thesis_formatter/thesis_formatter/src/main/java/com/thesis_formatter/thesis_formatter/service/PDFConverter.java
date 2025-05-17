@@ -197,7 +197,7 @@ public class PDFConverter {
         addCellWithSpanAndDescription(unicodeFontBold, table, " 1. TÊN ĐỀ TÀI", fullRow, 1, totalTableColumns, " (Không quá ... từ):", unicodeFont);
         addCellWithColSpan(unicodeFontItalic, table, " Điền tên đề tài tại đây", fullRow, totalTableColumns);
 
-        addCellWithColSpan(unicodeFontBold, table, " 2. NGƯỜI THỰC HIỆN", oneThird, totalTableColumns);
+        addCellWithColSpan(unicodeFontBold, table, " 2. NGƯỜI THỰC HIỆN", fullRow, totalTableColumns);
         addCellWithColSpan(unicodeFont, table, " - Tên sinh viên", oneThird, totalTableColumns);
         addCellWithColSpan(unicodeFont, table, " - Khóa (Mã số sinh viên)", oneThird, totalTableColumns);
         addCellWithColSpan(unicodeFont, table, " - Ngành:", oneThird, totalTableColumns);
