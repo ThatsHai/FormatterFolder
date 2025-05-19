@@ -1,6 +1,8 @@
 package com.thesis_formatter.thesis_formatter.controller;
 
 import com.thesis_formatter.thesis_formatter.entity.Form;
+import com.thesis_formatter.thesis_formatter.entity.FormField;
+import com.thesis_formatter.thesis_formatter.entity.FormRecord;
 import com.thesis_formatter.thesis_formatter.entity.Teacher;
 import com.thesis_formatter.thesis_formatter.repo.FormRepo;
 import com.thesis_formatter.thesis_formatter.response.APIResponse;
@@ -12,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping
 @RequiredArgsConstructor
@@ -20,10 +24,10 @@ import org.springframework.web.bind.annotation.*;
 public class FormController {
     FormService formService;
 
-    @PostMapping("/form/submit")
-    public APIResponse<Form> submitForm(@RequestBody Form form) {
-        return formService.saveForm(form);
-    }
+//    @PostMapping("/form/submit")
+//    public APIResponse<Form> submitForm(@RequestBody Form form) {
+//        return formService.saveForm(form);
+//    }
 
     @GetMapping("/form")
     public APIResponse<?> getAllForm() {
@@ -44,5 +48,15 @@ public class FormController {
     @PostMapping("/form/download")
     public APIResponse<Form> downloadForm(@RequestBody Form form) {
         return formService.downloadForm(form);
+    }
+
+    @PostMapping("/form/create")
+    public APIResponse<Form> createForm(@RequestBody Form form) {
+        return formService.createForm(form);
+    }
+
+    @PostMapping("/form/submit")
+    public APIResponse<FormRecord> submitForm(@RequestBody FormRecord formRecord) {
+        return formService.submitForm(formRecord);
     }
 }
