@@ -22,21 +22,21 @@ public class Form {
     String title;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "studentId", referencedColumnName = "stId")
+    @JoinColumn(name = "studentId", referencedColumnName = "userId")
     Student student;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
-        name = "teacher_form_map",
+            name = "teacher_form_map",
             joinColumns = @JoinColumn(
-                name = "formId",
-                referencedColumnName = "formId"
-            ),inverseJoinColumns = @JoinColumn(
-                name = "tcId",
-                referencedColumnName = "tcId"
+                    name = "formId",
+                    referencedColumnName = "formId"
+            ), inverseJoinColumns = @JoinColumn(
+            name = "teacherId",
+            referencedColumnName = "userId"
 
-            )
     )
-    List <Teacher> teachers;
+    )
+    List<Teacher> teachers;
     String introduction;
 }

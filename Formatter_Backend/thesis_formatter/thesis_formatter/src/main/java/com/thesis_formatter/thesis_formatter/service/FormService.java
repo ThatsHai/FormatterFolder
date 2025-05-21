@@ -6,11 +6,10 @@ import com.thesis_formatter.thesis_formatter.entity.Teacher;
 import com.thesis_formatter.thesis_formatter.repo.FormRepo;
 import com.thesis_formatter.thesis_formatter.repo.StudentRepo;
 import com.thesis_formatter.thesis_formatter.repo.TeacherRepo;
-import com.thesis_formatter.thesis_formatter.response.APIResponse;
+import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,12 +24,12 @@ public class FormService {
     TeacherRepo teacherRepo;
 
     public APIResponse<Form> saveForm(Form form) {
-        Student student = studentRepo.findByStId(form.getStudent().getStId());
+        Student student = studentRepo.findByUserId(form.getStudent().getUserId());
 
-        List <Teacher> teachers = new ArrayList<>();
-        for (Teacher teacher : form.getTeachers()){
-            Teacher existingTeacher = teacherRepo.findByTcId(teacher.getTcId());
-            if (existingTeacher != null){
+        List<Teacher> teachers = new ArrayList<>();
+        for (Teacher teacher : form.getTeachers()) {
+            Teacher existingTeacher = teacherRepo.findByUserId(teacher.getUserId());
+            if (existingTeacher != null) {
                 teachers.add(existingTeacher);
             }
         }
@@ -44,7 +43,7 @@ public class FormService {
     }
 
     public APIResponse<List<Form>> getAllForms() {
-        List <Form>  forms = formRepo.findAll();
+        List<Form> forms = formRepo.findAll();
         return APIResponse.<List<Form>>builder()
                 .code("200")
                 .result(forms)
@@ -52,7 +51,7 @@ public class FormService {
     }
 
     public APIResponse<List<Form>> getFormByTeacherId(String id) {
-        List <Form>  forms = formRepo.findByTeachers_TcId(id);
+        List<Form> forms = formRepo.findByTeachers_UserId(id);
         return APIResponse.<List<Form>>builder()
                 .code("200")
                 .result(forms)
@@ -60,7 +59,7 @@ public class FormService {
     }
 
     public APIResponse<List<Form>> getFormByStudentId(String id) {
-        List <Form>  forms = formRepo.findByStudent_StId(id);
+        List<Form> forms = formRepo.findByStudent_UserId(id);
         return APIResponse.<List<Form>>builder()
                 .code("200")
                 .result(forms)

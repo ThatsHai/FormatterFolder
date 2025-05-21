@@ -16,8 +16,8 @@ import lombok.experimental.FieldDefaults;
 @Data
 @PrimaryKeyJoinColumn(name = "acId")
 public class Teacher extends Account {
-    @Column(unique = true)
-    String tcId;
+    //    @Column(unique = true)
+//    String tcId;
     String degree;
     String position;
 

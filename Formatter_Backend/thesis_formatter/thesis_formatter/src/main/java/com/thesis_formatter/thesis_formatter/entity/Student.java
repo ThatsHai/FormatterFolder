@@ -12,9 +12,9 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
 @PrimaryKeyJoinColumn(name = "acId")
-public class Student extends Account{
-    @Column(unique = true)
-    String stId;
+public class Student extends Account {
+    //    @Column(unique = true)
+//    String stId;
     String className;
     String major;
     String course;

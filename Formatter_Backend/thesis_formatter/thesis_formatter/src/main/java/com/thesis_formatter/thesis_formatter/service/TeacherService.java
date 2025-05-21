@@ -3,12 +3,10 @@ package com.thesis_formatter.thesis_formatter.service;
 import com.thesis_formatter.thesis_formatter.dto.request.TeacherFiltersDTO;
 import com.thesis_formatter.thesis_formatter.dto.response.TeacherFiltersReponseDTO;
 import com.thesis_formatter.thesis_formatter.entity.Department;
-import com.thesis_formatter.thesis_formatter.entity.Faculty;
 import com.thesis_formatter.thesis_formatter.entity.Teacher;
 import com.thesis_formatter.thesis_formatter.repo.DepartmentRepo;
-import com.thesis_formatter.thesis_formatter.repo.FacultyRepo;
 import com.thesis_formatter.thesis_formatter.repo.TeacherRepo;
-import com.thesis_formatter.thesis_formatter.response.APIResponse;
+import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,10 +22,12 @@ import java.util.List;
 public class TeacherService {
     TeacherRepo teacherRepo;
     DepartmentRepo departmentRepo;
+    AuthenticationService authenticationService;
 
     public APIResponse<Teacher> addTeacher(Teacher teacher) {
         Department department = departmentRepo.findByDepartmentId(teacher.getDepartment().getDepartmentId());
         teacher.setDepartment(department);
+        authenticationService.encodePassword(teacher);
         teacherRepo.save(teacher);
         return APIResponse
                 .<Teacher>builder()
@@ -45,7 +45,7 @@ public class TeacherService {
     }
 
     public ResponseEntity<?> findTeacherByFilters(TeacherFiltersDTO teacherFiltersDTO) {
-        try{
+        try {
             String faculty = teacherFiltersDTO.faculty();
             String departmentName = teacherFiltersDTO.departmentName();
             String teacherName = teacherFiltersDTO.teacherName();
@@ -56,14 +56,15 @@ public class TeacherService {
             }
             TeacherFiltersReponseDTO teacherFiltersReponseDTO = convertTeacherToTeacherFiltersReponseDTO(teacher);
             return ResponseEntity.status(HttpStatus.OK).body(teacherFiltersReponseDTO);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
     private TeacherFiltersReponseDTO convertTeacherToTeacherFiltersReponseDTO(Teacher teacher) {
         return new TeacherFiltersReponseDTO(
-                teacher.getTcId(),
+                teacher.getUserId(),
                 teacher.getName()
         );
     }
