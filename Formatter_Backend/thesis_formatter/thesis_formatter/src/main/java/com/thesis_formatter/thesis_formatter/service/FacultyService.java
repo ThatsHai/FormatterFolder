@@ -20,6 +20,7 @@ public class FacultyService {
         facultyRepo.save(faculty);
         return APIResponse
                 .<Faculty>builder()
+                .code("200")
                 .result(faculty)
                 .build();
     }
@@ -27,6 +28,7 @@ public class FacultyService {
     public APIResponse<List<Faculty>> getAll() {
         List<Faculty> faculties = facultyRepo.findAll();
         return APIResponse.<List<Faculty>>builder()
+                .code("200")
                 .result(faculties)
                 .build();
     }
