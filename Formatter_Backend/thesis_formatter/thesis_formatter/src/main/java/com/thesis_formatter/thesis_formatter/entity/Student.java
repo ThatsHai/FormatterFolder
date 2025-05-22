@@ -8,7 +8,6 @@ import lombok.experimental.FieldDefaults;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
 @PrimaryKeyJoinColumn(name = "acId")

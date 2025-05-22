@@ -2,13 +2,13 @@ package com.thesis_formatter.thesis_formatter.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.util.Set;
+
+@Builder
 @Entity
 @Data
 @NoArgsConstructor
@@ -30,6 +30,7 @@ public class Account {
     String email;
     String avatar;
     String Status;
+    Set<String> roles;
 //
 //    @ManyToOne(cascade = CascadeType.ALL)
 //    @JoinColumn(name = "facultyId", referencedColumnName = "facultyId")
