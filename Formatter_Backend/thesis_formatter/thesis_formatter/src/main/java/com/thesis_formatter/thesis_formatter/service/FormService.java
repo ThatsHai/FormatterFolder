@@ -58,13 +58,13 @@ public class FormService {
                 .build();
     }
 
-    public APIResponse<List<Form>> getFormByStudentId(String id) {
-        List<Form> forms = formRepo.findByStudent_StId(id);
-        return APIResponse.<List<Form>>builder()
-                .code("200")
-                .result(forms)
-                .build();
-    }
+//    public APIResponse<List<Form>> getFormByStudentId(String id) {
+//        List<Form> forms = formRepo.findByStudent_StId(id);
+//        return APIResponse.<List<Form>>builder()
+//                .code("200")
+//                .result(forms)
+//                .build();
+//    }
 
     public APIResponse<Form> downloadForm(Form form) {
         return APIResponse.<Form>builder()

@@ -39,10 +39,10 @@ public class FormController {
         return formService.getFormByTeacherId(teacherId);
     }
 
-    @GetMapping("/form/student/{studentId}")
-    public APIResponse<?> getFormByStudentId(@PathVariable String studentId) {
-        return formService.getFormByStudentId(studentId);
-    }
+//    @GetMapping("/form/student/{studentId}")
+//    public APIResponse<?> getFormByStudentId(@PathVariable String studentId) {
+//        return formService.getFormByStudentId(studentId);
+//    }
 
 
     @PostMapping("/form/download")

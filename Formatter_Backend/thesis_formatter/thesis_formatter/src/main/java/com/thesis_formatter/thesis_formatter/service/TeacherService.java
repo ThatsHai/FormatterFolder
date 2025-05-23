@@ -1,10 +1,12 @@
 package com.thesis_formatter.thesis_formatter.service;
 
 import com.thesis_formatter.thesis_formatter.dto.request.TeacherFiltersDTO;
+import com.thesis_formatter.thesis_formatter.dto.response.TeacherDTO;
 import com.thesis_formatter.thesis_formatter.dto.response.TeacherFiltersReponseDTO;
 import com.thesis_formatter.thesis_formatter.entity.Department;
 import com.thesis_formatter.thesis_formatter.entity.Faculty;
 import com.thesis_formatter.thesis_formatter.entity.Teacher;
+import com.thesis_formatter.thesis_formatter.mapper.TeacherMapper;
 import com.thesis_formatter.thesis_formatter.repo.DepartmentRepo;
 import com.thesis_formatter.thesis_formatter.repo.FacultyRepo;
 import com.thesis_formatter.thesis_formatter.repo.TeacherRepo;
@@ -16,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -24,6 +27,7 @@ import java.util.List;
 public class TeacherService {
     TeacherRepo teacherRepo;
     DepartmentRepo departmentRepo;
+    private final TeacherMapper teacherMapper;
 
     public APIResponse<Teacher> addTeacher(Teacher teacher) {
         Department department = departmentRepo.findByDepartmentId(teacher.getDepartment().getDepartmentId());
@@ -36,16 +40,21 @@ public class TeacherService {
                 .build();
     }
 
-    public APIResponse<List<Teacher>> getAll() {
+    public APIResponse<List<TeacherDTO>> getAll() {
         List<Teacher> teachers = teacherRepo.findAll();
-        return APIResponse.<List<Teacher>>builder()
+        List<TeacherDTO> teacherDTOs = new ArrayList<>();
+        for (Teacher teacher : teachers) {
+            TeacherDTO dto = teacherMapper.toDTO(teacher);
+            teacherDTOs.add(dto);
+        }
+        return APIResponse.<List<TeacherDTO>>builder()
                 .code("200")
-                .result(teachers)
+                .result(teacherDTOs)
                 .build();
     }
 
     public ResponseEntity<?> findTeacherByFilters(TeacherFiltersDTO teacherFiltersDTO) {
-        try{
+        try {
             String faculty = teacherFiltersDTO.faculty();
             String departmentName = teacherFiltersDTO.departmentName();
             String teacherName = teacherFiltersDTO.teacherName();
@@ -56,11 +65,12 @@ public class TeacherService {
             }
             TeacherFiltersReponseDTO teacherFiltersReponseDTO = convertTeacherToTeacherFiltersReponseDTO(teacher);
             return ResponseEntity.status(HttpStatus.OK).body(teacherFiltersReponseDTO);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
     private TeacherFiltersReponseDTO convertTeacherToTeacherFiltersReponseDTO(Teacher teacher) {
         return new TeacherFiltersReponseDTO(
                 teacher.getTcId(),

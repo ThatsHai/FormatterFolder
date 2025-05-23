@@ -1,6 +1,7 @@
 package com.thesis_formatter.thesis_formatter.controller;
 
 import com.thesis_formatter.thesis_formatter.dto.request.TeacherFiltersDTO;
+import com.thesis_formatter.thesis_formatter.dto.response.TeacherDTO;
 import com.thesis_formatter.thesis_formatter.dto.response.TeacherFiltersReponseDTO;
 import com.thesis_formatter.thesis_formatter.entity.Account;
 import com.thesis_formatter.thesis_formatter.entity.Teacher;
@@ -30,13 +31,13 @@ public class TeacherController {
         return teacherService.addTeacher(teacher);
     }
 
-    @GetMapping("/teacher")
-    public APIResponse<List<Teacher>> getTeachers() {
+    @GetMapping("/teachers")
+    public APIResponse<List<TeacherDTO>> getTeachers() {
         return teacherService.getAll();
     }
 
     @GetMapping("teachers/getTeacherByFilters")
     public ResponseEntity<?> getTeacherById(@RequestBody TeacherFiltersDTO teacherFiltersDTO) {
-            return teacherService.findTeacherByFilters(teacherFiltersDTO);
+        return teacherService.findTeacherByFilters(teacherFiltersDTO);
     }
 }

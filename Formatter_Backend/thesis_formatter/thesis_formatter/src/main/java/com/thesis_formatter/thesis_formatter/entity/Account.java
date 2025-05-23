@@ -18,7 +18,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    String AC_id;
+    String acId;
     String password;
     String name;
     String dateOfBirth;
@@ -27,8 +27,8 @@ public class Account {
     String phoneNumber;
     String email;
     String avatar;
-    String Status;
-//
+    String status;
+
 //    @ManyToOne(cascade = CascadeType.ALL)
 //    @JoinColumn(name = "facultyId", referencedColumnName = "facultyId")
 //    Faculty faculty;
