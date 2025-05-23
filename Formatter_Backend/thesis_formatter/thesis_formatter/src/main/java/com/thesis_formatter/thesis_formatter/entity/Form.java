@@ -4,10 +4,7 @@ package com.thesis_formatter.thesis_formatter.entity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.thesis_formatter.thesis_formatter.enums.FormStatus;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.List;
@@ -17,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder
 public class Form {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -34,8 +32,9 @@ public class Form {
                     name = "formId",
                     referencedColumnName = "formId"
             ), inverseJoinColumns = @JoinColumn(
-            name = "tcId",
-            referencedColumnName = "tcId"
+            name = "teacherId",
+            referencedColumnName = "userId"
+
     )
     )
     List<Teacher> teachers;

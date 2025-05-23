@@ -1,9 +1,7 @@
 package com.thesis_formatter.thesis_formatter.controller;
 
 import com.thesis_formatter.thesis_formatter.entity.Department;
-import com.thesis_formatter.thesis_formatter.entity.Faculty;
-import com.thesis_formatter.thesis_formatter.repo.DepartmentRepo;
-import com.thesis_formatter.thesis_formatter.response.APIResponse;
+import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.service.DepartmentService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

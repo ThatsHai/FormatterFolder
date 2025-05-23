@@ -4,13 +4,12 @@ import com.thesis_formatter.thesis_formatter.dto.request.TeacherFiltersDTO;
 import com.thesis_formatter.thesis_formatter.dto.response.TeacherDTO;
 import com.thesis_formatter.thesis_formatter.dto.response.TeacherFiltersReponseDTO;
 import com.thesis_formatter.thesis_formatter.entity.Department;
-import com.thesis_formatter.thesis_formatter.entity.Faculty;
 import com.thesis_formatter.thesis_formatter.entity.Teacher;
 import com.thesis_formatter.thesis_formatter.mapper.TeacherMapper;
+import com.thesis_formatter.thesis_formatter.enums.Role;
 import com.thesis_formatter.thesis_formatter.repo.DepartmentRepo;
-import com.thesis_formatter.thesis_formatter.repo.FacultyRepo;
 import com.thesis_formatter.thesis_formatter.repo.TeacherRepo;
-import com.thesis_formatter.thesis_formatter.response.APIResponse;
+import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -19,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -28,10 +28,15 @@ public class TeacherService {
     TeacherRepo teacherRepo;
     DepartmentRepo departmentRepo;
     private final TeacherMapper teacherMapper;
+    AuthenticationService authenticationService;
 
     public APIResponse<Teacher> addTeacher(Teacher teacher) {
         Department department = departmentRepo.findByDepartmentId(teacher.getDepartment().getDepartmentId());
         teacher.setDepartment(department);
+        authenticationService.encodePassword(teacher);
+        HashSet<String> roles = new HashSet<>();
+        roles.add(Role.USER.name());
+        teacher.setRoles(roles);
         teacherRepo.save(teacher);
         return APIResponse
                 .<Teacher>builder()
@@ -73,7 +78,7 @@ public class TeacherService {
 
     private TeacherFiltersReponseDTO convertTeacherToTeacherFiltersReponseDTO(Teacher teacher) {
         return new TeacherFiltersReponseDTO(
-                teacher.getTcId(),
+                teacher.getUserId(),
                 teacher.getName()
         );
     }

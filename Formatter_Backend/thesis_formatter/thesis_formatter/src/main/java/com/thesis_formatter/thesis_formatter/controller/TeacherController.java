@@ -5,13 +5,11 @@ import com.thesis_formatter.thesis_formatter.dto.response.TeacherDTO;
 import com.thesis_formatter.thesis_formatter.dto.response.TeacherFiltersReponseDTO;
 import com.thesis_formatter.thesis_formatter.entity.Account;
 import com.thesis_formatter.thesis_formatter.entity.Teacher;
-import com.thesis_formatter.thesis_formatter.repo.TeacherRepo;
-import com.thesis_formatter.thesis_formatter.response.APIResponse;
+import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.service.TeacherService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

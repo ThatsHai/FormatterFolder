@@ -2,10 +2,9 @@ package com.thesis_formatter.thesis_formatter.service;
 
 import com.thesis_formatter.thesis_formatter.entity.Department;
 import com.thesis_formatter.thesis_formatter.entity.Faculty;
-import com.thesis_formatter.thesis_formatter.entity.Student;
 import com.thesis_formatter.thesis_formatter.repo.DepartmentRepo;
 import com.thesis_formatter.thesis_formatter.repo.FacultyRepo;
-import com.thesis_formatter.thesis_formatter.response.APIResponse;
+import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -19,13 +18,13 @@ import java.util.List;
 public class DepartmentService {
     DepartmentRepo departmentRepo;
     FacultyRepo facultyRepo;
+
     public APIResponse<Department> addDepartment(Department department) {
         Faculty faculty = facultyRepo.findByFacultyId(department.getFaculty().getFacultyId());
         department.setFaculty(faculty);
         departmentRepo.save(department);
         return APIResponse
                 .<Department>builder()
-                .code("200")
                 .result(department)
                 .build();
     }
@@ -33,7 +32,6 @@ public class DepartmentService {
     public APIResponse<List<Department>> getAll() {
         List<Department> departments = departmentRepo.findAll();
         return APIResponse.<List<Department>>builder()
-                .code("200")
                 .result(departments)
                 .build();
     }

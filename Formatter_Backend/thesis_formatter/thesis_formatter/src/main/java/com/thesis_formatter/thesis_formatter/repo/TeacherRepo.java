@@ -13,10 +13,11 @@ public interface TeacherRepo extends JpaRepository<Teacher, String> {
 
     @Query("SELECT t FROM Teacher t WHERE t.department.departmentName = :departmentName " +
             "AND t.department.faculty.facultyName = :faculty AND t.name = :teacherName " +
-            "AND t.tcId= :teacherId")
+            "AND t.userId= :teacherId")
     Teacher findTeachersByFilters(@Param("faculty") String faculty,
                                   @Param("departmentName") String departmentName,
                                   @Param("teacherId") String teacherId,
                                   @Param("teacherName") String teacherName);
-    Teacher findByTcId(String teacherId);
+
+    Teacher findByUserId(String teacherId);
 }

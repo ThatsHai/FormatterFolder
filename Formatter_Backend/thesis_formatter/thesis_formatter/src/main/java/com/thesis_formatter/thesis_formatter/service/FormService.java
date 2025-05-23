@@ -5,7 +5,7 @@ import com.thesis_formatter.thesis_formatter.repo.FormRecordRepo;
 import com.thesis_formatter.thesis_formatter.repo.FormRepo;
 import com.thesis_formatter.thesis_formatter.repo.StudentRepo;
 import com.thesis_formatter.thesis_formatter.repo.TeacherRepo;
-import com.thesis_formatter.thesis_formatter.response.APIResponse;
+import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -51,7 +51,7 @@ public class FormService {
     }
 
     public APIResponse<List<Form>> getFormByTeacherId(String id) {
-        List<Form> forms = formRepo.findByTeachers_TcId(id);
+        List<Form> forms = formRepo.findByTeachers_UserId(id);
         return APIResponse.<List<Form>>builder()
                 .code("200")
                 .result(forms)

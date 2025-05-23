@@ -17,3 +17,6 @@ spring:
       max-request-size: 115MB
 server:
   port: 8080
+jwt:
+  signerKey: "kDnLkIQNLqJ4Bm2AoiGLRQwk4RUUsrfVrT7Q0I3uxMx+/ngrZnKnOeCtIXpcmUF6"
+
