@@ -24,7 +24,7 @@ public class TeacherController {
 
     TeacherService teacherService;
 
-    @PostMapping("/teacher")
+    @PostMapping("/teachers")
     public APIResponse<Teacher> addTeacher(@RequestBody Teacher teacher) {
         return teacherService.addTeacher(teacher);
     }

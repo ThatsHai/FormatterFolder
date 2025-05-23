@@ -9,6 +9,4 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface TeacherMapper {
     TeacherDTO toDTO(Teacher teacher);
-
-    Teacher toEntity(TeacherDTO dto);
 }

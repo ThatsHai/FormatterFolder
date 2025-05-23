@@ -18,12 +18,12 @@ public class DepartmentController {
 
     DepartmentService departmentService;
 
-    @PostMapping("/department")
-    public APIResponse<Department> adDepartment(@RequestBody Department department) {
+    @PostMapping("/departments")
+    public APIResponse<Department> addDepartment(@RequestBody Department department) {
         return departmentService.addDepartment(department);
     }
 
-    @GetMapping("/department")
+    @GetMapping("/departments")
     public APIResponse<List<Department>> getAllDepartments() {
         return departmentService.getAll();
     }

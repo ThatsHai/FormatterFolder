@@ -17,12 +17,12 @@ import java.util.List;
 public class StudentController {
     StudentService studentService;
 
-    @PostMapping("/student")
+    @PostMapping("/students")
     public APIResponse<Student> addStudent(@RequestBody Student student) {
         return studentService.addStudent(student);
     }
 
-    @GetMapping("/student")
+    @GetMapping("/students")
     public APIResponse<List<Student>> getStudents() {
         return studentService.getAll();
     }

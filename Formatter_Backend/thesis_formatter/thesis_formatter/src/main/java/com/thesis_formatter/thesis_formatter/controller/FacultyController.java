@@ -17,12 +17,12 @@ import java.util.List;
 public class FacultyController {
     FacultyService facultyService;
 
-    @PostMapping("/faculty")
+    @PostMapping("/faculties")
     public APIResponse<Faculty> addFaculty(@RequestBody Faculty faculty) {
         return facultyService.addFaculty(faculty);
     }
 
-    @GetMapping("/faculty")
+    @GetMapping("/faculties")
     public APIResponse<List<Faculty>> getFaculty() {
         return facultyService.getAll();
     }

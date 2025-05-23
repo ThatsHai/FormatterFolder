@@ -50,13 +50,13 @@ public class FormService {
                 .build();
     }
 
-    public APIResponse<List<Form>> getFormByTeacherId(String id) {
-        List<Form> forms = formRepo.findByTeachers_UserId(id);
-        return APIResponse.<List<Form>>builder()
-                .code("200")
-                .result(forms)
-                .build();
-    }
+//    public APIResponse<List<Form>> getFormByTeacherId(String id) {
+//        List<Form> forms = formRepo.findByTeachers_UserId(id);
+//        return APIResponse.<List<Form>>builder()
+//                .code("200")
+//                .result(forms)
+//                .build();
+//    }
 
 //    public APIResponse<List<Form>> getFormByStudentId(String id) {
 //        List<Form> forms = formRepo.findByStudent_StId(id);
@@ -96,8 +96,8 @@ public class FormService {
 
     public APIResponse<FormRecord> submitForm(FormRecord formRecord) {
         // Fetch and set the managed Student entity
-        if (formRecord.getStudent() != null && formRecord.getStudent().getStId() != null) {
-            Student student = studentRepo.findById(formRecord.getStudent().getStId())
+        if (formRecord.getStudent() != null && formRecord.getStudent().getAcId() != null) {
+            Student student = studentRepo.findById(formRecord.getStudent().getAcId())
                     .orElseThrow(() -> new RuntimeException("Student not found"));
             formRecord.setStudent(student);
         }

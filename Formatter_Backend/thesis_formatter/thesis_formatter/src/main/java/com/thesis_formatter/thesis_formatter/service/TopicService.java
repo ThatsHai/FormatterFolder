@@ -1,10 +1,10 @@
 package com.thesis_formatter.thesis_formatter.service;
 
+import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.entity.Teacher;
 import com.thesis_formatter.thesis_formatter.entity.Topic;
 import com.thesis_formatter.thesis_formatter.repo.TeacherRepo;
 import com.thesis_formatter.thesis_formatter.repo.TopicRepo;
-import com.thesis_formatter.thesis_formatter.response.APIResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

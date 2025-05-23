@@ -1,7 +1,7 @@
 package com.thesis_formatter.thesis_formatter.controller;
 
+import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.entity.Topic;
-import com.thesis_formatter.thesis_formatter.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.service.TopicService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
