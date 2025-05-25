@@ -27,10 +27,10 @@ import java.util.List;
 public class TeacherService {
     TeacherRepo teacherRepo;
     DepartmentRepo departmentRepo;
-    private final TeacherMapper teacherMapper;
+    TeacherMapper teacherMapper;
     AuthenticationService authenticationService;
 
-    public APIResponse<Teacher> addTeacher(Teacher teacher) {
+    public APIResponse<TeacherDTO> addTeacher(Teacher teacher) {
         Department department = departmentRepo.findByDepartmentId(teacher.getDepartment().getDepartmentId());
         teacher.setDepartment(department);
         authenticationService.encodePassword(teacher);
@@ -38,10 +38,12 @@ public class TeacherService {
         roles.add(Role.USER.name());
         teacher.setRoles(roles);
         teacherRepo.save(teacher);
+
+        TeacherDTO teacherDTO = teacherMapper.toDTO(teacher);
         return APIResponse
-                .<Teacher>builder()
+                .<TeacherDTO>builder()
                 .code("200")
-                .result(teacher)
+                .result(teacherDTO)
                 .build();
     }
 

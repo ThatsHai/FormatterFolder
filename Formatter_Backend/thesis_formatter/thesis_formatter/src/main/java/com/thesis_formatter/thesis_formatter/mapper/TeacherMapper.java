@@ -8,5 +8,6 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface TeacherMapper {
+    @Mapping(source = "userId", target = "userId")
     TeacherDTO toDTO(Teacher teacher);
 }

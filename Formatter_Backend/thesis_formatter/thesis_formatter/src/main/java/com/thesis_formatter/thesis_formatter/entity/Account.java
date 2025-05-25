@@ -33,9 +33,5 @@ public class Account {
     String status;
     Set<String> roles;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "departmentId", referencedColumnName = "departmentId")
-    Department department;
-
 
 }
