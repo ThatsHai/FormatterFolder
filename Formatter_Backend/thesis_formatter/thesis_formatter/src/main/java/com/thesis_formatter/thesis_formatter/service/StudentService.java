@@ -1,8 +1,9 @@
 package com.thesis_formatter.thesis_formatter.service;
 
-import com.thesis_formatter.thesis_formatter.entity.Department;
 import com.thesis_formatter.thesis_formatter.entity.Student;
+import com.thesis_formatter.thesis_formatter.entity.StudentClass;
 import com.thesis_formatter.thesis_formatter.enums.Role;
+import com.thesis_formatter.thesis_formatter.repo.ClassRepo;
 import com.thesis_formatter.thesis_formatter.repo.DepartmentRepo;
 import com.thesis_formatter.thesis_formatter.repo.StudentRepo;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
@@ -12,7 +13,6 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 
 @Service
@@ -22,15 +22,16 @@ public class StudentService {
     StudentRepo studentRepo;
 
     DepartmentRepo departmentRepo;
+    ClassRepo classRepo;
 
     AuthenticationService authenticationService;
 
     public APIResponse<Student> addStudent(Student student) {
-        Department department = departmentRepo.findByDepartmentId(student.getDepartment().getDepartmentId());
-        student.setDepartment(department);
+        StudentClass studentClass = classRepo.findById(student.getStudentClass().getStudentClassId()).orElse(null);
         HashSet<String> roles = new HashSet<>();
         roles.add(Role.USER.name());
         student.setRoles(roles);
+        student.setStudentClass(studentClass);
         authenticationService.encodePassword(student);
         studentRepo.save(student);
         return APIResponse

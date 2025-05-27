@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Builder
@@ -31,13 +32,10 @@ public class Account {
     String avatar;
     String status;
     Set<String> roles;
-//
-//    @ManyToOne(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "facultyId", referencedColumnName = "facultyId")
-//    Faculty faculty;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "departmentId", referencedColumnName = "departmentId")
     Department department;
+
 
 }

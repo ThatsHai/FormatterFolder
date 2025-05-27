@@ -32,7 +32,7 @@ public class ApplicationInitConfig {
                 roles.add(Role.ADMIN.name());
                 Account account = Account.builder()
                         .userId("admin")
-                        .password(passwordEncoder.encode("admin"))
+                        .password(passwordEncoder.encode("admin123"))
                         .roles(roles)
                         .build();
                 accountRepo.save(account);

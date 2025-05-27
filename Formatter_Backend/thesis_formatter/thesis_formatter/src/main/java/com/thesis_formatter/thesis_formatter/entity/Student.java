@@ -14,10 +14,12 @@ import lombok.experimental.FieldDefaults;
 public class Student extends Account {
     //    @Column(unique = true)
 //    String stId;
-    String className;
-    String major;
     String course;
 
     @Enumerated(EnumType.STRING)
     EducationLevel educationLevel;
+
+    @ManyToOne
+    @JoinColumn(name = "studentClassId", referencedColumnName = "studentClassId")
+    StudentClass studentClass;
 }

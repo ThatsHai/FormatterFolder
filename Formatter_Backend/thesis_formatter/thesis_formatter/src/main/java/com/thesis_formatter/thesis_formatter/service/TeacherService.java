@@ -1,9 +1,11 @@
 package com.thesis_formatter.thesis_formatter.service;
 
 import com.thesis_formatter.thesis_formatter.dto.request.TeacherFiltersDTO;
+import com.thesis_formatter.thesis_formatter.dto.response.TeacherDTO;
 import com.thesis_formatter.thesis_formatter.dto.response.TeacherFiltersReponseDTO;
 import com.thesis_formatter.thesis_formatter.entity.Department;
 import com.thesis_formatter.thesis_formatter.entity.Teacher;
+import com.thesis_formatter.thesis_formatter.mapper.TeacherMapper;
 import com.thesis_formatter.thesis_formatter.enums.Role;
 import com.thesis_formatter.thesis_formatter.repo.DepartmentRepo;
 import com.thesis_formatter.thesis_formatter.repo.TeacherRepo;
@@ -15,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -24,6 +27,7 @@ import java.util.List;
 public class TeacherService {
     TeacherRepo teacherRepo;
     DepartmentRepo departmentRepo;
+    private final TeacherMapper teacherMapper;
     AuthenticationService authenticationService;
 
     public APIResponse<Teacher> addTeacher(Teacher teacher) {
@@ -41,11 +45,16 @@ public class TeacherService {
                 .build();
     }
 
-    public APIResponse<List<Teacher>> getAll() {
+    public APIResponse<List<TeacherDTO>> getAll() {
         List<Teacher> teachers = teacherRepo.findAll();
-        return APIResponse.<List<Teacher>>builder()
+        List<TeacherDTO> teacherDTOs = new ArrayList<>();
+        for (Teacher teacher : teachers) {
+            TeacherDTO dto = teacherMapper.toDTO(teacher);
+            teacherDTOs.add(dto);
+        }
+        return APIResponse.<List<TeacherDTO>>builder()
                 .code("200")
-                .result(teachers)
+                .result(teacherDTOs)
                 .build();
     }
 

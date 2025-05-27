@@ -1,6 +1,8 @@
 package com.thesis_formatter.thesis_formatter.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.thesis_formatter.thesis_formatter.enums.FormStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -19,9 +21,9 @@ public class Form {
     String formId;
     String title;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "studentId", referencedColumnName = "userId")
-    Student student;
+//    @ManyToOne(cascade = CascadeType.ALL)
+//    @JoinColumn(name = "studentId", referencedColumnName = "stId")
+//    Student student;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
@@ -37,4 +39,9 @@ public class Form {
     )
     List<Teacher> teachers;
     String introduction;
+    @Enumerated(EnumType.STRING)
+    FormStatus status = FormStatus.WAITING;
+    @OneToMany(mappedBy = "form", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    List<FormField> formFields;
 }

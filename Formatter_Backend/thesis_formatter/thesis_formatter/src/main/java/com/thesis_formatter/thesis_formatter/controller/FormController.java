@@ -1,7 +1,8 @@
 package com.thesis_formatter.thesis_formatter.controller;
 
-import com.thesis_formatter.thesis_formatter.entity.Form;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
+import com.thesis_formatter.thesis_formatter.entity.Form;
+import com.thesis_formatter.thesis_formatter.entity.FormRecord;
 import com.thesis_formatter.thesis_formatter.service.FormService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -12,35 +13,43 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@CrossOrigin
 public class FormController {
     FormService formService;
 
-    @PostMapping("/form/submit")
-    public APIResponse<Form> submitForm(@RequestBody Form form) {
-//        System.out.println(form.toString());
-        return formService.saveForm(form);
+//    @PostMapping("/form/submit")
+//    public APIResponse<Form> submitForm(@RequestBody Form form) {
+//        return formService.saveForm(form);
+//    }
 
-
-    }
-
-    @GetMapping("/form")
+    @GetMapping("/forms")
     public APIResponse<?> getAllForm() {
         return formService.getAllForms();
     }
 
-    @GetMapping("/form/teacher/{teacherId}")
-    public APIResponse<?> getFormByTeacherId(@PathVariable String teacherId) {
-        return formService.getFormByTeacherId(teacherId);
-    }
+//    @GetMapping("/form/teacher/{teacherId}")
+//    public APIResponse<?> getFormByTeacherId(@PathVariable String teacherId) {
+//        return formService.getFormByTeacherId(teacherId);
+//    }
 
-    @GetMapping("/form/student/{studentId}")
-    public APIResponse<?> getFormByStudentId(@PathVariable String studentId) {
-        return formService.getFormByStudentId(studentId);
-    }
+//    @GetMapping("/form/student/{studentId}")
+//    public APIResponse<?> getFormByStudentId(@PathVariable String studentId) {
+//        return formService.getFormByStudentId(studentId);
+//    }
 
 
-    @PostMapping("/form/download")
+    @PostMapping("/forms/download")
     public APIResponse<Form> downloadForm(@RequestBody Form form) {
         return formService.downloadForm(form);
+    }
+
+    @PostMapping("/forms/create")
+    public APIResponse<Form> createForm(@RequestBody Form form) {
+        return formService.createForm(form);
+    }
+
+    @PostMapping("/forms/submit")
+    public APIResponse<FormRecord> submitForm(@RequestBody FormRecord formRecord) {
+        return formService.submitForm(formRecord);
     }
 }

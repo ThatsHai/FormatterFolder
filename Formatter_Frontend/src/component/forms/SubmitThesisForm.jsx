@@ -4,34 +4,22 @@ import { useState, useEffect } from "react";
 import ShortAnswer from "./SubmitThesisFormComponents/ShortAnswer";
 import DisabledField from "./SubmitThesisFormComponents/DisabledField";
 import AddTeacherTable from "./SubmitThesisFormComponents/AddTeacherTable";
+import api from "../../services/api";
 
-const SubmitThesisForm = ({ handleFormToggle = () => {} }) => {
+const SubmitThesisForm = ({ handleFormToggle = () => {}, onSuccess = () => {} }) => {
   const currentYear = new Date().getFullYear();
-
-  // Initialize form data state
   const [formData, setFormData] = useState({
-    title: "Tên đề tài",
-    studentName: "Nguyễn Văn A",
-    studentId: "B2111111",
-    department: "Tên ngành",
-    unit: "Tên đơn vị",
-    school: "Tên Khoa/Trường",
-    year: currentYear,
-    teachersList: [
+    title: "Khóa luận tốt nghiệp 2025",
+    introduction: "Đề tài về trí tuệ nhân tạo ứng dụng trong giáo dục.",
+    student: {
+      stId: "STU2025A01",
+    },
+    teachers: [
       {
-        Khoa: "Trường CNTT",
-        MaBM: "Khoa CNTT",
-        TenCB: "Nguyen V",
-        MaCB: "0111",
-      },
-      {
-        Khoa: "Trường CNTT",
-        MaBM: "Khoa CNTT",
-        TenCB: "Nguyen Y",
-        MaCB: "0122",
+        tcId: "TC001",
       },
     ],
-    introduction: "Giới thiệu",
+    status: "WAITING",
   });
   const [openAddTeacherTable, setOpenAddTeacherTable] = useState(false);
 
@@ -47,7 +35,15 @@ const SubmitThesisForm = ({ handleFormToggle = () => {} }) => {
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
+    const result = async () => {
+      try {
+        await api.post("/form/submit", formData);
+        onSuccess();
+      } catch (error) {
+        console.log("Error submitting " + error);
+      }
+    };
+    result();
   };
 
   const handleRemoveTeacher = (MaCB) => {
@@ -207,6 +203,7 @@ const SubmitThesisForm = ({ handleFormToggle = () => {} }) => {
             <button
               type="submit"
               className="bg-darkBlue text-white px-6 py-2 rounded-full"
+              onClick={(e) => handleSubmit(e)}
             >
               Submit
             </button>
@@ -219,6 +216,7 @@ const SubmitThesisForm = ({ handleFormToggle = () => {} }) => {
 
 SubmitThesisForm.propTypes = {
   handleFormToggle: PropTypes.func,
+  onSuccess: PropTypes.func,
 };
 
 export default SubmitThesisForm;
