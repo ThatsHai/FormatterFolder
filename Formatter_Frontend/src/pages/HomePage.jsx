@@ -16,7 +16,7 @@ const HomePage = () => {
       <div className="flex justify-end">
         <div className="w-1/3 flex mr-3">
           <Button label="Tìm kiếm..."></Button>
-          <Button label="Thêm đề tài" handleClick={handleFormToggle}></Button>
+          <Button label="Thêm đề cương" handleClick={handleFormToggle}></Button>
         </div>
       </div>
 
