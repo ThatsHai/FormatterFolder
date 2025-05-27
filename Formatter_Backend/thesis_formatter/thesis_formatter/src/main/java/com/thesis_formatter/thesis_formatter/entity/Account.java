@@ -18,7 +18,7 @@ import java.util.Set;
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    String AC_id;
+    String acId;
     @Column(unique = true, nullable = false)
     String userId;
     String password;
@@ -29,7 +29,7 @@ public class Account {
     String phoneNumber;
     String email;
     String avatar;
-    String Status;
+    String status;
     Set<String> roles;
 //
 //    @ManyToOne(cascade = CascadeType.ALL)
