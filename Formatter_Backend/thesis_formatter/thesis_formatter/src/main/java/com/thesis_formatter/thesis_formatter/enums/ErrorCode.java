@@ -8,11 +8,13 @@ import lombok.experimental.FieldDefaults;
 
 @Getter
 public enum ErrorCode {
-    UNCATEGORIZED_EXCEPTION("9999", "Uncategorized Exception"),
-    INVALID_KEYWORD("0001", "Invalid message keyword"),
-    USER_EXISTED("1001", "User already existed"),
-    USER_NOT_EXISTED("1002", "User not existed"),
-    UNAUTHENTICATED("1003", "Unauthenticated"),
+    UNCATEGORIZED_EXCEPTION( "Uncategorized Exception","9999"),
+    INVALID_KEYWORD( "Invalid message keyword","0001"),
+    USER_EXISTED("User already existed","1001"),
+    USER_NOT_EXISTED( "User not existed","1002"),
+    UNAUTHENTICATED("Unauthenticated", "1003"),
+    NULL_PROPERTY(" has Null property", "1004"),
+    PERMISSION_EXISTED("Permission existed", "1005"),
     ;
 
     private String code;

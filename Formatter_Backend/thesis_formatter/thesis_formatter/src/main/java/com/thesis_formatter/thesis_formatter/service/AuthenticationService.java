@@ -10,6 +10,7 @@ import com.thesis_formatter.thesis_formatter.dto.request.IntrospectRequest;
 import com.thesis_formatter.thesis_formatter.dto.response.AuthenticationResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.IntrospectResponse;
 import com.thesis_formatter.thesis_formatter.entity.Account;
+import com.thesis_formatter.thesis_formatter.entity.Role;
 import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
 import com.thesis_formatter.thesis_formatter.exception.AppException;
 import com.thesis_formatter.thesis_formatter.repo.AccountRepo;
@@ -30,6 +31,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Date;
 import java.util.StringJoiner;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -91,6 +93,7 @@ public class AuthenticationService {
                 .expirationTime(new Date(
                         Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli() //after 1 hour
                 ))
+                .jwtID(UUID.randomUUID().toString())
                 .claim("scope", buildScope(account))
                 .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
@@ -111,9 +114,11 @@ public class AuthenticationService {
 
     private String buildScope(Account account) {
         StringJoiner stringJoiner = new StringJoiner(" ");
-        if (!CollectionUtils.isEmpty(account.getRoles())) {
-            account.getRoles().forEach(stringJoiner::add);
-        }
+        Role role = account.getRole();
+        stringJoiner.add(role.getName());
+
+        if (!CollectionUtils.isEmpty(role.getPermissions()))
+            role.getPermissions().forEach(permission -> stringJoiner.add(permission.getName()));
         return stringJoiner.toString();
     }
 }

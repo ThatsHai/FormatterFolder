@@ -28,10 +28,10 @@ public class StudentService {
 
     public APIResponse<Student> addStudent(Student student) {
         StudentClass studentClass = classRepo.findById(student.getStudentClass().getStudentClassId()).orElse(null);
-        HashSet<String> roles = new HashSet<>();
-        roles.add(Role.USER.name());
-        student.setRoles(roles);
-        student.setStudentClass(studentClass);
+//        HashSet<String> roles = new HashSet<>();
+//        roles.add(Role.USER.name());
+////        student.setRoles(roles);
+//        student.setStudentClass(studentClass);
         authenticationService.encodePassword(student);
         studentRepo.save(student);
         return APIResponse

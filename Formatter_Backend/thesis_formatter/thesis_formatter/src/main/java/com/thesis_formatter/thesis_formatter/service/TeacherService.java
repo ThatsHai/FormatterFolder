@@ -5,38 +5,48 @@ import com.thesis_formatter.thesis_formatter.dto.response.TeacherDTO;
 import com.thesis_formatter.thesis_formatter.dto.response.TeacherFiltersReponseDTO;
 import com.thesis_formatter.thesis_formatter.entity.Department;
 import com.thesis_formatter.thesis_formatter.entity.Teacher;
+import com.thesis_formatter.thesis_formatter.mapper.RoleMapper;
 import com.thesis_formatter.thesis_formatter.mapper.TeacherMapper;
-import com.thesis_formatter.thesis_formatter.enums.Role;
+import com.thesis_formatter.thesis_formatter.entity.Role;
 import com.thesis_formatter.thesis_formatter.repo.DepartmentRepo;
+import com.thesis_formatter.thesis_formatter.repo.RoleRepo;
 import com.thesis_formatter.thesis_formatter.repo.TeacherRepo;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+
 public class TeacherService {
     TeacherRepo teacherRepo;
     DepartmentRepo departmentRepo;
     private final TeacherMapper teacherMapper;
     AuthenticationService authenticationService;
+    RoleRepo roleRepo;
 
+    @PreAuthorize("hasRole('ADMIN')")
     public APIResponse<Teacher> addTeacher(Teacher teacher) {
         Department department = departmentRepo.findByDepartmentId(teacher.getDepartment().getDepartmentId());
         teacher.setDepartment(department);
         authenticationService.encodePassword(teacher);
-        HashSet<String> roles = new HashSet<>();
-        roles.add(Role.USER.name());
-        teacher.setRoles(roles);
+        Role role = roleRepo.findByName("TEACHER");
+        teacher.setRole(role);
         teacherRepo.save(teacher);
         return APIResponse
                 .<Teacher>builder()
