@@ -1,6 +1,8 @@
 package com.thesis_formatter.thesis_formatter.dto.response;
 
 import com.thesis_formatter.thesis_formatter.entity.Department;
+import com.thesis_formatter.thesis_formatter.entity.StudentClass;
+import com.thesis_formatter.thesis_formatter.enums.EducationLevel;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,7 +13,7 @@ import lombok.experimental.FieldDefaults;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TeacherDTO {
+public class StudentDTO {
     String userId;
     String name;
     String gender;
@@ -19,7 +21,7 @@ public class TeacherDTO {
     String phoneNumber;
     String email;
     String avatar;
-    Department department;
-    String degree;
-    String position;
+    String course;
+    EducationLevel educationLevel;
+    StudentClass studentClass;
 }
