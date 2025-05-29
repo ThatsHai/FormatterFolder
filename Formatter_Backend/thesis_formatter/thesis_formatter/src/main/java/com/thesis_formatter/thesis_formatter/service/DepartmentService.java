@@ -35,4 +35,12 @@ public class DepartmentService {
                 .result(departments)
                 .build();
     }
+
+    public APIResponse<List<Department>> getDepartmentsByFacultyId(String facultyId) {
+        List<Department> departments = departmentRepo.findByFacultyFacultyId(facultyId);
+        return APIResponse.<List<Department>>builder()
+                .code("200")
+                .result(departments)
+                .build();
+    }
 }

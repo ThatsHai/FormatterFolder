@@ -1,5 +1,6 @@
 package com.thesis_formatter.thesis_formatter.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.thesis_formatter.thesis_formatter.enums.EducationLevel;
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,8 +13,6 @@ import lombok.experimental.FieldDefaults;
 @Data
 @PrimaryKeyJoinColumn(name = "acId")
 public class Student extends Account {
-    //    @Column(unique = true)
-//    String stId;
     String course;
 
     @Enumerated(EnumType.STRING)

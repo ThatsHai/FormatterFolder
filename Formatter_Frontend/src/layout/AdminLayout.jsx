@@ -1,22 +1,22 @@
 import PropTypes from "prop-types";
 import Header from "../component/Header"
-import Navbar from "../component/Navbar";
+import AdminNavbar from "../pages/adminPages/adminComponents/AdminNavbar";
 
-const DefaultLayout = ({ children }) => {
+const AdminLayout = ({ children }) => {
   return (
     <>
       <div className="">
         <Header></Header>
-        <Navbar></Navbar>
+        <AdminNavbar></AdminNavbar>
         <div>{children}</div>
       </div>
     </>
   );
 };
 
-export default DefaultLayout;
+export default AdminLayout;
 
-DefaultLayout.propTypes = {
+AdminLayout.propTypes = {
   children: PropTypes.node.isRequired,
 };
 

@@ -31,9 +31,5 @@ public class Account {
     @JoinColumn(name = "role", referencedColumnName = "name")
     Role role;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "departmentId", referencedColumnName = "departmentId")
-    Department department;
-
 
 }

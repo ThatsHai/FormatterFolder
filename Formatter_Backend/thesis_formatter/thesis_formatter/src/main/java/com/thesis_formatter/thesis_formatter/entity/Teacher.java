@@ -15,4 +15,7 @@ import lombok.experimental.FieldDefaults;
 public class Teacher extends Account {
     String degree;
     String position;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "departmentId", referencedColumnName = "departmentId")
+    Department department;
 }

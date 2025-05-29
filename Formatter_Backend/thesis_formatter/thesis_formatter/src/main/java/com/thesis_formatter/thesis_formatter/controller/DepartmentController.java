@@ -14,6 +14,7 @@ import java.util.List;
 @RequestMapping
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@CrossOrigin
 public class DepartmentController {
 
     DepartmentService departmentService;
@@ -23,8 +24,22 @@ public class DepartmentController {
         return departmentService.addDepartment(department);
     }
 
+    //    @GetMapping("/departments")
+//    public APIResponse<List<Department>> getAllDepartments() {
+//        return departmentService.getAll();
+//    }
+//
+//    @GetMapping("/departments")
+//    public APIResponse<List<Department>> getAllDepartments(@RequestParam String facultyId) {
+//        return departmentService.getDepartmentsByFacultyId(facultyId);
+//    }
     @GetMapping("/departments")
-    public APIResponse<List<Department>> getAllDepartments() {
-        return departmentService.getAll();
+    public APIResponse<List<Department>> getDepartments(@RequestParam(required = false) String facultyId) {
+        if (facultyId == null) {
+            return departmentService.getAll();
+        } else {
+            return departmentService.getDepartmentsByFacultyId(facultyId);
+        }
     }
+
 }

@@ -1,5 +1,6 @@
 package com.thesis_formatter.thesis_formatter.controller;
 
+import com.thesis_formatter.thesis_formatter.dto.response.StudentDTO;
 import com.thesis_formatter.thesis_formatter.entity.Student;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.service.StudentService;
@@ -18,7 +19,7 @@ public class StudentController {
     StudentService studentService;
 
     @PostMapping("/students")
-    public APIResponse<Student> addStudent(@RequestBody Student student) {
+    public APIResponse<StudentDTO> addStudent(@RequestBody Student student) {
         return studentService.addStudent(student);
     }
 

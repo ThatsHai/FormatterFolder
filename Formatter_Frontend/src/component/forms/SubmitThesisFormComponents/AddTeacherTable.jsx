@@ -41,6 +41,8 @@ const AddTeacherTable = ({ formData, setFormData }) => {
     }
   };
 
+  
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-lightGray rounded-md mb-2">
       <div className="flex flex-col">
@@ -95,14 +97,14 @@ const AddTeacherTable = ({ formData, setFormData }) => {
         </button>
       </div>
 
-      {teacherList && (
+      {formData.teacherList && (
         <div className="md:col-span-2 w-full">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-2 w-full text-center border-t pt-4 border-gray">
             <label className="font-semibold">Mã CB</label>
             <label className="font-semibold">Tên CB</label>
             <label className="font-semibold size">Chọn</label>
 
-            {teacherList.map((teacher, index) => (
+            {formData.teacherList.length > 0 && teacherList.map((teacher, index) => (
               <React.Fragment key={index}>
                 <p>{teacher.MaCB}</p>
                 <p>{teacher.TenCB}</p>
