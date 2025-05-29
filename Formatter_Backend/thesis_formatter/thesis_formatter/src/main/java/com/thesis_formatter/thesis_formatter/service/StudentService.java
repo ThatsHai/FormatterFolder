@@ -1,8 +1,10 @@
 package com.thesis_formatter.thesis_formatter.service;
 
+import com.thesis_formatter.thesis_formatter.dto.response.StudentDTO;
 import com.thesis_formatter.thesis_formatter.entity.Role;
 import com.thesis_formatter.thesis_formatter.entity.Student;
 import com.thesis_formatter.thesis_formatter.entity.StudentClass;
+import com.thesis_formatter.thesis_formatter.mapper.StudentMapper;
 import com.thesis_formatter.thesis_formatter.repo.ClassRepo;
 import com.thesis_formatter.thesis_formatter.repo.DepartmentRepo;
 import com.thesis_formatter.thesis_formatter.repo.RoleRepo;
@@ -27,18 +29,20 @@ public class StudentService {
 
     AuthenticationService authenticationService;
     RoleRepo roleRepo;
+    private final StudentMapper studentMapper;
 
-    public APIResponse<Student> addStudent(Student student) {
+    public APIResponse<StudentDTO> addStudent(Student student) {
         StudentClass studentClass = classRepo.findById(student.getStudentClass().getStudentClassId()).orElse(null);
         Role role = roleRepo.findByName("STUDENT");
         student.setRole(role);
         student.setStudentClass(studentClass);
         authenticationService.encodePassword(student);
         studentRepo.save(student);
+        StudentDTO studentDTO = studentMapper.toDTO(student);
         return APIResponse
-                .<Student>builder()
+                .<StudentDTO>builder()
                 .code("200")
-                .result(student)
+                .result(studentDTO)
                 .build();
     }
 
