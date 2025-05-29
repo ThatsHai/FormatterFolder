@@ -5,23 +5,30 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 
 @Getter
 public enum ErrorCode {
-    UNCATEGORIZED_EXCEPTION( "Uncategorized Exception","9999"),
-    INVALID_KEYWORD( "Invalid message keyword","0001"),
-    USER_EXISTED("User already existed","1001"),
-    USER_NOT_EXISTED( "User not existed","1002"),
-    UNAUTHENTICATED("Unauthenticated", "1003"),
-    NULL_PROPERTY(" has Null property", "1004"),
-    PERMISSION_EXISTED("Permission existed", "1005"),
+    UNCATEGORIZED_EXCEPTION("9999", "Uncategorized Exception", HttpStatus.INTERNAL_SERVER_ERROR),
+    INVALID_KEYWORD("0001", "Invalid message keyword", HttpStatus.BAD_REQUEST),
+    USER_EXISTED("1001", "User already existed", HttpStatus.BAD_REQUEST),
+    USER_NOT_EXISTED("1002", "User not existed", HttpStatus.NOT_FOUND),
+    UNAUTHENTICATED("1003", "Unauthenticated", HttpStatus.UNAUTHORIZED),
+    UNAUTHORIZED("1004", "you don't have permission", HttpStatus.FORBIDDEN),
+    NULL_PROPERTY("1005", " has Null property", HttpStatus.BAD_REQUEST),
+    PERMISSION_EXISTED("1006", "Permission existed", HttpStatus.BAD_REQUEST),
+    TOKEN_INVALID("1007", "Token invalid", HttpStatus.BAD_REQUEST),
+
     ;
 
     private String code;
     private String message;
+    private HttpStatusCode httpStatusCode;
 
-    ErrorCode(String message, String code) {
-        this.message = message;
+    ErrorCode(String code, String message, HttpStatusCode httpStatusCode) {
         this.code = code;
+        this.message = message;
+        this.httpStatusCode = httpStatusCode;
     }
 }

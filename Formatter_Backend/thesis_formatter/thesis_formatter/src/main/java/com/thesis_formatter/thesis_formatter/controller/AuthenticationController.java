@@ -3,6 +3,7 @@ package com.thesis_formatter.thesis_formatter.controller;
 import com.nimbusds.jose.JOSEException;
 import com.thesis_formatter.thesis_formatter.dto.request.AuthenticationRequest;
 import com.thesis_formatter.thesis_formatter.dto.request.IntrospectRequest;
+import com.thesis_formatter.thesis_formatter.dto.request.LogoutRequest;
 import com.thesis_formatter.thesis_formatter.dto.response.AuthenticationResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.IntrospectResponse;
@@ -37,6 +38,14 @@ public class AuthenticationController {
         return APIResponse.<IntrospectResponse>builder()
                 .code("200")
                 .result(result)
+                .build();
+    }
+
+    @PostMapping("/logout")
+    public APIResponse<Void> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
+        authenticationService.logout(request);
+        return APIResponse.<Void>builder()
+                .code("200")
                 .build();
     }
 }

@@ -42,6 +42,8 @@ public class TeacherService {
 
     @PreAuthorize("hasRole('ADMIN')")
     public APIResponse<Teacher> addTeacher(Teacher teacher) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        log.info("Authorities: " + authentication.getAuthorities());
         Department department = departmentRepo.findByDepartmentId(teacher.getDepartment().getDepartmentId());
         teacher.setDepartment(department);
         authenticationService.encodePassword(teacher);
