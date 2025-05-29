@@ -14,6 +14,7 @@ import java.util.List;
 @RequestMapping
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@CrossOrigin
 public class FacultyController {
     FacultyService facultyService;
 

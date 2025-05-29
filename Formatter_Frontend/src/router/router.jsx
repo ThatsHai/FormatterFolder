@@ -6,7 +6,10 @@ import AuthLayout from "../layout/AuthLayout";
 import DefaultLayout from "../layout/DefaultLayout";
 import HomePage from "../pages/HomePage";
 import ThesisInfo from "../pages/ThesisInfo";
+import AdminHomePage from "../pages/adminPages/AdminHomePage";
 import ThesisInfoLayout from "../layout/ThesisInfoLayout";
+import AdminLayout from "../layout/AdminLayout";
+import AccountManagementPage from "../pages/adminPages/AccountManagementPage";
 
 const Router = createBrowserRouter([
   {
@@ -47,6 +50,30 @@ const Router = createBrowserRouter([
       <ThesisInfoLayout>
         <ThesisInfo />
       </ThesisInfoLayout>
+    ),
+  },
+  {
+    path: "/admin",
+    element: (
+      <AdminLayout>
+        <AdminHomePage />
+      </AdminLayout>
+    ),
+  },
+  {
+    path: "/admin/accounts/students",
+    element: (
+      <AdminLayout>
+        <AccountManagementPage />
+      </AdminLayout>
+    ),
+  },
+  {
+    path: "/admin/accounts",
+    element: (
+      <AdminLayout>
+        <AccountManagementPage />
+      </AdminLayout>
     ),
   },
 ]);

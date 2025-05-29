@@ -1,15 +1,19 @@
 package com.thesis_formatter.thesis_formatter.repo;
 
+import com.thesis_formatter.thesis_formatter.dto.response.TeacherDTO;
+import com.thesis_formatter.thesis_formatter.entity.Department;
 import com.thesis_formatter.thesis_formatter.entity.Teacher;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-public interface TeacherRepo extends JpaRepository<Teacher, String> {
+public interface TeacherRepo extends JpaRepository<Teacher, String>, JpaSpecificationExecutor<Teacher> {
 
     @Query("SELECT t FROM Teacher t WHERE t.department.departmentName = :departmentName " +
             "AND t.department.faculty.facultyName = :faculty AND t.name = :teacherName " +
@@ -18,6 +22,4 @@ public interface TeacherRepo extends JpaRepository<Teacher, String> {
                                   @Param("departmentName") String departmentName,
                                   @Param("teacherId") String teacherId,
                                   @Param("teacherName") String teacherName);
-
-    Teacher findByUserId(String teacherId);
 }
