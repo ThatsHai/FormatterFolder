@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import TeachersTable from "./AccountManagementPage/TeachersTable";
 import TeacherQuery from "./AccountManagementPage/TeacherQuery";
 import PropTypes from "prop-types";
@@ -8,36 +8,20 @@ const QueryContent = ({ selectedTab }) => {
   const [queryCriteria, setQueryCriteria] = useState({});
   const [teachers, setTeachers] = useState([]);
 
-  useEffect(() => {
-    console.log(queryCriteria);
-  }, [queryCriteria]);
-
   const handleQueryCriteria = (e) => {
     const { name, value } = e.target;
     setQueryCriteria((prevState) => ({ ...prevState, [name]: value }));
-    console.log(queryCriteria);
-  };
-
-  const fetchTeachers = async (url) => {
-    try {
-      const result = await api.get(url);
-      setTeachers(result.data.result);
-      return result;
-    } catch (error) {
-      console.error("Failed to fetch teachers:", error);
-    }
   };
 
   const handleSearch = async () => {
-    if (queryCriteria?.departmentId) {
-      await fetchTeachers(
-        `/teachers?departmentId=${queryCriteria.departmentId}`
-      );
-      return;
-    }
-    if (queryCriteria?.facultyId) {
-      await fetchTeachers(`/teachers?facultyId=${queryCriteria.facultyId}`);
-      return;
+    if (queryCriteria) {
+      try {
+        const result = await api.post("/teachers/search", queryCriteria);
+        setTeachers(result.data.result);
+        return;
+      } catch (e) {
+        console.log("Error fetching teachers with query, error: ", e);
+      }
     }
     setTeachers({});
   };
@@ -108,7 +92,7 @@ const AccountManagementPage = () => {
   const [selectedTab, setSelectedTab] = useState("teacher");
 
   return (
-    <div className="flex pt-5">
+    <div className="flex">
       <ManagementTabs
         selectedTab={selectedTab}
         setSelectedTab={setSelectedTab}

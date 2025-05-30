@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import api from "../../../services/api";
+import PropTypes from "prop-types";
 
-const TeacherQuery = ({ queryCriteria, handleQueryCriteria, handleSearch }) => {
+const TeacherQuery = ({ handleQueryCriteria, handleSearch }) => {
   const [facultiesList, setFacultiesList] = useState([]);
   const [departmentsList, setDepartmentsList] = useState([]);
   const [selectedFacultyId, setSelectedFacultyId] = useState("");
@@ -31,7 +32,7 @@ const TeacherQuery = ({ queryCriteria, handleQueryCriteria, handleSearch }) => {
     if (e.target.value !== "") {
       const { value } = e.target;
       setSelectedFacultyId(value);
-      handleQueryCriteria(e)
+      handleQueryCriteria(e);
     }
   };
 
@@ -74,7 +75,10 @@ const TeacherQuery = ({ queryCriteria, handleQueryCriteria, handleSearch }) => {
               <>
                 <option></option>
                 {departmentsList.map((department) => (
-                  <option key={department.departmentId} value={department.departmentId}>
+                  <option
+                    key={department.departmentId}
+                    value={department.departmentId}
+                  >
                     {department.departmentName}
                   </option>
                 ))}
@@ -89,8 +93,8 @@ const TeacherQuery = ({ queryCriteria, handleQueryCriteria, handleSearch }) => {
             type="text"
             className="border px-2 py-1 rounded-md"
             placeholder="Mã CB"
-            value="acId"
-            name="acId"
+            name="userId"
+            onChange={(e) => handleQueryCriteria(e)}
           />
         </div>
 
@@ -100,7 +104,8 @@ const TeacherQuery = ({ queryCriteria, handleQueryCriteria, handleSearch }) => {
             type="text"
             className="border px-2 py-1 rounded-md"
             placeholder="Tên CB"
-            value="Tên CB"
+            name="name"
+            onChange={(e) => handleQueryCriteria(e)}
           />
         </div>
 
@@ -108,7 +113,7 @@ const TeacherQuery = ({ queryCriteria, handleQueryCriteria, handleSearch }) => {
           <button
             type="button"
             className="bg-darkBlue text-white px-4 py-1 rounded-md shadow-md"
-            onClick={()=> handleSearch()}
+            onClick={() => handleSearch()}
           >
             Tìm kiếm
           </button>
@@ -118,3 +123,8 @@ const TeacherQuery = ({ queryCriteria, handleQueryCriteria, handleSearch }) => {
   );
 };
 export default TeacherQuery;
+
+TeacherQuery.propTypes = {
+  handleQueryCriteria: PropTypes.func,
+  handleSearch: PropTypes.func,
+};

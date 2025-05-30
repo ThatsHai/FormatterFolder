@@ -10,6 +10,7 @@ import AdminHomePage from "../pages/adminPages/AdminHomePage";
 import ThesisInfoLayout from "../layout/ThesisInfoLayout";
 import AdminLayout from "../layout/AdminLayout";
 import AccountManagementPage from "../pages/adminPages/AccountManagementPage";
+import FormCreationPage from "../pages/adminPages/FormCreationPage";
 
 const Router = createBrowserRouter([
   {
@@ -61,7 +62,7 @@ const Router = createBrowserRouter([
     ),
   },
   {
-    path: "/admin/accounts/students",
+    path: "/admin/accounts",
     element: (
       <AdminLayout>
         <AccountManagementPage />
@@ -69,10 +70,10 @@ const Router = createBrowserRouter([
     ),
   },
   {
-    path: "/admin/accounts",
+    path: "/forms/create",
     element: (
       <AdminLayout>
-        <AccountManagementPage />
+        <FormCreationPage />
       </AdminLayout>
     ),
   },

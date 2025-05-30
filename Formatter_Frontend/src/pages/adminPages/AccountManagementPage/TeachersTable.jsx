@@ -1,8 +1,6 @@
-import { useState, useEffect } from "react";
-import api from "../../../services/api";
-import PropTypes, { object } from "prop-types";
-const TeachersTable = ({ teachers, setTeachers }) => {
-  useEffect(() => console.log(teachers), [teachers]);
+import PropTypes from "prop-types";
+
+const TeachersTable = ({ teachers }) => {
   return (
     <>
       <table className="table-fixed w-full border-collapse text-center">
@@ -57,4 +55,5 @@ const TeachersTable = ({ teachers, setTeachers }) => {
 export default TeachersTable;
 
 TeachersTable.propTypes = {
+  teachers: PropTypes.array,
 };

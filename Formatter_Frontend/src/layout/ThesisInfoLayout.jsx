@@ -8,7 +8,7 @@ const ThesisInfoLayout = ({ children }) => {
       <div className="">
         <Header></Header>
         <Navbar></Navbar>
-        <div>{children}</div>
+        <div className="pt-5">{children}</div>
       </div>
     </>
   );

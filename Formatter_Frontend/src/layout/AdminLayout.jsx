@@ -8,7 +8,7 @@ const AdminLayout = ({ children }) => {
       <div className="">
         <Header></Header>
         <AdminNavbar></AdminNavbar>
-        <div>{children}</div>
+        <div className="pt-5">{children}</div>
       </div>
     </>
   );

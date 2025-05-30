@@ -22,7 +22,7 @@ import javax.crypto.spec.SecretKeySpec;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final String[] PUBLIC_ENDPOINTS = {"/teacher", "/student", "/auth/token", "/auth/introspect"};
+    private final String[] PUBLIC_ENDPOINTS = {"/teachers", "/students", "/auth/token", "/auth/introspect"};
 
     @Value("${jwt.signerKey}")
     private String signerKey;
