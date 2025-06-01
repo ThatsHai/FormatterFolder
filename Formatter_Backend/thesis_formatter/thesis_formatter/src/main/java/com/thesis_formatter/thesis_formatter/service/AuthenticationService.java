@@ -8,6 +8,7 @@ import com.nimbusds.jwt.SignedJWT;
 import com.thesis_formatter.thesis_formatter.dto.request.AuthenticationRequest;
 import com.thesis_formatter.thesis_formatter.dto.request.IntrospectRequest;
 import com.thesis_formatter.thesis_formatter.dto.request.LogoutRequest;
+import com.thesis_formatter.thesis_formatter.dto.request.RefeshRequest;
 import com.thesis_formatter.thesis_formatter.dto.response.AuthenticationResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.IntrospectResponse;
 import com.thesis_formatter.thesis_formatter.entity.Account;
@@ -50,13 +51,21 @@ public class AuthenticationService {
     @Value("${jwt.signerKey}")
     protected String SIGNER_KEY;
 
+    @NonFinal
+    @Value("${jwt.valid-duration}")
+    protected long VALID_DURATION;
+
+    @NonFinal
+    @Value("${jwt.refeshable-duration}")
+    protected long REFESHABLE_DURATION;
+
     public IntrospectResponse introspect(IntrospectRequest request) throws JOSEException, ParseException {
         var token = request.getToken();
 
         boolean isValid = true;
         try {
-            verifyToken(token);
-        }catch (AppException e){
+            verifyToken(token, false);
+        } catch (AppException e) {
             isValid = false;
         }
 
@@ -97,7 +106,7 @@ public class AuthenticationService {
                 .issuer("https://github.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(
-                        Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli() //after 1 hour
+                        Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()
                 ))
                 .jwtID(UUID.randomUUID().toString())
                 .claim("scope", buildScope(account))
@@ -129,10 +138,27 @@ public class AuthenticationService {
     }
 
     public void logout(LogoutRequest request) throws ParseException, JOSEException {
-        var signToken = verifyToken(request.getToken());
+        try {
+            var signToken = verifyToken(request.getToken(), true);
 
-        String jit = signToken.getJWTClaimsSet().getJWTID();
-        Date expiryTime = signToken.getJWTClaimsSet().getExpirationTime();
+            String jit = signToken.getJWTClaimsSet().getJWTID();
+            Date expiryTime = signToken.getJWTClaimsSet().getExpirationTime();
+
+            InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+                    .id(jit)
+                    .expiryTime(expiryTime)
+                    .build();
+            invalidatedTokenRepo.save(invalidatedToken);
+        } catch (AppException e) {
+            log.info("Token expired");
+        }
+    }
+
+    public AuthenticationResponse refeshToken(RefeshRequest request) throws ParseException, JOSEException {
+        var signJWT = verifyToken(request.getToken(), true);
+
+        String jit = signJWT.getJWTClaimsSet().getJWTID();
+        Date expiryTime = signJWT.getJWTClaimsSet().getExpirationTime();
 
         InvalidatedToken invalidatedToken = InvalidatedToken.builder()
                 .id(jit)
@@ -140,20 +166,35 @@ public class AuthenticationService {
                 .build();
         invalidatedTokenRepo.save(invalidatedToken);
 
+        String userId = signJWT.getJWTClaimsSet().getSubject();
+        Account user = accountRepo.findByUserId(userId).orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+
+        var token = generateToken(user);
+        return AuthenticationResponse.builder()
+                .token(token)
+                .authenticated(true)
+                .build();
     }
 
-    private SignedJWT verifyToken(String token) throws JOSEException, ParseException {
+    private SignedJWT verifyToken(String token, boolean isRefesh) throws JOSEException, ParseException {
         JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
         SignedJWT signedJWT = SignedJWT.parse(token);
 
-        Date expiration = signedJWT.getJWTClaimsSet().getExpirationTime();
+        Date expiration = (isRefesh) ?
+                new Date(signedJWT.getJWTClaimsSet().getExpirationTime().toInstant().plus(REFESHABLE_DURATION, ChronoUnit.SECONDS).toEpochMilli())
+                : signedJWT.getJWTClaimsSet().getExpirationTime();
         var verified = signedJWT.verify(verifier);
 
-        if (!(verified && expiration.after(new Date())))
+        if (!(verified && expiration.after(new Date()))) {
+            log.error("unauthenticated token");
             throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
 
-        if (invalidatedTokenRepo.existsById(signedJWT.getJWTClaimsSet().getJWTID()))
+        if (invalidatedTokenRepo.existsById(signedJWT.getJWTClaimsSet().getJWTID())) {
+            log.error("find invalid token");
             throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+
         return signedJWT;
     }
 }

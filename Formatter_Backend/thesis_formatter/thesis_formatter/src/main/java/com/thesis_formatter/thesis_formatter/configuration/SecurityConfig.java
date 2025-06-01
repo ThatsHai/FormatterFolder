@@ -29,7 +29,7 @@ import javax.crypto.spec.SecretKeySpec;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final String[] PUBLIC_ENDPOINTS = {"/teacher", "/student", "/auth/token", "/auth/introspect", "/auth/logout"};
+    private final String[] PUBLIC_ENDPOINTS = {"/teacher", "/student", "/auth/token", "/auth/introspect", "/auth/logout", "/auth/refesh"};
 
     CustomJwtDecoder customJwtDecoder;
 
