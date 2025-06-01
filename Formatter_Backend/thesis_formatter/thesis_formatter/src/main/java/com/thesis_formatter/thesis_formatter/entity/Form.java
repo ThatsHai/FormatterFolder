@@ -20,24 +20,6 @@ public class Form {
     @GeneratedValue(strategy = GenerationType.UUID)
     String formId;
     String title;
-
-//    @ManyToOne(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "studentId", referencedColumnName = "stId")
-//    Student student;
-
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "teacher_form_map",
-            joinColumns = @JoinColumn(
-                    name = "formId",
-                    referencedColumnName = "formId"
-            ), inverseJoinColumns = @JoinColumn(
-            name = "teacherId",
-            referencedColumnName = "userId"
-
-    )
-    )
-    List<Teacher> teachers;
     String introduction;
     @Enumerated(EnumType.STRING)
     FormStatus status = FormStatus.WAITING;

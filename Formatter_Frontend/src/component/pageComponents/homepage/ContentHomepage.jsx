@@ -11,7 +11,7 @@ const ContentHomepage = ({
 
   useEffect(() => {
     const result = async () => {
-      const result = await api.get("/form");
+      const result = await api.get("/forms");
       setThesisList(result.data.result);
       console.log(result);
     };

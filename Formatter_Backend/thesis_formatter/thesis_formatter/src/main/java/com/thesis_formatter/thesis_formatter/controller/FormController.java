@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.*;
 public class FormController {
     FormService formService;
 
-//    @PostMapping("/form/submit")
-//    public APIResponse<Form> submitForm(@RequestBody Form form) {
-//        return formService.saveForm(form);
-//    }
+    @PostMapping("/form/submit")
+    public APIResponse<Form> submitForm(@RequestBody Form form) {
+        return formService.saveForm(form);
+    }
 
     @GetMapping("/forms")
     public APIResponse<?> getAllForm() {
@@ -51,5 +51,10 @@ public class FormController {
     @PostMapping("/forms/submit")
     public APIResponse<FormRecord> submitForm(@RequestBody FormRecord formRecord) {
         return formService.submitForm(formRecord);
+    }
+
+    @GetMapping("/forms/{formId}")
+    public APIResponse<Form> getFormByFormId(@PathVariable("formId") String formId) {
+        return formService.getFormById(formId);
     }
 }

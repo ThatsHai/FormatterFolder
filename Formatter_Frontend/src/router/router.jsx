@@ -10,6 +10,9 @@ import AdminHomePage from "../pages/adminPages/AdminHomePage";
 import ThesisInfoLayout from "../layout/ThesisInfoLayout";
 import AdminLayout from "../layout/AdminLayout";
 import AccountManagementPage from "../pages/adminPages/AccountManagementPage";
+import FormCreationPage from "../pages/adminPages/FormCreationPage";
+import FormManagementPage from "../pages/adminPages/FormManagementPage"
+import FormInfoPage from "../pages/adminPages/FormInfoPage";
 
 const Router = createBrowserRouter([
   {
@@ -61,7 +64,7 @@ const Router = createBrowserRouter([
     ),
   },
   {
-    path: "/admin/accounts/students",
+    path: "/admin/accounts",
     element: (
       <AdminLayout>
         <AccountManagementPage />
@@ -69,10 +72,26 @@ const Router = createBrowserRouter([
     ),
   },
   {
-    path: "/admin/accounts",
+    path: "/admin/forms/create",
     element: (
       <AdminLayout>
-        <AccountManagementPage />
+        <FormCreationPage />
+      </AdminLayout>
+    ),
+  },
+  {
+    path: "/admin/forms",
+    element: (
+      <AdminLayout>
+        <FormManagementPage />
+      </AdminLayout>
+    ),
+  },
+  {
+    path: "/admin/forms/:formId",
+    element: (
+      <AdminLayout>
+        <FormInfoPage />
       </AdminLayout>
     ),
   },
