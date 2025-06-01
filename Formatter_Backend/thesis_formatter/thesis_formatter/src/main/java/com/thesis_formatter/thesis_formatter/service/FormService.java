@@ -23,7 +23,7 @@ public class FormService {
     StudentRepo studentRepo;
     TeacherRepo teacherRepo;
 
-//    public APIResponse<Form> saveForm(Form form) {
+    public APIResponse<Form> saveForm(Form form) {
 //        Student student = studentRepo.findByStId(form.getStudent().getStId());
 //
 //        List<Teacher> teachers = new ArrayList<>();
@@ -35,12 +35,12 @@ public class FormService {
 //        }
 //        form.setStudent(student);
 //        form.setTeachers(teachers);
-//        formRepo.save(form);
-//        return APIResponse.<Form>builder()
-//                .code("200")
-//                .result(form)
-//                .build();
-//    }
+        formRepo.save(form);
+        return APIResponse.<Form>builder()
+                .code("200")
+                .result(form)
+                .build();
+    }
 
     public APIResponse<List<Form>> getAllForms() {
         List<Form> forms = formRepo.findAll();
@@ -74,11 +74,6 @@ public class FormService {
     }
 
     public APIResponse<Form> createForm(Form form) {
-//        String studentId = form.getStudent().getStId();
-//        Student student = studentRepo.findById(studentId)
-//                .orElseThrow(() -> new RuntimeException("Student not found"));
-//
-//        form.setStudent(student);
 
         // Set the back-reference on each FormField
         if (form.getFormFields() != null) {
@@ -123,4 +118,11 @@ public class FormService {
                 .build();
     }
 
+    public APIResponse<Form> getFormById(String formId) {
+        Form form = formRepo.findById(formId).orElseThrow(() -> new RuntimeException("Form not found"));
+        return APIResponse.<Form>builder()
+                .code("200")
+                .result(form)
+                .build();
+    }
 }

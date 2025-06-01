@@ -1,9 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       colors: {
@@ -13,13 +10,13 @@ export default {
         lightGray: "#f0f0f0",
         redError: "#ef4444",
         greenCorrect: "#22c55e",
+        darkGray: "#383838",
       },
       fontFamily: {
         headerFont: ["CustomFont_Baloo2", "cursive"],
         textFont: ["BaiJamjuree", "sans-serif"],
       },
-      
     },
   },
   plugins: [],
-}
+};

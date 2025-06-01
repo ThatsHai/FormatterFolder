@@ -1,6 +1,6 @@
 import { useState } from "react";
-import TeachersTable from "./AccountManagementPage/TeachersTable";
-import TeacherQuery from "./AccountManagementPage/TeacherQuery";
+import TeachersTable from "./accountManagementPage/TeachersTable";
+import TeacherQuery from "./accountManagementPage/TeacherQuery";
 import PropTypes from "prop-types";
 import api from "../../services/api";
 
@@ -16,7 +16,12 @@ const QueryContent = ({ selectedTab }) => {
   const handleSearch = async () => {
     if (queryCriteria) {
       try {
-        const result = await api.post("/teachers/search", queryCriteria);
+        const cleanQueryCriteria = Object.fromEntries(
+          Object.entries(queryCriteria).filter(
+            ([, value]) => value !== "" && value !== null && value !== undefined
+          )
+        );
+        const result = await api.post("/teachers/search", cleanQueryCriteria);
         setTeachers(result.data.result);
         return;
       } catch (e) {

@@ -34,7 +34,7 @@ public class TeacherService {
     DepartmentRepo departmentRepo;
     TeacherMapper teacherMapper;
     AuthenticationService authenticationService;
-    private final FacultyRepo facultyRepo;
+//    private final FacultyRepo facultyRepo;
 
     public APIResponse<TeacherDTO> addTeacher(Teacher teacher) {
         Department department = departmentRepo.findByDepartmentId(teacher.getDepartment().getDepartmentId());
