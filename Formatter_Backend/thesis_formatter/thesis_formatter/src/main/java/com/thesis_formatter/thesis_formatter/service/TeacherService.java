@@ -44,6 +44,7 @@ public class TeacherService {
     TeacherMapper teacherMapper;
     AuthenticationService authenticationService;
     RoleRepo roleRepo;
+//    private final FacultyRepo facultyRepo;
 
     private final FacultyRepo facultyRepo;
     @PreAuthorize("hasRole('ADMIN')")

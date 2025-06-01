@@ -15,13 +15,15 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FormField {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+//    @GeneratedValue(strategy = GenerationType.UUID)
     String formFieldId;
     String fieldName;
-    int colSpan;
-    int rowSpan;
+    //    int colSpan;
+//    int rowSpan;
     int position;
     String description;
+    //Form type is used for further expansion
+    String formType;
     @ManyToOne
     @JoinColumn(name = "formId", referencedColumnName = "formId")
     @JsonBackReference
