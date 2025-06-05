@@ -3,8 +3,9 @@ package com.thesis_formatter.thesis_formatter.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 
-@Builder
+@SuperBuilder
 @Entity
 @Data
 @NoArgsConstructor
@@ -21,7 +22,6 @@ public class Account {
     String name;
     String dateOfBirth;
     String gender;
-    String address;
     String phoneNumber;
     String email;
     String avatar;

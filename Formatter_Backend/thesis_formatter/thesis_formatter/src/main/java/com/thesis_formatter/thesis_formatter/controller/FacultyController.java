@@ -25,7 +25,12 @@ public class FacultyController {
     }
 
     @GetMapping("/faculties")
-    public APIResponse<List<FacultyResponse>> getFaculty() {
+    public APIResponse<List<Faculty>> getFaculty() {
         return facultyService.getAll();
     }
+
+//    @GetMapping("/faculties")
+//    public APIResponse<List<FacultyResponse>> getFaculty() {
+//        return facultyService.getAll();
+//    }
 }

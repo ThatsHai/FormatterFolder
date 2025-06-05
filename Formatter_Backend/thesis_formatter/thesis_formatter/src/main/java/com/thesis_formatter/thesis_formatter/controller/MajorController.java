@@ -1,6 +1,7 @@
 package com.thesis_formatter.thesis_formatter.controller;
 
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
+import com.thesis_formatter.thesis_formatter.entity.Department;
 import com.thesis_formatter.thesis_formatter.entity.Faculty;
 import com.thesis_formatter.thesis_formatter.entity.Major;
 import com.thesis_formatter.thesis_formatter.service.MajorService;
@@ -25,7 +26,12 @@ public class MajorController {
     }
 
     @GetMapping("/majors")
-    public APIResponse<List<Major>> getMajor() {
-        return majorService.getAll();
+    public APIResponse<List<Major>> getMajors(@RequestParam(required = false) String deparmentId) {
+        if (deparmentId == null) {
+            System.out.println("deparmentId is null");
+            return majorService.getAll();
+        } else {
+            return majorService.getMajorsByDepartmentId(deparmentId);
+        }
     }
 }

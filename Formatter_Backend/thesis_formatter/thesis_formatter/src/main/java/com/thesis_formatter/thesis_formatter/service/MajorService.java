@@ -39,4 +39,12 @@ public class MajorService {
                 .result(majors)
                 .build();
     }
+
+    public APIResponse<List<Major>> getMajorsByDepartmentId(String departmentId) {
+        List<Major> majors = majorRepo.findByDepartment_DepartmentId(departmentId);
+        return APIResponse.<List<Major>>builder()
+                .code("200")
+                .result(majors)
+                .build();
+    }
 }
