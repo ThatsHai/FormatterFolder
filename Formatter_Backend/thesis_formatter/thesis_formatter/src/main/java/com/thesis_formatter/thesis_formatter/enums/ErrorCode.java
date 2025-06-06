@@ -19,7 +19,7 @@ public enum ErrorCode {
     NULL_PROPERTY("1005", " has Null property", HttpStatus.BAD_REQUEST),
     PERMISSION_EXISTED("1006", "Permission existed", HttpStatus.BAD_REQUEST),
     TOKEN_INVALID("1007", "Token invalid", HttpStatus.BAD_REQUEST),
-
+    INCORRECT_PASSWORD("1008", "Incorrect password", HttpStatus.UNAUTHORIZED),
     ;
 
     private String code;

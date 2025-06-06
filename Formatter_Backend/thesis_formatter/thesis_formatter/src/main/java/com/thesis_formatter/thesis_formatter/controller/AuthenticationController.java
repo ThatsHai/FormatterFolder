@@ -19,6 +19,7 @@ import java.text.ParseException;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@CrossOrigin
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
@@ -33,7 +34,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/introspect")
-    public APIResponse<IntrospectResponse> login(@RequestBody IntrospectRequest request) throws ParseException, JOSEException {
+    public APIResponse<IntrospectResponse> introspect(@RequestBody IntrospectRequest request) throws ParseException, JOSEException {
         var result = authenticationService.introspect(request);
         return APIResponse.<IntrospectResponse>builder()
                 .code("200")
@@ -50,7 +51,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/refesh")
-    public APIResponse<AuthenticationResponse> login(@RequestBody RefeshRequest request) throws ParseException, JOSEException {
+    public APIResponse<AuthenticationResponse> refesh(@RequestBody RefeshRequest request) throws ParseException, JOSEException {
         var result = authenticationService.refeshToken(request);
         return APIResponse.<AuthenticationResponse>builder()
                 .code("200")

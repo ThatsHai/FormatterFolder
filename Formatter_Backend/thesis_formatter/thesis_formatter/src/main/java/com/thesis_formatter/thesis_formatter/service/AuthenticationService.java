@@ -76,16 +76,13 @@ public class AuthenticationService {
 
     public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest) {
 
-        if (accountRepo == null) {
-            throw new IllegalStateException("accountRepo chưa được khởi tạo!");
-        }
         var user = accountRepo.findByUserId(authenticationRequest.getUserId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
 
         boolean authenticated = passwordEncoder.matches(authenticationRequest.getPassword(), user.getPassword());
         if (!authenticated) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.INCORRECT_PASSWORD);
         }
         try {
             var token = generateToken(user);
