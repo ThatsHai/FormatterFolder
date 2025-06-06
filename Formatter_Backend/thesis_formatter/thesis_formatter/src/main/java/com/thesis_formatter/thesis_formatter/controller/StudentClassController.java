@@ -14,7 +14,7 @@ import java.util.List;
 @RequestMapping
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class ClassController {
+public class StudentClassController {
 
     ClassService classService;
 
