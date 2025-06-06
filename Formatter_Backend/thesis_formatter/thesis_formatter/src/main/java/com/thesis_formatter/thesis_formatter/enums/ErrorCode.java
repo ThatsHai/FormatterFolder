@@ -5,16 +5,10 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ErrorCode {
-<<<<<<< Updated upstream
-    UNCATEGORIZED_EXCEPTION("9999", "Uncategorized Exception"),
-    INVALID_KEYWORD("0001", "Invalid message keyword"),
-    USER_EXISTED("1001", "User already existed"),
-    USER_NOT_EXISTED("1002", "User not existed"),
-    UNAUTHENTICATED("1003", "Unauthenticated"),
-=======
     UNCATEGORIZED_EXCEPTION("9999", "Uncategorized Exception", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_KEYWORD("0001", "Invalid message keyword", HttpStatus.BAD_REQUEST),
     USER_EXISTED("1001", "User already existed", HttpStatus.BAD_REQUEST),
@@ -25,14 +19,15 @@ public enum ErrorCode {
     PERMISSION_EXISTED("1006", "Permission existed", HttpStatus.BAD_REQUEST),
     TOKEN_INVALID("1007", "Token invalid", HttpStatus.BAD_REQUEST),
 
->>>>>>> Stashed changes
     ;
 
     private String code;
     private String message;
+    private HttpStatus httpStatusCode;
 
-    ErrorCode(String message, String code) {
+    ErrorCode(String message, String code, HttpStatus httpStatusCode) {
         this.message = message;
         this.code = code;
+        this.httpStatusCode = httpStatusCode;
     }
 }
