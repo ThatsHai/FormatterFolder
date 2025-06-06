@@ -6,8 +6,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class AppException extends RuntimeException {
     private ErrorCode errorCode;
+
+    public AppException(ErrorCode errorCode) {
+        super(errorCode.getMessage()); // Truyền thông điệp lỗi vào RuntimeException
+        this.errorCode = errorCode;
+    }
+
+    public ErrorCode getErrorCode() {
+        return errorCode;
+    }
 }

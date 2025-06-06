@@ -1,13 +1,8 @@
 package com.thesis_formatter.thesis_formatter.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @Builder
 @Entity
@@ -31,7 +26,10 @@ public class Account {
     String email;
     String avatar;
     String status;
-    Set<String> roles;
+
+    @ManyToOne
+    @JoinColumn(name = "role", referencedColumnName = "name")
+    Role role;
 
 
 }

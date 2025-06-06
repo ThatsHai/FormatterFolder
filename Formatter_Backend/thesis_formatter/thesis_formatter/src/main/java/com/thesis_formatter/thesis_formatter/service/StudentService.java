@@ -1,12 +1,13 @@
 package com.thesis_formatter.thesis_formatter.service;
 
 import com.thesis_formatter.thesis_formatter.dto.response.StudentDTO;
+import com.thesis_formatter.thesis_formatter.entity.Role;
 import com.thesis_formatter.thesis_formatter.entity.Student;
 import com.thesis_formatter.thesis_formatter.entity.StudentClass;
-import com.thesis_formatter.thesis_formatter.enums.Role;
 import com.thesis_formatter.thesis_formatter.mapper.StudentMapper;
 import com.thesis_formatter.thesis_formatter.repo.ClassRepo;
 import com.thesis_formatter.thesis_formatter.repo.DepartmentRepo;
+import com.thesis_formatter.thesis_formatter.repo.RoleRepo;
 import com.thesis_formatter.thesis_formatter.repo.StudentRepo;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import lombok.AccessLevel;
@@ -22,15 +23,18 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class StudentService {
     StudentRepo studentRepo;
+
+    DepartmentRepo departmentRepo;
     ClassRepo classRepo;
-    StudentMapper studentMapper;
+
     AuthenticationService authenticationService;
+    RoleRepo roleRepo;
+    private final StudentMapper studentMapper;
 
     public APIResponse<StudentDTO> addStudent(Student student) {
         StudentClass studentClass = classRepo.findById(student.getStudentClass().getStudentClassId()).orElse(null);
-        HashSet<String> roles = new HashSet<>();
-        roles.add(Role.USER.name());
-        student.setRoles(roles);
+        Role role = roleRepo.findByName("STUDENT");
+        student.setRole(role);
         student.setStudentClass(studentClass);
         authenticationService.encodePassword(student);
         studentRepo.save(student);
