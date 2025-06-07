@@ -4,7 +4,7 @@ import com.nimbusds.jose.JOSEException;
 import com.thesis_formatter.thesis_formatter.dto.request.AuthenticationRequest;
 import com.thesis_formatter.thesis_formatter.dto.request.IntrospectRequest;
 import com.thesis_formatter.thesis_formatter.dto.request.LogoutRequest;
-import com.thesis_formatter.thesis_formatter.dto.request.RefeshRequest;
+import com.thesis_formatter.thesis_formatter.dto.request.RefreshRequest;
 import com.thesis_formatter.thesis_formatter.dto.response.AuthenticationResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.IntrospectResponse;
@@ -50,8 +50,8 @@ public class AuthenticationController {
                 .build();
     }
 
-    @PostMapping("/refesh")
-    public APIResponse<AuthenticationResponse> refesh(@RequestBody RefeshRequest request) throws ParseException, JOSEException {
+    @PostMapping("/refresh")
+    public APIResponse<AuthenticationResponse> refresh(@RequestBody RefreshRequest request) throws ParseException, JOSEException {
         var result = authenticationService.refeshToken(request);
         return APIResponse.<AuthenticationResponse>builder()
                 .code("200")
