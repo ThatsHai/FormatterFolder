@@ -19,5 +19,5 @@ server:
   port: 8080
 jwt:
   signerKey: "kDnLkIQNLqJ4Bm2AoiGLRQwk4RUUsrfVrT7Q0I3uxMx+/ngrZnKnOeCtIXpcmUF6"
-  valid-duration: 3600 #in second
-  refeshable-duration: 86400 #in second
+  valid-duration: 900 #in second 15minutes
+  refeshable-duration: 172800 #in second 2 days

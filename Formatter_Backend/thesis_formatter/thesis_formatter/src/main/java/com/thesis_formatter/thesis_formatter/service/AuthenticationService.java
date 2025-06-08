@@ -12,13 +12,11 @@ import com.thesis_formatter.thesis_formatter.dto.request.RefreshRequest;
 import com.thesis_formatter.thesis_formatter.dto.response.AuthenticationResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.IntrospectResponse;
 import com.thesis_formatter.thesis_formatter.entity.Account;
-import com.thesis_formatter.thesis_formatter.entity.InvalidatedToken;
 import com.thesis_formatter.thesis_formatter.entity.RefreshToken;
 import com.thesis_formatter.thesis_formatter.entity.Role;
 import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
 import com.thesis_formatter.thesis_formatter.exception.AppException;
 import com.thesis_formatter.thesis_formatter.repo.AccountRepo;
-import com.thesis_formatter.thesis_formatter.repo.InvalidatedTokenRepo;
 import com.thesis_formatter.thesis_formatter.repo.RefreshTokenRepo;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +45,6 @@ public class AuthenticationService {
     AccountRepo accountRepo;
     PasswordEncoder passwordEncoder;
     RefreshTokenRepo refreshTokenRepo;
-    private final InvalidatedTokenRepo invalidatedTokenRepo;
 
     @NonFinal
     @Value("${jwt.signerKey}")
@@ -171,19 +168,18 @@ public class AuthenticationService {
     }
 
     public void logout(LogoutRequest request) throws ParseException, JOSEException {
+
+        //revoke refresh token
         try {
-            var signToken = verifyToken(request.getToken());
+            var signedJWT = verifyToken(request.getRefreshToken());
 
-            String jit = signToken.getJWTClaimsSet().getJWTID();
-            Date expiryTime = signToken.getJWTClaimsSet().getExpirationTime();
-
-            InvalidatedToken invalidatedToken = InvalidatedToken.builder()
-                    .id(jit)
-                    .expiryTime(expiryTime)
-                    .build();
-            invalidatedTokenRepo.save(invalidatedToken);
+            String jti = signedJWT.getJWTClaimsSet().getJWTID();
+            RefreshToken tokenEntity = refreshTokenRepo.findById(jti)
+                    .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+            tokenEntity.setRevoked(true);
+            refreshTokenRepo.save(tokenEntity);
         } catch (AppException e) {
-            log.info("Token expired or already invalidated");
+            log.info("Refresh token expired or already invalidated");
         }
     }
 
@@ -241,10 +237,10 @@ public class AuthenticationService {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
 
-        if (invalidatedTokenRepo.existsById(signedJWT.getJWTClaimsSet().getJWTID())) {
-            log.error("find invalid token");
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
-        }
+//        if (invalidatedTokenRepo.existsById(signedJWT.getJWTClaimsSet().getJWTID())) {
+//            log.error("find invalid token");
+//            throw new AppException(ErrorCode.UNAUTHENTICATED);
+//        }
 
         return signedJWT;
     }
