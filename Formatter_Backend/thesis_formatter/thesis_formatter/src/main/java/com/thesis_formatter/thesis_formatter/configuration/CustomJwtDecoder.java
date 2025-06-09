@@ -2,16 +2,12 @@ package com.thesis_formatter.thesis_formatter.configuration;
 
 import com.nimbusds.jose.JOSEException;
 import com.thesis_formatter.thesis_formatter.dto.request.IntrospectRequest;
-import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
-import com.thesis_formatter.thesis_formatter.exception.AppException;
 import com.thesis_formatter.thesis_formatter.service.AuthenticationService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Component;
