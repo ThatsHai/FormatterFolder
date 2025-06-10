@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import FormContent from "./formManagementPage/FormContent";
 
 const FormManagementPage = () => {
