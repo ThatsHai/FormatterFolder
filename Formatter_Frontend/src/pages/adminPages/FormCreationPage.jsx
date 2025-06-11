@@ -35,11 +35,11 @@ const FormCreationPage = () => {
   const [emptyTitleError, setEmptyTitleError] = useState(false);
 
   const textareaRef = useRef(null);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    console.log(form);
-  }, [form]);
+  // useEffect(() => {
+  //   console.log(form);
+  // }, [form]);
 
   const onBasicInfoChange = (e) => {
     const { name, value } = e.target;
@@ -74,7 +74,7 @@ const FormCreationPage = () => {
   //Display confirmation popup
   const handleSaveForm = () => {
     const emptyFields = form.formFields.filter((form) => form.fieldName === "");
-    if (form.title === "") {
+    if (form.title.trim() === "") {
       setEmptyTitleError(true);
     } else {
       setEmptyTitleError(false);
@@ -98,7 +98,7 @@ const FormCreationPage = () => {
   const onSuccessPopupClosed = () => {
     setDisplayConfirmationPopup(false);
     setDisplaySuccessPopup(false);
-    navigate("/admin/forms")
+    navigate("/admin/forms");
   };
 
   return (
