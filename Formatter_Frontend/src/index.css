@@ -7,3 +7,10 @@
   
 }
 
+.ql-editor {
+  font-size: 1rem !important;
+}
+
+.ql-no-border .ql-container {
+  border: none !important;
+}
