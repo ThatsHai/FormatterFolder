@@ -61,7 +61,7 @@ const RightSidebar = ({ formData }) => {
 };
 
 const FormDesignCreationPage = ({
-  formId = "f9e059d1-f7f1-4bae-8c7b-c7d90b454280",
+  formId = "a6523b0b-b0ec-4c84-8a94-5dab35a2a029",
 }) => {
   const [formData, setFormData] = useState();
 
