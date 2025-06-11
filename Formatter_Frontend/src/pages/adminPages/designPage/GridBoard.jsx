@@ -4,8 +4,11 @@ import CustomizableInput from "../../../component/CustomizableInput";
 import { CustomToolbar } from "../../../component/CustomizableInput";
 import PropTypes from "prop-types";
 
-const GridBoard = ({ onUpdateDesignInfo = () => {}, gridSize = 12, cellSize = 50 }) => {
-  
+const GridBoard = ({
+  onUpdateDesignInfo = () => {},
+  gridSize = 12,
+  cellSize = 50,
+}) => {
   const editorRefs = useRef({});
 
   const [startCell, setStartCell] = useState(null);
@@ -43,16 +46,16 @@ const GridBoard = ({ onUpdateDesignInfo = () => {}, gridSize = 12, cellSize = 50
   const handleMouseUp = (row, col) => {
     if (!startCell) return;
 
-    const top = Math.min(startCell.row, row);
-    const left = Math.min(startCell.col, col);
+    const topPos = Math.min(startCell.row, row);
+    const leftPos = Math.min(startCell.col, col);
     const bottom = Math.max(startCell.row, row);
     const right = Math.max(startCell.col, col);
 
     const newRegion = {
-      top,
-      left,
-      width: right - left + 1,
-      height: bottom - top + 1,
+      topPos,
+      leftPos,
+      width: right - leftPos + 1,
+      height: bottom - topPos + 1,
       text: "",
       fromDrag: false,
     };
@@ -72,31 +75,31 @@ const GridBoard = ({ onUpdateDesignInfo = () => {}, gridSize = 12, cellSize = 50
 
   const regionsOverlap = (a, b) => {
     return !(
-      a.left + a.width - 1 < b.left ||
-      b.left + b.width - 1 < a.left ||
-      a.top + a.height - 1 < b.top ||
-      b.top + b.height - 1 < a.top
+      a.leftPos + a.width - 1 < b.leftPos ||
+      b.leftPos + b.width - 1 < a.leftPos ||
+      a.topPos + a.height - 1 < b.topPos ||
+      b.topPos + b.height - 1 < a.topPos
     );
   };
 
   const isCovered = (row, col) => {
     return mergeRegions.some((region) => {
       return (
-        row >= region.top &&
-        row < region.top + region.height &&
-        col >= region.left &&
-        col < region.left + region.width
+        row >= region.topPos &&
+        row < region.topPos + region.height &&
+        col >= region.leftPos &&
+        col < region.leftPos + region.width
       );
     });
   };
 
   const isInSelection = (row, col) => {
     if (!startCell || !hoverCell) return false;
-    const top = Math.min(startCell.row, hoverCell.row);
-    const left = Math.min(startCell.col, hoverCell.col);
+    const topPos = Math.min(startCell.row, hoverCell.row);
+    const leftPos = Math.min(startCell.col, hoverCell.col);
     const bottom = Math.max(startCell.row, hoverCell.row);
     const right = Math.max(startCell.col, hoverCell.col);
-    return row >= top && row <= bottom && col >= left && col <= right;
+    return row >= topPos && row <= bottom && col >= leftPos && col <= right;
   };
 
   // Main function to generate print data with filling gaps
@@ -110,8 +113,8 @@ const GridBoard = ({ onUpdateDesignInfo = () => {}, gridSize = 12, cellSize = 50
     );
 
     mergeRegions.forEach((region, index) => {
-      for (let r = region.top; r < region.top + region.height; r++) {
-        for (let c = region.left; c < region.left + region.width; c++) {
+      for (let r = region.topPos; r < region.topPos + region.height; r++) {
+        for (let c = region.leftPos; c < region.leftPos + region.width; c++) {
           gridMap[r][c] = index;
         }
       }
@@ -128,22 +131,26 @@ const GridBoard = ({ onUpdateDesignInfo = () => {}, gridSize = 12, cellSize = 50
         // If it's part of a merged region
         if (regionIndex !== null) {
           const region = mergeRegions[regionIndex];
-          const isTopLeft = region.top === r && region.left === c;
+          const isTopPosLeft = region.topPos === r && region.leftPos === c;
 
-          if (isTopLeft) {
+          if (isTopPosLeft) {
             result.push({
               text: region.text || "",
               colspan: region.width,
               rowspan: region.height,
-              top: r,
-              left: c,
+              topPos: r,
+              leftPos: c,
             });
 
             // Mark visited
-            for (let rr = region.top; rr < region.top + region.height; rr++) {
+            for (
+              let rr = region.topPos;
+              rr < region.topPos + region.height;
+              rr++
+            ) {
               for (
-                let cc = region.left;
-                cc < region.left + region.width;
+                let cc = region.leftPos;
+                cc < region.leftPos + region.width;
                 cc++
               ) {
                 visited[rr][cc] = true;
@@ -190,11 +197,11 @@ const GridBoard = ({ onUpdateDesignInfo = () => {}, gridSize = 12, cellSize = 50
             text: "",
             colspan: spanWidth,
             rowspan: spanHeight,
-            top: minRow,
-            left: minCol,
+            topPos: minRow,
+            leftPos: minCol,
           });
 
-          // Skip over already processed left-side cells
+          // Skip over already processed leftPos-side cells
           c = minCol;
         }
       }
@@ -206,9 +213,10 @@ const GridBoard = ({ onUpdateDesignInfo = () => {}, gridSize = 12, cellSize = 50
   const handlePrintData = () => {
     const data = generateOptimizedCellData();
     data.reverse();
-    console.log("Grid Print Data:", data);
+    // console.log("Grid Print Data:", data);
     data.pop();
     onUpdateDesignInfo("cells", data);
+    data.reverse();
     console.log("Grid Print Data:", data);
   };
 
@@ -218,14 +226,14 @@ const GridBoard = ({ onUpdateDesignInfo = () => {}, gridSize = 12, cellSize = 50
     const region = mergeRegions[focusedIndex];
     if (!region) return { display: "none" };
 
-    // Position toolbar 5px right of the merged cell block, aligned top with the cell block
-    const top = region.top * cellSize;
-    const left = (region.left + region.width) * cellSize + 5;
+    // Position toolbar 5px right of the merged cell block, aligned topPos with the cell block
+    const topPos = region.topPos * cellSize;
+    const leftPos = (region.leftPos + region.width) * cellSize + 5;
 
     return {
       position: "absolute",
-      top: `${top}px`,
-      left: `${left}px`,
+      top: `${topPos}px`,
+      left: `${leftPos}px`,
       zIndex: 1000,
       backgroundColor: "white",
       border: "1px solid #ccc",
@@ -316,8 +324,8 @@ const GridBoard = ({ onUpdateDesignInfo = () => {}, gridSize = 12, cellSize = 50
               });
             }}
             style={{
-              gridColumn: `${region.left + 1} / span ${region.width}`,
-              gridRow: `${region.top + 1} / span ${region.height}`,
+              gridColumn: `${region.leftPos + 1} / span ${region.width}`,
+              gridRow: `${region.topPos + 1} / span ${region.height}`,
               // backgroundColor:  region.fromDrag ? "#D9D9D9" : "#fff",
               border: "2px solid #3b82f6",
               fontFamily: "'BaiJamjuree', sans-serif",
