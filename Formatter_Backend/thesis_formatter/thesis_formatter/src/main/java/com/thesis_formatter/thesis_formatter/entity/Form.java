@@ -21,6 +21,8 @@ public class Form {
     String formId;
     String title;
     String introduction;
+    @ElementCollection
+    List<String> readersList;
     @Enumerated(EnumType.STRING)
     FormStatus status = FormStatus.WAITING;
     @OneToMany(mappedBy = "form", cascade = CascadeType.ALL)

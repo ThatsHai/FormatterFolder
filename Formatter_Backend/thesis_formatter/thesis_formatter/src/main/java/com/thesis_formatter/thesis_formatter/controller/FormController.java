@@ -7,6 +7,7 @@ import com.thesis_formatter.thesis_formatter.service.FormService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -56,5 +57,15 @@ public class FormController {
     @GetMapping("/forms/{formId}")
     public APIResponse<Form> getFormByFormId(@PathVariable("formId") String formId) {
         return formService.getFormById(formId);
+    }
+
+    @GetMapping("/forms/students")
+    public APIResponse<Form> getStudentForm() {
+        return formService.getFormForReader("STUDENT");
+    }
+
+    @GetMapping("/forms/teachers")
+    public APIResponse<Form> getTeacherForm() {
+        return formService.getFormForReader("TEACHER");
     }
 }

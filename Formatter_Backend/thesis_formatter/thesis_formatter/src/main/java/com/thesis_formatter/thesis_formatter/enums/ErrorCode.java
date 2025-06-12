@@ -20,6 +20,9 @@ public enum ErrorCode {
     PERMISSION_EXISTED("1006", "Permission existed", HttpStatus.BAD_REQUEST),
     TOKEN_INVALID("1007", "Token invalid", HttpStatus.BAD_REQUEST),
     INCORRECT_PASSWORD("1008", "Incorrect password", HttpStatus.UNAUTHORIZED),
+    DUPLICATE_KEY("1009", "Duplicate key", HttpStatus.BAD_REQUEST),
+    TEACHER_NOT_EXISTED("1010", "Teacher not existed", HttpStatus.NOT_FOUND),
+    MAJOR_NOT_EXISTED("1011", "Major not existed", HttpStatus.NOT_FOUND),
     ;
 
     private String code;

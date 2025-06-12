@@ -40,8 +40,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = SQLIntegrityConstraintViolationException.class)
     ResponseEntity<APIResponse> handleSQLException(SQLIntegrityConstraintViolationException e) {
         APIResponse apiResponse = new APIResponse();
-        apiResponse.setCode(ErrorCode.USER_EXISTED.getCode());
-        apiResponse.setMessage(ErrorCode.USER_EXISTED.getMessage());
+        apiResponse.setCode(ErrorCode.DUPLICATE_KEY.getCode());
+        apiResponse.setMessage(ErrorCode.DUPLICATE_KEY.getMessage());
         return ResponseEntity.badRequest().body(apiResponse);
     }
 

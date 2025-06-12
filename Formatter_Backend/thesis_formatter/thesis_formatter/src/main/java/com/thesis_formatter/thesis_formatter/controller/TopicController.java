@@ -1,6 +1,8 @@
 package com.thesis_formatter.thesis_formatter.controller;
 
+import com.thesis_formatter.thesis_formatter.dto.request.TopicRequest;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
+import com.thesis_formatter.thesis_formatter.dto.response.TopicResponse;
 import com.thesis_formatter.thesis_formatter.entity.Topic;
 import com.thesis_formatter.thesis_formatter.service.TopicService;
 import lombok.AccessLevel;
@@ -24,7 +26,7 @@ public class TopicController {
     }
 
     @PostMapping("/topics/create")
-    public APIResponse<Topic> createTopic(@RequestBody Topic topic) {
+    public APIResponse<TopicResponse> createTopic(@RequestBody TopicRequest topic) {
         return topicService.create(topic);
     }
 }
