@@ -3,16 +3,20 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import FieldInfo from "../component/FieldInfo.jsx";
 import PasswordField from "../component/PasswordField.jsx";
-import api from "../services/api.js";
+import { useDispatch } from "react-redux";
+import api, { noTokenApi } from "../services/api.js";
+import { loginSuccess } from "../redux/authSlice";
+
 const Login = () => {
   const navigate = useNavigate();
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
+
   useEffect(() => {
-        if (error) {
-            const timer = setTimeout(() => setError(''), 5000);
-            return () => clearTimeout(timer);
-        }
-    }, [error]);
+    if (error) {
+      const timer = setTimeout(() => setError(""), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   const fields = [
     { label: "Mã số sinh viên", minLength: 8 },
@@ -46,26 +50,46 @@ const Login = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = async(e) => {
+  const saveToken = async (jwtToken) => {
+    sessionStorage.removeItem("accessToken");
+    sessionStorage.setItem("accessToken", jwtToken);
+  };
+
+  const dispatch = useDispatch();
+
+  const fetchInfo = async () => {
+    const response = await api.get("/myInfo");
+    return response.data.result;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      const mapFormInfoToPayload = () => {
-              return {
-                userId: formInfo["Mã số sinh viên"],
-                password: formInfo["Mật khẩu"],
-              };
-            };
-      const dataToSend = mapFormInfoToPayload();
-      try{
-        console.log("Form submitted:", dataToSend);
-        await api.post(`/auth/token`, dataToSend)
-        
-        setFormInfo(Object.fromEntries(fields.map((f) => [f.label, ""])));
-        setResetSignal((prev) => prev + 1);
-        navigate("/");
-      }catch (error) {
-        setError(error.response.data?.message || "Đăng nhập thất bại");
-      }
+
+    if (!validateForm()) return;
+
+    const mapFormInfoToPayload = () => ({
+      userId: formInfo["Mã số sinh viên"],
+      password: formInfo["Mật khẩu"],
+    });
+
+    const dataToSend = mapFormInfoToPayload();
+
+    try {
+      console.log("Form submitted:", dataToSend);
+      const loginResponse = await noTokenApi.post(`/auth/token`, dataToSend);
+      const accessToken = loginResponse.data.result.accesstoken;
+
+      await saveToken(accessToken);
+      const user = await fetchInfo();
+
+      dispatch(loginSuccess({ user, accessToken }));
+
+      setFormInfo(Object.fromEntries(fields.map((f) => [f.label, ""])));
+      setResetSignal((prev) => prev + 1);
+      alert(JSON.stringify(user));
+      navigate("/");
+    } catch (error) {
+      setError(error.response?.data?.message || "Đăng nhập thất bại");
     }
   };
 
@@ -78,7 +102,9 @@ const Login = () => {
         <p className="text-[1.8rem] text-gray mt-2 opacity-80">
           Hệ thống Đề cương luận văn luận án
         </p>
-        {error && <p className="text-lg text-redError text-center mb-4">{error}</p>}
+        {error && (
+          <p className="text-lg text-redError text-center mb-4">{error}</p>
+        )}
       </div>
       <form onSubmit={handleSubmit}>
         {fields.map((field) => {

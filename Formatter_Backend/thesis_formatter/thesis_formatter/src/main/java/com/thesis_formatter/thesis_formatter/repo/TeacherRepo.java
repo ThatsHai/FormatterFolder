@@ -2,6 +2,7 @@ package com.thesis_formatter.thesis_formatter.repo;
 
 import com.thesis_formatter.thesis_formatter.dto.response.TeacherDTO;
 import com.thesis_formatter.thesis_formatter.entity.Department;
+import com.thesis_formatter.thesis_formatter.entity.Student;
 import com.thesis_formatter.thesis_formatter.entity.Teacher;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -23,4 +24,6 @@ public interface TeacherRepo extends JpaRepository<Teacher, String>, JpaSpecific
                                   @Param("departmentName") String departmentName,
                                   @Param("teacherId") String teacherId,
                                   @Param("teacherName") String teacherName);
+
+    Teacher findByUserId(String teacherId);
 }
