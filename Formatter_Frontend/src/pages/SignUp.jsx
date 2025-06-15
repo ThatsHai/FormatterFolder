@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import FieldInfo from "../component/FieldInfo.jsx";
 import PasswordField from "../component/PasswordField.jsx";
 import SelectField from "../component/SelectField.jsx";
-import api from "../services/api.js";
-import { EditNote } from "@mui/icons-material";
+import api, { noTokenApi } from "../services/api.js";
 import dayjs from "dayjs";
+import { loginSuccess } from "../redux/authSlice";
+import { useDispatch } from "react-redux";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -16,10 +17,10 @@ const SignUp = () => {
     { label: "Ngày sinh", minLength: 10, type: "date" },
     { label: "Số điện thoại", minLength: 10, type: "number" },
     { label: "Giới tính", options: ["Nam", "Nữ"], type: "select" },
-    { label: "Khoa/Trường/Viện",type: "select" },
-    { label: "Đơn vị (Khoa/Bộ môn)",type: "select" },
-    { label: "Ngành",type: "select" },
-    { label: "Lớp" ,type: "select"},
+    { label: "Khoa/Trường/Viện", type: "select" },
+    { label: "Đơn vị (Khoa/Bộ môn)", type: "select" },
+    { label: "Ngành", type: "select" },
+    { label: "Lớp", type: "select" },
     { label: "Mật khẩu", minLength: 8, type: "password" },
     { label: "Nhập lại mật khẩu", minLength: 8, type: "password" },
   ];
@@ -33,17 +34,17 @@ const SignUp = () => {
   const [selectedMajorId, setSelectedMajorId] = useState("");
   const [selectedClassId, setSelectedClassId] = useState("");
 
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   useEffect(() => {
-        if (error) {
-            const timer = setTimeout(() => setError(''), 5000);
-            return () => clearTimeout(timer);
-        }
-    }, [error]);
+    if (error) {
+      const timer = setTimeout(() => setError(""), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   const fetchOptions = async (endpoint, setList) => {
     try {
-      const response = await api.get(endpoint);
+      const response = await noTokenApi.get(endpoint);
       setList(response.data.result);
     } catch (error) {
       setList([]);
@@ -105,14 +106,14 @@ const SignUp = () => {
     fields.forEach(({ label, minLength, type }) => {
       const value = formInfo[label] || "";
       if (type === "select" || type === "date") {
-      if (value === "") {
-        errors[label] = `Vui lòng chọn ${label.toLowerCase()}`;
+        if (value === "") {
+          errors[label] = `Vui lòng chọn ${label.toLowerCase()}`;
+        }
+      } else {
+        if (value.trim().length < minLength) {
+          errors[label] = `${label} phải có ít nhất ${minLength} ký tự`;
+        }
       }
-    } else {
-      if (value.trim().length < minLength) {
-        errors[label] = `${label} phải có ít nhất ${minLength} ký tự`;
-      }
-    }
     });
 
     if (
@@ -127,10 +128,21 @@ const SignUp = () => {
     return Object.keys(errors).length === 0;
   };
 
+  const saveToken = async (jwtToken) => {
+    sessionStorage.removeItem("accessToken");
+    sessionStorage.setItem("accessToken", jwtToken);
+  };
+
+  const dispatch = useDispatch();
+
+  const fetchInfo = async () => {
+    const response = await api.get("/myInfo");
+    return response.data.result;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-
       const mapFormInfoToPayload = () => {
         return {
           name: formInfo["Họ và tên sinh viên"],
@@ -145,13 +157,25 @@ const SignUp = () => {
       const dataToSend = mapFormInfoToPayload();
 
       try {
-        const signup = await api.post("/students", dataToSend);
+        await noTokenApi.post("/students", dataToSend);
         console.log("Form submitted:", dataToSend);
+
+        const loginResponse = await noTokenApi.post(`/auth/token`, dataToSend);
+        const accessToken = loginResponse.data.result.accesstoken;
+
+        await saveToken(accessToken);
+        const user = await fetchInfo();
+
+        dispatch(loginSuccess({ user, accessToken }));
+        alert(JSON.stringify(user));
+
         setFormInfo(Object.fromEntries(fields.map((f) => [f.label, ""])));
         setResetSignal((prev) => prev + 1);
-        navigate("/login");
+        navigate("/");
       } catch (error) {
-        setError(error.response.data.message || "Đăng ký thất bại. Vui lòng thử lại!");
+        setError(
+          error.response.data.message || "Đăng ký thất bại. Vui lòng thử lại!"
+        );
       }
       setFormErrors({});
     }
@@ -166,7 +190,9 @@ const SignUp = () => {
         <p className="text-[1.8rem] text-gray mt-2 opacity-80">
           Hệ thống Đề cương luận văn luận án
         </p>
-        {error && <p className="text-lg text-redError text-center mb-4">{error}</p>}
+        {error && (
+          <p className="text-lg text-redError text-center mb-4">{error}</p>
+        )}
       </div>
       <form onSubmit={handleSubmit}>
         {fields.map((field) => {
@@ -266,8 +292,10 @@ const SignUp = () => {
         </button>
         <p className="text-gray text-center">
           Đã có tài khoản?{" "}
-          <span className="text-darkBlue cursor-pointer"
-          onClick={() => navigate("/login")}>
+          <span
+            className="text-darkBlue cursor-pointer"
+            onClick={() => navigate("/login")}
+          >
             Đăng nhập ngay
           </span>
         </p>
