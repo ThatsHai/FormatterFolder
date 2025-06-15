@@ -13,6 +13,7 @@ const TopicSuggestionPage = ({
     title: "",
     description: "",
     objective: "",
+    funding: "",
     fundingSource: "",
     implementationTime: "",
     teacherIds: [],
@@ -22,6 +23,7 @@ const TopicSuggestionPage = ({
   const [teachersList, setTeachersList] = useState([]); // currentUserTeacher là giáo viên đăng nhập
   const [openAddTeacherModal, setOpenAddTeacherModal] = useState(false);
   const [majorsOptions, setMajorsOptions] = useState([]);
+  const [formErrors, setFormErrors] = useState({});
 
   const onUpdateFormData = (fieldName, value) => {
     setFormData((prev) => ({ ...prev, [fieldName]: value }));
@@ -64,25 +66,40 @@ const TopicSuggestionPage = ({
   //   setTeachersList((prev) => prev.filter(t => t.userId !== userId || t.isDefault));
   // };
 
+  const validateForm = () => {
+    const errors = {};
+
+    if (!formData.title.trim())
+      errors.title = "Tên đề tài không được để trống.";
+    if (!formData.description.trim())
+      errors.description = "Mô tả không được để trống.";
+    if (!formData.objective.trim())
+      errors.objective = "Mục tiêu không được để trống.";
+    if (!formData.funding.trim())
+      errors.funding = "Kinh phí không được để trống.";
+    if (!formData.fundingSource.trim())
+      errors.fundingSource = "Nguồn kinh phí không được để trống.";
+    if (!formData.implementationTime.trim())
+      errors.implementationTime = "Thời gian thực hiện không được để trống.";
+    if (!formData.contactInfo.trim())
+      errors.contactInfo = "Thông tin liên hệ không được để trống.";
+    if (!formData.majorId)
+      errors.majorId = "Vui lòng chọn ngành cho sinh viên thực hiện đề tài.";
+    if (teachersList.length === 0)
+      errors.teacherIds = "Phải có ít nhất một cán bộ hướng dẫn.";
+    else console.log("teachersList", teachersList);
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Form data:", formData);
-    if (
-      !formData.title ||
-      !formData.description ||
-      !formData.objective ||
-      !formData.fundingSource ||
-      !formData.implementationTime ||
-      !formData.contactInfo ||
-      !formData.majorId ||
-      teachersList.length === 0
-    ) {
-      alert("Vui lòng điền đầy đủ thông tin trước khi gửi.");
-      return;
-    }
+    if (!validateForm()) return;
+
     const result = async () => {
       try {
-        
         await api.post("/topics/create", formData);
 
         onSuccess();
@@ -123,6 +140,7 @@ const TopicSuggestionPage = ({
             VNTitle="TÊN ĐỀ TÀI"
             ENTitle="title"
             formData={formData}
+            error={formErrors.title}
             handleChange={handleChange}
           ></ShortAnswer>
           <ShortAnswer
@@ -130,6 +148,7 @@ const TopicSuggestionPage = ({
             VNTitle="MÔ TẢ"
             ENTitle="description"
             formData={formData}
+            error={formErrors.description}
             handleChange={handleChange}
           ></ShortAnswer>
           <div className="relative text-start font-textFont text-lg m-8 px-10">
@@ -140,7 +159,13 @@ const TopicSuggestionPage = ({
               value={formData.objective || ""}
               onChange={(value) => onUpdateFormData("objective", value)}
               placeholder="Nhập mô tả chi tiết về mục tiêu đề tài..."
+              error={formErrors.objective}
             />
+            {formErrors.objective && (
+              <p className="text-redError pt-2">
+                {formErrors.objective}
+              </p>
+            )}
           </div>
 
           <ShortAnswer
@@ -148,6 +173,7 @@ const TopicSuggestionPage = ({
             VNTitle="KINH PHÍ"
             ENTitle="funding"
             formData={formData}
+            error={formErrors.funding}
             handleChange={handleChange}
           ></ShortAnswer>
           <ShortAnswer
@@ -155,6 +181,7 @@ const TopicSuggestionPage = ({
             VNTitle="NGUỒN KINH PHÍ"
             ENTitle="fundingSource"
             formData={formData}
+            error={formErrors.fundingSource}
             handleChange={handleChange}
           ></ShortAnswer>
 
@@ -163,6 +190,7 @@ const TopicSuggestionPage = ({
             VNTitle="THỜI GIAN THỰC HIỆN"
             ENTitle="implementationTime"
             formData={formData}
+            error={formErrors.implementationTime}
             handleChange={handleChange}
           ></ShortAnswer>
           <div className="flex items-center relative text-start font-textFont text-lg m-8 px-10">
@@ -172,11 +200,16 @@ const TopicSuggestionPage = ({
               className="border text-xs rounded-md p-1 px-2 mx-3"
               onClick={() => setOpenAddTeacherModal(true)}
             >
-              + Thêm CBHD
+              {teachersList.length>0 ? "Sửa CBHD" : "+ Thêm CBHD"}
             </button>
           </div>
           <div className="max-w-xl mx-auto">
             <TeachersTable teachers={teachersList} />
+             {formErrors.teacherIds && (
+              <p className="text-redError pt-2">
+                {formErrors.teacherIds}
+              </p>
+            )}
           </div>
           {/* Modal thêm giáo viên */}
           {openAddTeacherModal && (
@@ -191,6 +224,7 @@ const TopicSuggestionPage = ({
             VNTitle="THÔNG TIN LIÊN HỆ"
             ENTitle="contactInfo"
             formData={formData}
+            error={formErrors.contactInfo}
             handleChange={handleChange}
           ></ShortAnswer>
 
@@ -205,7 +239,7 @@ const TopicSuggestionPage = ({
                 label={"majorId"}
                 value={formData.majorId}
                 onChange={handleSelectChange}
-                error={""}
+                error={formErrors.majorId}
                 options={majorsOptions}
                 showLabel={false}
               ></SelectField>
@@ -229,3 +263,4 @@ const TopicSuggestionPage = ({
 };
 
 export default TopicSuggestionPage;
+//chưa bắt lỗi từng trường

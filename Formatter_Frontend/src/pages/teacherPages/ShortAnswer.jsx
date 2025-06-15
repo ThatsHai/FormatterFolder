@@ -6,6 +6,7 @@ const Title = ({
   ENTitle = "English Title",
   formData = {},
   handleChange = () => {},
+  error = "",
 }) => {
   return (
     <div className="relative text-start font-textFont text-lg m-8 px-10">
@@ -17,6 +18,7 @@ const Title = ({
         value={formData[ENTitle] || ""}
         onChange={handleChange}
       />
+       {error && <p className="text-redError pt-2">{error}</p>}
     </div>
   );
 };
@@ -28,5 +30,6 @@ Title.propTypes = {
   VNTitle: PropTypes.string,
   ENTitle: PropTypes.string,
   formData: PropTypes.object,
+  error: PropTypes.string,
   handleChange: PropTypes.func,
 };
