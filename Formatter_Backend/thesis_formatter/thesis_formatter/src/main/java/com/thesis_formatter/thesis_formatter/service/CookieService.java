@@ -2,6 +2,7 @@ package com.thesis_formatter.thesis_formatter.service;
 
 import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
 import com.thesis_formatter.thesis_formatter.exception.AppException;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
@@ -26,13 +27,26 @@ public class CookieService {
         return cookie;
     }
 
+//    public String getRefreshToken(HttpServletRequest request) {
+//        String refreshToken = Arrays.stream(request.getCookies())
+//                .filter(c -> "refreshToken".equals(c.getName()))
+//                .findFirst()
+//                .map(Cookie::getValue)
+//                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+//        return refreshToken;
+//    }
+
     public String getRefreshToken(HttpServletRequest request) {
-        String refreshToken = Arrays.stream(request.getCookies())
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED); // or return null/Optional
+        }
+
+        return Arrays.stream(cookies)
                 .filter(c -> "refreshToken".equals(c.getName()))
                 .findFirst()
                 .map(Cookie::getValue)
                 .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
-        return refreshToken;
     }
 
     public Cookie deleteCookie() {

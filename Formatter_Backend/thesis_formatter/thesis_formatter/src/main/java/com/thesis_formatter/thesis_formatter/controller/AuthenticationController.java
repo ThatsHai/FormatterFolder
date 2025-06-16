@@ -29,8 +29,8 @@ import java.text.ParseException;
 @CrossOrigin
 public class AuthenticationController {
 
-    private final AuthenticationService authenticationService;
-    private final CookieService cookieService;
+    AuthenticationService authenticationService;
+    CookieService cookieService;
 
     @PostMapping("/token")
     public APIResponse<AuthenticationResponse> login(@RequestBody AuthenticationRequest request, HttpServletResponse response) {
