@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import api from "../../services/api";
 import ShortAnswer from "../teacherPages/ShortAnswer";
 import ReactQuill from "react-quill";
-import AddingTeacher from "./AddingTeacher";
-import TeachersTable from "./TeachersTable";
 import SelectField from "../../component/SelectField";
+import { useSelector } from "react-redux";
+import AddingTeacherField from "./AddingTeacherField";
 const TopicSuggestionPage = ({
   handleFormToggle = () => {},
   onSuccess = () => {},
@@ -24,6 +24,8 @@ const TopicSuggestionPage = ({
   const [openAddTeacherModal, setOpenAddTeacherModal] = useState(false);
   const [majorsOptions, setMajorsOptions] = useState([]);
   const [formErrors, setFormErrors] = useState({});
+  const user = useSelector((state) => state.auth.user);
+  const [currentUserTeacher, setCurrentUserTeacher] = useState(user);
 
   const onUpdateFormData = (fieldName, value) => {
     setFormData((prev) => ({ ...prev, [fieldName]: value }));
@@ -44,6 +46,7 @@ const TopicSuggestionPage = ({
       setMajorsOptions(majors);
     };
     getMajors();
+    console.log("currentUserTeacher", currentUserTeacher);
   }, []);
 
   useEffect(() => {
@@ -162,9 +165,7 @@ const TopicSuggestionPage = ({
               error={formErrors.objective}
             />
             {formErrors.objective && (
-              <p className="text-redError pt-2">
-                {formErrors.objective}
-              </p>
+              <p className="text-redError pt-2">{formErrors.objective}</p>
             )}
           </div>
 
@@ -193,32 +194,16 @@ const TopicSuggestionPage = ({
             error={formErrors.implementationTime}
             handleChange={handleChange}
           ></ShortAnswer>
-          <div className="flex items-center relative text-start font-textFont text-lg m-8 px-10">
-            <h3 className="text-black font-semibold">7. CÁN BỘ HƯỚNG DẪN</h3>
-            <button
-              type="button"
-              className="border text-xs rounded-md p-1 px-2 mx-3"
-              onClick={() => setOpenAddTeacherModal(true)}
-            >
-              {teachersList.length>0 ? "Sửa CBHD" : "+ Thêm CBHD"}
-            </button>
-          </div>
-          <div className="max-w-xl mx-auto">
-            <TeachersTable teachers={teachersList} />
-             {formErrors.teacherIds && (
-              <p className="text-redError pt-2">
-                {formErrors.teacherIds}
-              </p>
-            )}
-          </div>
-          {/* Modal thêm giáo viên */}
-          {openAddTeacherModal && (
-            <AddingTeacher
-              onSelectTeachers={(selected) => setTeachersList(selected)}
-              onClose={() => setOpenAddTeacherModal(false)}
-            />
-          )}
 
+          <AddingTeacherField
+            className="flex items-center relative text-start font-textFont text-lg m-8 px-10"
+            title="7. CÁN BỘ HƯỚNG DẪN"
+            teachersList={teachersList}
+            setTeachersList={setTeachersList}
+            formErrors={formErrors}
+            openAddTeacherModal={openAddTeacherModal}
+            setOpenAddTeacherModal={setOpenAddTeacherModal}
+          ></AddingTeacherField>
           <ShortAnswer
             order="8"
             VNTitle="THÔNG TIN LIÊN HỆ"

@@ -15,14 +15,14 @@ const FormCreationPage = () => {
         fieldName: "Field thu nhat",
         formFieldId: uuidv4(),
         description: "",
-        formType: "",
+        fieldType: "",
       },
       {
         position: 1,
         fieldName: "Day la field thu 2",
         formFieldId: uuidv4(),
         description: "",
-        formType: "",
+        fieldType: "",
       },
     ],
   });

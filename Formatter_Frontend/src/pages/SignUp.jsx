@@ -7,6 +7,7 @@ import api, { noTokenApi } from "../services/api.js";
 import dayjs from "dayjs";
 import { loginSuccess } from "../redux/authSlice";
 import { useDispatch } from "react-redux";
+import FormField from "../component/forms/SubmitThesisFormComponents/FormField.jsx";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -181,127 +182,89 @@ const SignUp = () => {
     }
   };
 
-  return (
-    <>
-      <div className="px-16 py-5">
-        <p className="text-5xl text-darkBlue font-headerFont text-center font-bold">
-          Đăng ký
-        </p>
-        <p className="text-[1.8rem] text-gray mt-2 opacity-80">
-          Hệ thống Đề cương luận văn luận án
-        </p>
-        {error && (
-          <p className="text-lg text-redError text-center mb-4">{error}</p>
-        )}
-      </div>
-      <form onSubmit={handleSubmit}>
-        {fields.map((field) => {
-          if (field.label === "Giới tính") {
-            return (
-              <SelectField
-                key={field.label}
-                label={field.label}
-                value={formInfo[field.label]}
-                onChange={handleChange}
-                error={formErrors[field.label]}
-                options={field.options}
-              ></SelectField>
-            );
-          }
-          if (field.label === "Khoa/Trường/Viện") {
-            return (
-              <SelectField
-                key={field.label}
-                label={field.label}
-                value={formInfo[field.label]}
-                onChange={handleSelectChange(setSelectedFacultyId)}
-                error={formErrors[field.label]}
-                options={facultiesList.map((faculty) => ({
-                  key: faculty.facultyId,
-                  value: faculty.facultyName,
-                }))}
-              ></SelectField>
-            );
-          }
-          if (field.label === "Đơn vị (Khoa/Bộ môn)") {
-            return (
-              <SelectField
-                key={field.label}
-                label={field.label}
-                value={formInfo[field.label]}
-                onChange={handleSelectChange(setSelectedDepartmentId)}
-                error={formErrors[field.label]}
-                options={departmentsList.map((department) => ({
-                  key: department.departmentId,
-                  value: department.departmentName,
-                }))}
-              ></SelectField>
-            );
-          }
-          if (field.label === "Ngành") {
-            return (
-              <SelectField
-                key={field.label}
-                label={field.label}
-                value={formInfo[field.label]}
-                onChange={handleSelectChange(setSelectedMajorId)}
-                error={formErrors[field.label]}
-                options={majorsList.map((major) => ({
-                  key: major.majorId,
-                  value: major.majorName,
-                }))}
-              ></SelectField>
-            );
-          }
-          if (field.label === "Lớp") {
-            return (
-              <SelectField
-                key={field.label}
-                label={field.label}
-                value={formInfo[field.label]}
-                onChange={handleSelectChange(setSelectedClassId)}
-                error={formErrors[field.label]}
-                options={studentClassesList.map((studentClass) => ({
-                  key: studentClass.studentClassId,
-                  value: studentClass.studentClassName,
-                }))}
-              ></SelectField>
-            );
-          }
+  const specialSelectFields = {
+  "Khoa/Trường/Viện": {
+    options: facultiesList.map((f) => ({
+      key: f.facultyId,
+      value: f.facultyName,
+    })),
+    onChange: handleSelectChange(setSelectedFacultyId),
+  },
+  "Đơn vị (Khoa/Bộ môn)": {
+    options: departmentsList.map((d) => ({
+      key: d.departmentId,
+      value: d.departmentName,
+    })),
+    onChange: handleSelectChange(setSelectedDepartmentId),
+  },
+  "Ngành": {
+    options: majorsList.map((m) => ({
+      key: m.majorId,
+      value: m.majorName,
+    })),
+    onChange: handleSelectChange(setSelectedMajorId),
+  },
+  "Lớp": {
+    options: studentClassesList.map((c) => ({
+      key: c.studentClassId,
+      value: c.studentClassName,
+    })),
+    onChange: handleSelectChange(setSelectedClassId),
+  },
+};
 
-          const FieldComponent =
-            field.type === "password" ? PasswordField : FieldInfo;
-          return (
-            <FieldComponent
-              key={field.label}
-              label={field.label}
-              value={formInfo[field.label]}
-              onChange={handleChange}
-              error={formErrors[field.label]}
-              minLength={field.minLength}
-              type={field.type}
-              resetSignal={resetSignal}
-            />
-          );
-        })}
-        <button
-          type="submit"
-          className="text-white text-xl py-2 px-4 rounded-md bg-gradient-to-r from-[#23A9E1] to-[#0249AE] w-full mb-10"
+return (
+  <>
+    <div className="px-16 py-5">
+      <p className="text-5xl text-darkBlue font-headerFont text-center font-bold">
+        Đăng ký
+      </p>
+      <p className="text-[1.8rem] text-gray mt-2 opacity-80">
+        Hệ thống Đề cương luận văn luận án
+      </p>
+      {error && (
+        <p className="text-lg text-redError text-center mb-4">{error}</p>
+      )}
+    </div>
+    <form onSubmit={handleSubmit}>
+      {fields.map((field) => {
+        const { label, type, minLength } = field;
+
+        const isSpecialSelect = specialSelectFields[label];
+
+        return (
+          <FormField
+            key={label}
+            type={type === "password" ? "password" : field.type === "select" || isSpecialSelect ? "select" : "fieldInfo"}
+            label={label}
+            value={formInfo[label]}
+            onChange={isSpecialSelect ? isSpecialSelect.onChange : handleChange}
+            error={formErrors[label]}
+            options={isSpecialSelect ? isSpecialSelect.options : field.options}
+            minLength={minLength}
+            resetSignal={resetSignal}
+          />
+        );
+      })}
+      <button
+        type="submit"
+        className="text-white text-xl py-2 px-4 rounded-md bg-gradient-to-r from-[#23A9E1] to-[#0249AE] w-full mb-10"
+      >
+        <p className="text-headerFont text-xl text-center">ĐĂNG KÝ</p>
+      </button>
+      <p className="text-gray text-center">
+        Đã có tài khoản?{" "}
+        <span
+          className="text-darkBlue cursor-pointer"
+          onClick={() => navigate("/login")}
         >
-          <p className="text-headerFont text-xl text-center">ĐĂNG KÝ</p>
-        </button>
-        <p className="text-gray text-center">
-          Đã có tài khoản?{" "}
-          <span
-            className="text-darkBlue cursor-pointer"
-            onClick={() => navigate("/login")}
-          >
-            Đăng nhập ngay
-          </span>
-        </p>
-      </form>
-    </>
-  );
+          Đăng nhập ngay
+        </span>
+      </p>
+    </form>
+  </>
+);
+
 };
 
 export default SignUp;

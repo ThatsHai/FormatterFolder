@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@CrossOrigin
+//@CrossOrigin
 public class FormController {
     FormService formService;
 

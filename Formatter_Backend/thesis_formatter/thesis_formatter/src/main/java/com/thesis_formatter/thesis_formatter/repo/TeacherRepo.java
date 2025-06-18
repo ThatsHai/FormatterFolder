@@ -24,6 +24,4 @@ public interface TeacherRepo extends JpaRepository<Teacher, String>, JpaSpecific
                                   @Param("departmentName") String departmentName,
                                   @Param("teacherId") String teacherId,
                                   @Param("teacherName") String teacherName);
-
-    Teacher findByUserId(String teacherId);
 }

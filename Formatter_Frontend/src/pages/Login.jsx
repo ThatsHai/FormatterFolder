@@ -19,7 +19,7 @@ const Login = () => {
   }, [error]);
 
   const fields = [
-    { label: "Mã số sinh viên", minLength: 8 },
+    { label: "Mã số người dùng", minLength: 5 },
     { label: "Mật khẩu", minLength: 8, type: "password" },
   ];
 
@@ -68,7 +68,7 @@ const Login = () => {
     if (!validateForm()) return;
 
     const mapFormInfoToPayload = () => ({
-      userId: formInfo["Mã số sinh viên"],
+      userId: formInfo["Mã số người dùng"],
       password: formInfo["Mật khẩu"],
     });
 

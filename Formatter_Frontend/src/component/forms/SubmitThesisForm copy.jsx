@@ -1,32 +1,27 @@
 import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 
+import ShortAnswer from "./SubmitThesisFormComponents/ShortAnswer";
 import DisabledField from "./SubmitThesisFormComponents/DisabledField";
+import AddTeacherTable from "./SubmitThesisFormComponents/AddTeacherTable";
 import api from "../../services/api";
-import { useSelector } from "react-redux";
-import SelectField from "../SelectField";
-import AddingTeacherField from "../../pages/teacherPages/AddingTeacherField";
 
-const SubmitThesisForm = ({
-  handleFormToggle = () => {},
-  onSuccess = () => {},
-}) => {
-  const student = useSelector((state) => state.auth.user);
+const SubmitThesisForm = ({ handleFormToggle = () => {}, onSuccess = () => {} }) => {
   const currentYear = new Date().getFullYear();
   const [formData, setFormData] = useState({
-    formId: "",
-    studentName: student?.name,
-    studentId: student?.userId,
-    majorName: student?.studentClass.major.majorName,
-    departmentName: student?.studentClass.major.department.departmentName,
-    facultyName: student?.studentClass.major.department.faculty.facultyName,
+    title: "Khóa luận tốt nghiệp 2025",
+    introduction: "Đề tài về trí tuệ nhân tạo ứng dụng trong giáo dục.",
+    student: {
+      stId: "STU2025A01",
+    },
+    teachers: [
+      {
+        tcId: "TC001",
+      },
+    ],
     status: "WAITING",
   });
   const [openAddTeacherTable, setOpenAddTeacherTable] = useState(false);
-  const [forms, setForms] = useState([]);
-  const [teachersList, setTeachersList] = useState([]);
-  const [openAddTeacherModal, setOpenAddTeacherModal] = useState(false);
-  const [formErrors, setFormErrors] = useState({});
 
   // Handle form field changes
   const handleChange = (e) => {
@@ -67,27 +62,6 @@ const SubmitThesisForm = ({
     };
   }, []);
 
-  const fetchForms = async () => {
-    try {
-      const response = await api.get("/forms");
-      return response.data.result;
-    } catch (error) {
-      console.error("Error fetching majors:", error);
-      return [];
-    }
-  };
-  useEffect(() => {
-    const getForms = async () => {
-      const forms = await fetchForms();
-      setForms(forms);
-    };
-    getForms();
-  }, []);
-
-  const handleSelectChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
   // Generate years
   const yearOptions = [
     currentYear - 4,
@@ -112,26 +86,18 @@ const SubmitThesisForm = ({
 
         <form className="w-full" onSubmit={handleSubmit}>
           <h1 className="text-4xl font-headerFont text-darkBlue font-bold text-center mb-6">
-            Thông tin chung
+            Đề cương
           </h1>
 
           {/* Title */}
-          <div className="relative text-start w-full font-textFont text-lg mb-8 px-10">
-            <h3 className="text-black font-semibold">1. Chọn loại biểu mẫu</h3>
-            <SelectField
-              className="!m-0"
-              key={"formId"}
-              label={"formId"}
-              value={formData.formId}
-              onChange={handleSelectChange}
-              error={""}
-              options={forms.map((form) => ({
-                key: form.formId,
-                value: form.title,
-              }))}
-              showLabel={false}
-            ></SelectField>
-          </div>
+          <ShortAnswer
+            order="1"
+            VNTitle="TÊN ĐỀ TÀI"
+            ENTitle="title"
+            formData={formData}
+            handleChange={handleChange}
+          ></ShortAnswer>
+
           {/* Student Information */}
           <div className="relative text-start w-full font-textFont text-lg mb-8 px-10">
             <h3 className="text-black font-semibold mb-3">
@@ -150,17 +116,17 @@ const SubmitThesisForm = ({
             ></DisabledField>
             <DisabledField
               VNTitle="Ngành"
-              ENTitle="majorName"
+              ENTitle="department"
               formData={formData}
             ></DisabledField>
             <DisabledField
               VNTitle="Đơn vị (Khoa/Bộ môn)"
-              ENTitle="departmentName"
+              ENTitle="unit"
               formData={formData}
             ></DisabledField>
             <DisabledField
               VNTitle="Khoa/Trường"
-              ENTitle="facultyName"
+              ENTitle="school"
               formData={formData}
             ></DisabledField>
             {/* Year */}
@@ -182,18 +148,46 @@ const SubmitThesisForm = ({
           </div>
 
           {/* Teacher */}
-          <AddingTeacherField
-          className="relative flex items-start text-start w-full font-textFont text-lg mb-8 px-10"
-            title="3. CÁN BỘ HƯỚNG DẪN"
-            teachersList={teachersList}
-            setTeachersList={setTeachersList}
-            formErrors={formErrors}
-            openAddTeacherModal={openAddTeacherModal}
-            setOpenAddTeacherModal={setOpenAddTeacherModal}
-          ></AddingTeacherField>
+          <div className="relative text-start w-full font-textFont text-lg mb-6 px-10">
+            <div className="flex items-center mb-2">
+              <h3 className="text-black font-semibold">3. CÁN BỘ HƯỚNG DẪN</h3>
+              <button
+                className="border text-xs rounded-md p-1 px-2 mx-3"
+                onClick={() => setOpenAddTeacherTable(!openAddTeacherTable)}
+              >
+                {openAddTeacherTable ? "- Ẩn bảng chọn" : "+ Thêm CBHD"}
+              </button>
+            </div>
+            {openAddTeacherTable && (
+              <AddTeacherTable
+                name="teacher"
+                formData={formData}
+                setFormData={setFormData}
+              ></AddTeacherTable>
+            )}
+            <ul className="list-disc ml-5 space-y-1">
+              {formData.teachersList?.map((teacher, index) => (
+                <li key={index}>
+                  <div className="flex justify-between items-center">
+                    <span>
+                      {teacher.TenCB} ({teacher.MaCB}) - {teacher.Khoa},{" "}
+                      {teacher.MaBM}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveTeacher(teacher.MaCB)}
+                      className="text-redError font-bold ml-4"
+                    >
+                      X
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
 
           {/* Introduction */}
-          {/* <div className="relative text-start w-full font-textFont text-lg mb-8 px-10">
+          <div className="relative text-start w-full font-textFont text-lg mb-8 px-10">
             <h3 className="text-black font-semibold mb-2">4. GIỚI THIỆU</h3>
             <textarea
               name="introduction"
@@ -202,7 +196,7 @@ const SubmitThesisForm = ({
               className="border w-full p-3 rounded-md resize-none"
               onChange={handleChange}
             ></textarea>
-          </div> */}
+          </div>
 
           {/* Submit Button */}
           <div className="mt-6 text-center">

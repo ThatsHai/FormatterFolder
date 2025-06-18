@@ -2,7 +2,7 @@
 import React from "react";
 import { RouterProvider } from "react-router-dom";
 //Ignore spelling warning in the following line
-import Router from "./router/Router.jsx";
+import Router from "./router/router.jsx";
 import { Provider } from "react-redux";
 import store from "./redux/store.js";
 

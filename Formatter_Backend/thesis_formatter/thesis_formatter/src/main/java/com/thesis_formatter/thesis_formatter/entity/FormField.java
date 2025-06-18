@@ -23,7 +23,8 @@ public class FormField {
     int position;
     String description;
     //Form type is used for further expansion
-    String formType;
+//    String formType;
+    String fieldType;
     @ManyToOne
     @JoinColumn(name = "formId", referencedColumnName = "formId")
     @JsonBackReference

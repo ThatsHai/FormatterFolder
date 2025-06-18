@@ -65,7 +65,7 @@ const AddingTeacher = ({ onSelectTeachers, onClose }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
       <div className="bg-white rounded shadow-lg p-6 w-full max-w-3xl relative">
         <button
-          className="absolute top-2 right-2 px-2 py-1 rounded bg-gray-200"
+          className="absolute -top-4 -right-4 bg-white border border-gray-300 px-2 py-1 rounded-full z-20 shadow-md"
           onClick={onClose}
         >
           X
