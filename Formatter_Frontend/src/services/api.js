@@ -4,8 +4,6 @@ const api = axios.create({
   baseURL: "http://localhost:8080",
 });
 
-<<<<<<< Updated upstream
-=======
 api.interceptors.request.use((config) => {
   const token = sessionStorage.getItem("accessToken");
   if (token) {
@@ -68,5 +66,4 @@ const refreshTokenApi = axios.create({
   withCredentials: true,
 });
 
->>>>>>> Stashed changes
 export default api;
