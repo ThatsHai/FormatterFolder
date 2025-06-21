@@ -5,15 +5,15 @@ import com.thesis_formatter.thesis_formatter.enums.EducationLevel;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
-@PrimaryKeyJoinColumn(name = "acId")
+@SuperBuilder
 public class Student extends Account {
-    String course;
 
     @Enumerated(EnumType.STRING)
     EducationLevel educationLevel;

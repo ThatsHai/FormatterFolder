@@ -4,13 +4,20 @@ import com.nimbusds.jose.JOSEException;
 import com.thesis_formatter.thesis_formatter.dto.request.AuthenticationRequest;
 import com.thesis_formatter.thesis_formatter.dto.request.IntrospectRequest;
 import com.thesis_formatter.thesis_formatter.dto.request.LogoutRequest;
-import com.thesis_formatter.thesis_formatter.dto.request.RefeshRequest;
+import com.thesis_formatter.thesis_formatter.dto.request.RefreshRequest;
 import com.thesis_formatter.thesis_formatter.dto.response.AuthenticationResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.IntrospectResponse;
+import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
+import com.thesis_formatter.thesis_formatter.exception.AppException;
 import com.thesis_formatter.thesis_formatter.service.AuthenticationService;
+import com.thesis_formatter.thesis_formatter.service.CookieService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -19,21 +26,30 @@ import java.text.ParseException;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@CrossOrigin
 public class AuthenticationController {
 
-    private final AuthenticationService authenticationService;
+    AuthenticationService authenticationService;
+    CookieService cookieService;
 
     @PostMapping("/token")
-    public APIResponse<AuthenticationResponse> login(@RequestBody AuthenticationRequest request) {
-        var result = authenticationService.authenticate(request);
+    public APIResponse<AuthenticationResponse> login(@RequestBody AuthenticationRequest request, HttpServletResponse response) {
+        AuthenticationResponse result = authenticationService.authenticate(request);
+
+        Cookie cookie = cookieService.createCookie(result.getRefreshtoken());
+        response.addCookie(cookie);
+
         return APIResponse.<AuthenticationResponse>builder()
                 .code("200")
-                .result(result)
+                .result(AuthenticationResponse.builder()
+                        .accesstoken(result.getAccesstoken())
+                        .authenticated(true)
+                        .build())
                 .build();
     }
 
     @PostMapping("/introspect")
-    public APIResponse<IntrospectResponse> login(@RequestBody IntrospectRequest request) throws ParseException, JOSEException {
+    public APIResponse<IntrospectResponse> introspect(@RequestBody IntrospectRequest request) throws ParseException, JOSEException {
         var result = authenticationService.introspect(request);
         return APIResponse.<IntrospectResponse>builder()
                 .code("200")
@@ -42,19 +58,38 @@ public class AuthenticationController {
     }
 
     @PostMapping("/logout")
-    public APIResponse<Void> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
-        authenticationService.logout(request);
+    public APIResponse<Void> logout(HttpServletRequest request, HttpServletResponse response) throws ParseException, JOSEException {
+
+        String refreshToken = cookieService.getRefreshToken(request);
+
+        authenticationService.logout(LogoutRequest.builder()
+                .refreshToken(refreshToken)
+                .build());
+
+        Cookie cookie = cookieService.deleteCookie();
+        response.addCookie(cookie);
         return APIResponse.<Void>builder()
                 .code("200")
                 .build();
     }
 
-    @PostMapping("/refesh")
-    public APIResponse<AuthenticationResponse> login(@RequestBody RefeshRequest request) throws ParseException, JOSEException {
-        var result = authenticationService.refeshToken(request);
+    @PostMapping("/refresh")
+    public APIResponse<AuthenticationResponse> refresh(HttpServletRequest request, HttpServletResponse response) throws ParseException, JOSEException {
+        //get cookie
+        String refreshToken = cookieService.getRefreshToken(request);
+
+        AuthenticationResponse result = authenticationService.refeshToken(RefreshRequest.builder().refreshToken(refreshToken).build());
+
+        //new coookie
+        Cookie cookie = cookieService.createCookie(result.getRefreshtoken());
+        response.addCookie(cookie);
+
         return APIResponse.<AuthenticationResponse>builder()
                 .code("200")
-                .result(result)
+                .result(AuthenticationResponse.builder()
+                        .accesstoken(result.getAccesstoken())
+                        .authenticated(true)
+                        .build())
                 .build();
     }
 }

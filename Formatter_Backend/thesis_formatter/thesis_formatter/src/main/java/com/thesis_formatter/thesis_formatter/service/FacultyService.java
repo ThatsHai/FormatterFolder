@@ -1,5 +1,6 @@
 package com.thesis_formatter.thesis_formatter.service;
 
+import com.thesis_formatter.thesis_formatter.dto.response.FacultyResponse;
 import com.thesis_formatter.thesis_formatter.entity.Faculty;
 import com.thesis_formatter.thesis_formatter.repo.FacultyRepo;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
@@ -32,4 +33,12 @@ public class FacultyService {
                 .result(faculties)
                 .build();
     }
+
+//    public APIResponse<List<FacultyResponse>> getAll() {
+//        List<Faculty> faculties = facultyRepo.findAll();
+//        return APIResponse.<List<FacultyResponse>>builder()
+//                .code("200")
+//                .result(facultyMapper.toFacultyResponseList(faculties))
+//                .build();
+//    }
 }

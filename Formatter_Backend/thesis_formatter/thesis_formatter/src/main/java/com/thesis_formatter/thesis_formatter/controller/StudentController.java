@@ -1,5 +1,6 @@
 package com.thesis_formatter.thesis_formatter.controller;
 
+import com.thesis_formatter.thesis_formatter.dto.request.AddStudentRequest;
 import com.thesis_formatter.thesis_formatter.dto.response.StudentDTO;
 import com.thesis_formatter.thesis_formatter.entity.Student;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
@@ -15,12 +16,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@CrossOrigin
 public class StudentController {
     StudentService studentService;
 
     @PostMapping("/students")
-    public APIResponse<StudentDTO> addStudent(@RequestBody Student student) {
-        return studentService.addStudent(student);
+    public APIResponse<StudentDTO> addStudent(@RequestBody AddStudentRequest request) {
+        return studentService.addStudent(request);
     }
 
     @GetMapping("/students")

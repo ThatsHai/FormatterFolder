@@ -7,17 +7,22 @@ const FieldInfo = ({
   onChange = () => {},
   error = "",
   minLength = 1,
+  type = "text",
 }) => {
   return (
     <div className="my-12">
       <p className="text-gray text-lg opacity-80 py-2">{label}</p>
       <div className="relative w-full flex items-center">
         <input
-          className="text-xl w-full outline-none bg-transparent"
+          type={type}
+          className={`text-xl w-full ${
+            type === "date" ? "bg-white" : "bg-transparent"
+          } outline-none`}
           value={value}
           onChange={(e) => onChange(label, e.target.value)}
           name={label}
         />
+
         {value.length >= minLength && (
           <CheckIcon
             sx={{ marginLeft: "8px", color: "green", paddingBottom: "2px" }}
@@ -38,4 +43,5 @@ FieldInfo.propTypes = {
   onChange: PropTypes.func,
   error: PropTypes.string,
   minLength: PropTypes.number,
+  type: PropTypes.string,
 };

@@ -1,4 +1,5 @@
 import axios from "axios";
+//accessToken is saved inside session storage
 
 const api = axios.create({
   baseURL: "http://localhost:8080",

@@ -14,6 +14,7 @@ import FormCreationPage from "../pages/adminPages/FormCreationPage";
 import FormManagementPage from "../pages/adminPages/FormManagementPage"
 import FormInfoPage from "../pages/adminPages/FormInfoPage";
 import FormDesignCreationPage from "../pages/adminPages/FormDesignCreationPage";
+import Test from "../pages/Test";
 
 const Router = createBrowserRouter([
   {
@@ -101,6 +102,14 @@ const Router = createBrowserRouter([
     element: (
       <AdminLayout>
         <FormDesignCreationPage />
+      </AdminLayout>
+    ),
+  },
+  {
+    path: "/test",
+    element: (
+      <AdminLayout>
+        <Test />
       </AdminLayout>
     ),
   },
