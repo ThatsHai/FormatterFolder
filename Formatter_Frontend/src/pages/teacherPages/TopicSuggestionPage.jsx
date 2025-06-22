@@ -5,11 +5,14 @@ import ReactQuill from "react-quill";
 import SelectField from "../../component/SelectField";
 import { useSelector } from "react-redux";
 import AddingTeacherField from "./AddingTeacherField";
+import AddingMajorField from "./major/AddingMajorField"
+import { major } from "@mui/material";
 const TopicSuggestionPage = ({
   handleFormToggle = () => {},
   onSuccess = () => {},
 }) => {
   const [formData, setFormData] = useState({
+    formId: "",
     title: "",
     description: "",
     objective: "",
@@ -18,14 +21,17 @@ const TopicSuggestionPage = ({
     implementationTime: "",
     teacherIds: [],
     contactInfo: "",
-    majorId: "",
+    majorIds: [],
   });
   const [teachersList, setTeachersList] = useState([]); // currentUserTeacher là giáo viên đăng nhập
   const [openAddTeacherModal, setOpenAddTeacherModal] = useState(false);
-  const [majorsOptions, setMajorsOptions] = useState([]);
+  const [majorsList, setMajorsList] = useState([]);
   const [formErrors, setFormErrors] = useState({});
   const user = useSelector((state) => state.auth.user);
   const [currentUserTeacher, setCurrentUserTeacher] = useState(user);
+  const [forms, setForms] = useState([]);
+  const [openAddMajorModal, setOpenAddMajorModal] = useState(false);
+
 
   const onUpdateFormData = (fieldName, value) => {
     setFormData((prev) => ({ ...prev, [fieldName]: value }));
@@ -40,14 +46,32 @@ const TopicSuggestionPage = ({
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const fetchForms = async () => {
+    try {
+      const response = await api.get("/forms");
+      return response.data.result;
+    } catch (error) {
+      console.error("Error fetching majors:", error);
+      return [];
+    }
+  };
+
   useEffect(() => {
-    const getMajors = async () => {
-      const majors = await fetchMajors();
-      setMajorsOptions(majors);
+    const getForms = async () => {
+      const forms = await fetchForms();
+      setForms(forms);
     };
-    getMajors();
-    console.log("currentUserTeacher", currentUserTeacher);
+    getForms();
   }, []);
+
+  // useEffect(() => {
+  //   const getMajors = async () => {
+  //     const majors = await fetchMajors();
+  //     setMajorsOptions(majors);
+  //   };
+  //   getMajors();
+  //   console.log("currentUserTeacher", currentUserTeacher);
+  // }, []);
 
   useEffect(() => {
     setFormData((prev) => ({
@@ -64,6 +88,13 @@ const TopicSuggestionPage = ({
       }));
     }
   }, [teachersList]);
+
+  useEffect(() => {
+  setFormData((prev) => ({
+    ...prev,
+    majorIds: majorsList.map((major) => major.majorId), 
+  }));
+}, [majorsList]);
 
   // const handleRemoveTeacher = (userId) => {
   //   setTeachersList((prev) => prev.filter(t => t.userId !== userId || t.isDefault));
@@ -86,8 +117,8 @@ const TopicSuggestionPage = ({
       errors.implementationTime = "Thời gian thực hiện không được để trống.";
     if (!formData.contactInfo.trim())
       errors.contactInfo = "Thông tin liên hệ không được để trống.";
-    if (!formData.majorId)
-      errors.majorId = "Vui lòng chọn ngành cho sinh viên thực hiện đề tài.";
+    if (majorsList.length === 0)
+      errors.majorIds = "Vui lòng chọn ngành cho sinh viên thực hiện đề tài.";
     if (teachersList.length === 0)
       errors.teacherIds = "Phải có ít nhất một cán bộ hướng dẫn.";
     else console.log("teachersList", teachersList);
@@ -112,18 +143,18 @@ const TopicSuggestionPage = ({
     };
     result();
   };
-  const fetchMajors = async () => {
-    try {
-      const response = await api.get("/majors");
-      return response.data.result.map((major) => ({
-        key: major.majorId,
-        value: major.majorName,
-      }));
-    } catch (error) {
-      console.error("Error fetching majors:", error);
-      return [];
-    }
-  };
+  // const fetchMajors = async () => {
+  //   try {
+  //     const response = await api.get("/majors");
+  //     return response.data.result.map((major) => ({
+  //       key: major.majorId,
+  //       value: major.majorName,
+  //     }));
+  //   } catch (error) {
+  //     console.error("Error fetching majors:", error);
+  //     return [];
+  //   }
+  // };
 
   return (
     <div className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-black bg-opacity-50 p-6">
@@ -138,6 +169,30 @@ const TopicSuggestionPage = ({
           <h1 className="text-4xl font-headerFont text-darkBlue font-bold text-center m-6">
             Đề xuất đề tài
           </h1>
+          {/* Form */}
+         <div className="relative text-start font-textFont text-lg m-8 px-10">
+            <h2 className="text-black font-semibold">
+              LOẠI BIỂU MẪU TƯƠNG ỨNG
+            </h2>
+            <SelectField
+              className="mt-2 mb-4"
+              key={"formId"}
+              label={"formId"}
+              value={formData.formId}
+              onChange={handleSelectChange}
+              error={""}
+              options={forms.map((form) => ({
+                key: form.formId,
+                value: form.title,
+              }))}
+              showLabel={false}
+            ></SelectField>
+          </div>
+          <div className="relative text-start font-textFont text-lg m-8 px-10">
+           <h2 className="text-lightBlue font-semibold">
+              THÔNG TIN ĐỀ TÀI
+            </h2>
+          </div>
           <ShortAnswer
             order="1"
             VNTitle="TÊN ĐỀ TÀI"
@@ -213,23 +268,32 @@ const TopicSuggestionPage = ({
             handleChange={handleChange}
           ></ShortAnswer>
 
-          <div className="relative text-start font-textFont text-lg m-8 px-10">
+          {/* <div className="relative text-start font-textFont text-lg m-8 px-10">
             <h3 className="text-black font-semibold">
               9. DÀNH CHO SINH VIÊN NGÀNH
             </h3>
-            <div className="mt-2 mb-4">
-              <SelectField
-                className="!m-0"
-                key={"majorId"}
-                label={"majorId"}
-                value={formData.majorId}
-                onChange={handleSelectChange}
-                error={formErrors.majorId}
-                options={majorsOptions}
-                showLabel={false}
-              ></SelectField>
-            </div>
-          </div>
+
+            <SelectField
+              className="!m-0"
+              key={"majorId"}
+              label={"majorId"}
+              value={formData.majorId}
+              onChange={handleSelectChange}
+              error={formErrors.majorId}
+              options={majorsOptions}
+              showLabel={false}
+            ></SelectField>
+          </div> */}
+
+          <AddingMajorField
+            className="flex items-center relative text-start font-textFont text-lg m-8 px-10"
+            title="8. DÀNH CHO SINH VIÊN NGÀNH"
+            majorsList={majorsList}
+            setMajorsList={setMajorsList}
+            formErrors={formErrors}
+            openAddMajorModal={openAddMajorModal}
+            setOpenAddMajorModal={setOpenAddMajorModal}
+          ></AddingMajorField>
 
           <div className="m-6 text-center">
             <button
@@ -243,9 +307,8 @@ const TopicSuggestionPage = ({
         </form>
       </div>
     </div>
-    // Lấy danh sách form từ 1 cái id form có sẵn, lấy danh sách fields từ form đó
+  
   );
 };
 
 export default TopicSuggestionPage;
-//chưa bắt lỗi từng trường

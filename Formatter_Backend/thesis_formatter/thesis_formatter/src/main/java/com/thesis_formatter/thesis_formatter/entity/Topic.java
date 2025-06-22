@@ -24,6 +24,7 @@ public class Topic {
     String topicId;
     String title;
     String description;
+    @Column(columnDefinition = "TEXT")
     String objective;
     String funding;
     String fundingSource;
@@ -37,9 +38,16 @@ public class Topic {
     )
     List<Teacher> teachers;
 
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "major_topic",
+            joinColumns = @JoinColumn(name = "topicId"),
+            inverseJoinColumns = @JoinColumn(name = "majorId")
+    )
+    List<Major> majors;
+
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "majorId", referencedColumnName = "majorId")
-    Major major;
+    @JoinColumn(name = "formId", referencedColumnName = "formId")
+    Form form;
 
     @CreationTimestamp
     LocalDateTime createdAt;

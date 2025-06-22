@@ -21,8 +21,10 @@ public class TopicController {
     TopicService topicService;
 
     @GetMapping("/topics")
-    public APIResponse<List<Topic>> getTopics() {
-        return topicService.getAll();
+    public APIResponse<List<Topic>> getTopics(@RequestParam(required = false) String formId) {
+        if (formId==null)
+            return topicService.getAll();
+        else return topicService.getTopicByFormId(formId);
     }
 
     @PostMapping("/topics/create")

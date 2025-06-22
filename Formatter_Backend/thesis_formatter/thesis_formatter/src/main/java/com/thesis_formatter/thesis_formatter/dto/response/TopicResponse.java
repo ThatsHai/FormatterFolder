@@ -23,7 +23,8 @@ public class TopicResponse {
     String implementationTime;
     List<String> teacherNames;
     String contactInfo;
-    Major major;
+    List<String> majorNames;
+    String formName;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
 }

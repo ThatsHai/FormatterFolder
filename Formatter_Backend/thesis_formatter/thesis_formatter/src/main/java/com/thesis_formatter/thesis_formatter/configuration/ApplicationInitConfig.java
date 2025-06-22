@@ -2,6 +2,7 @@ package com.thesis_formatter.thesis_formatter.configuration;
 
 import com.thesis_formatter.thesis_formatter.entity.Account;
 import com.thesis_formatter.thesis_formatter.entity.Role;
+import com.thesis_formatter.thesis_formatter.entity.Student;
 import com.thesis_formatter.thesis_formatter.repo.AccountRepo;
 import com.thesis_formatter.thesis_formatter.repo.RoleRepo;
 import lombok.AccessLevel;

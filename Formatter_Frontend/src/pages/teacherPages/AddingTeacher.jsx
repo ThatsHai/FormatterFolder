@@ -22,7 +22,15 @@ const QueryContent = ({ setSelectedTeachers, selectedTeachers }) => {
           )
         );
         const result = await api.post("/teachers/search", cleanQueryCriteria);
-        setTeachers(result.data.result);
+        const newTeachers = result.data.result;
+        const updatedTeachers = [
+          ...selectedTeachers,
+          ...newTeachers.filter(
+            (newTeacher) =>
+              !selectedTeachers.some((t) => t.userId === newTeacher.userId)
+          ),
+        ];
+        setTeachers(updatedTeachers);
         return;
       } catch (e) {
         console.log("Error fetching teachers with query, error: ", e);
@@ -62,7 +70,16 @@ const AddingTeacher = ({ onSelectTeachers, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
+      onKeyDown={(e) => {
+        if (e.key === "Enter" && selectedTeachers.length > 0) {
+          e.preventDefault();
+          handleConfirm();
+        }
+      }}
+      tabIndex={0}
+    >
       <div className="bg-white rounded shadow-lg p-6 w-full max-w-3xl relative">
         <button
           className="absolute -top-4 -right-4 bg-white border border-gray-300 px-2 py-1 rounded-full z-20 shadow-md"

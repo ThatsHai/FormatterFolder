@@ -3,12 +3,14 @@ package com.thesis_formatter.thesis_formatter.service;
 import com.thesis_formatter.thesis_formatter.dto.request.TopicRequest;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.TopicResponse;
+import com.thesis_formatter.thesis_formatter.entity.Form;
 import com.thesis_formatter.thesis_formatter.entity.Major;
 import com.thesis_formatter.thesis_formatter.entity.Teacher;
 import com.thesis_formatter.thesis_formatter.entity.Topic;
 import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
 import com.thesis_formatter.thesis_formatter.exception.AppException;
 import com.thesis_formatter.thesis_formatter.mapper.TopicMapper;
+import com.thesis_formatter.thesis_formatter.repo.FormRepo;
 import com.thesis_formatter.thesis_formatter.repo.MajorRepo;
 import com.thesis_formatter.thesis_formatter.repo.TeacherRepo;
 import com.thesis_formatter.thesis_formatter.repo.TopicRepo;
@@ -28,6 +30,7 @@ public class TopicService {
     TeacherRepo teacherRepo;
     private final MajorRepo majorRepo;
     private final TopicMapper topicMapper;
+    private final FormRepo formRepo;
 
     public APIResponse<List<Topic>> getAll() {
         List<Topic> topics = topicRepo.findAll();
@@ -67,20 +70,42 @@ public class TopicService {
             System.out.println(teacherId);
         }
 
-        String majorId = topicRequest.getMajorId();
-        Major major = majorRepo.findById(majorId).orElseThrow(() -> new AppException(ErrorCode.MAJOR_NOT_EXISTED));
+        List<String> majorIds = topicRequest.getMajorIds();
+        if (majorIds.isEmpty()) {
+            throw new AppException(ErrorCode.MAJOR_NOT_EXISTED);
+        }
+        List<Major> majors = new ArrayList<>();
+        List<String> majorNames = new ArrayList<>();
+        for (String majorId : majorIds) {
+            Major major = majorRepo.findByMajorId(majorId);
+            majors.add(major);
+            majorNames.add(major.getMajorName());
+        }
+
+        Form form = formRepo.findByFormId(topicRequest.getFormId());
 
         Topic topic = topicMapper.toTopic(topicRequest);
         topic.setTeachers(teachers);
-        topic.setMajor(major);
+        topic.setMajors(majors);
+        topic.setForm(form);
         topicRepo.save(topic);
 
         TopicResponse topicResponse = topicMapper.toTopicResponse(topic);
         topicResponse.setTeacherNames(teacherNames);
+        topicResponse.setMajorNames(majorNames);
+        topicResponse.setFormName(form.getTitle());
         return APIResponse.<TopicResponse>builder()
                 .code("200")
                 .result(topicResponse)
                 .build();
+    }
+
+    public APIResponse<List<Topic>> getTopicByFormId(String formId) {
+        List<Topic> topics = topicRepo.findTopicsByForm_FormId(formId);
+
+        return APIResponse.<List<Topic>>builder()
+                .code("200")
+                .result(topics).build();
     }
 
 }

@@ -2,6 +2,8 @@ package com.thesis_formatter.thesis_formatter.service;
 
 import com.thesis_formatter.thesis_formatter.dto.response.FacultyResponse;
 import com.thesis_formatter.thesis_formatter.entity.Faculty;
+import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
+import com.thesis_formatter.thesis_formatter.exception.AppException;
 import com.thesis_formatter.thesis_formatter.repo.FacultyRepo;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import lombok.AccessLevel;
@@ -18,6 +20,10 @@ public class FacultyService {
     FacultyRepo facultyRepo;
 
     public APIResponse<Faculty> addFaculty(Faculty faculty) {
+        Faculty facultyFinding = facultyRepo.findByFacultyId(faculty.getFacultyId());
+        if (facultyFinding != null) {
+            throw new AppException(ErrorCode.DUPLICATE_KEY);
+        }
         facultyRepo.save(faculty);
         return APIResponse
                 .<Faculty>builder()

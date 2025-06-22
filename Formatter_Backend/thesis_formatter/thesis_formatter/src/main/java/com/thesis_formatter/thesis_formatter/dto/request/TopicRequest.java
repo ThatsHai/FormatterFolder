@@ -20,5 +20,6 @@ public class TopicRequest {
     String implementationTime;
     List<String> teacherIds;
     String contactInfo;
-    String majorId;
+    List<String> majorIds;
+    String formId;
 }

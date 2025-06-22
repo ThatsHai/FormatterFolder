@@ -20,18 +20,34 @@ const AddingTeacherField = ({
           className="border text-xs rounded-md p-1 px-2 mx-3"
           onClick={() => setOpenAddTeacherModal(true)}
         >
-          {teachersList.length > 0 ? "Sửa CBHD" : "+ Thêm CBHD"}
+          {"+ Thêm CBHD"}
         </button>
       </div>
       <div className="max-w-xl mx-auto">
-        <TeachersTable teachers={teachersList} />
+        <TeachersTable teachers={teachersList} 
+        selectedTeachers={teachersList}
+        setSelectedTeachers={setTeachersList}
+        />
         {formErrors?.teacherIds && (
           <p className="text-redError pt-2">{formErrors.teacherIds}</p>
         )}
       </div>
       {openAddTeacherModal && (
         <AddingTeacher
-          onSelectTeachers={(selected) => setTeachersList(selected)}
+          onSelectTeachers={(selected) =>
+            setTeachersList((prev) => {
+              const newTeachers = selected.filter(
+                (teacher) => !prev.some((t) => t.userId === teacher.userId)
+              );
+
+              if (prev.length + newTeachers.length > 2) {
+                alert("Chỉ chọn tối đa 2 cán bộ hướng dẫn.");
+                return prev;
+              }
+
+              return [...prev, ...newTeachers];
+            })
+          }
           onClose={() => setOpenAddTeacherModal(false)}
         />
       )}

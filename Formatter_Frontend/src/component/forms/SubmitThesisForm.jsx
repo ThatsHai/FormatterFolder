@@ -5,6 +5,7 @@ import DisabledField from "./SubmitThesisFormComponents/DisabledField";
 import api from "../../services/api";
 import { useSelector } from "react-redux";
 import SelectField from "../SelectField";
+import TopicDetail from "./SubmitThesisFormComponents/TopicDetail";
 import AddingTeacherField from "../../pages/teacherPages/AddingTeacherField";
 
 const SubmitThesisForm = ({
@@ -15,15 +16,19 @@ const SubmitThesisForm = ({
   const currentYear = new Date().getFullYear();
   const [formData, setFormData] = useState({
     formId: "",
-    studentName: student?.name,
-    studentId: student?.userId,
-    majorName: student?.studentClass.major.majorName,
-    departmentName: student?.studentClass.major.department.departmentName,
-    facultyName: student?.studentClass.major.department.faculty.facultyName,
-    status: "WAITING",
+    topicId: "",
+    student: {
+      name: student?.name,
+      studentId: student?.userId,
+      majorName: student?.studentClass.major.majorName,
+      departmentName: student?.studentClass.major.department.departmentName,
+      facultyName: student?.studentClass.major.department.faculty.facultyName,
+    },
   });
   const [openAddTeacherTable, setOpenAddTeacherTable] = useState(false);
   const [forms, setForms] = useState([]);
+  const [topics, setTopics] = useState([]);
+  const [selectedTopic, setSelectedTopic] = useState("");
   const [teachersList, setTeachersList] = useState([]);
   const [openAddTeacherModal, setOpenAddTeacherModal] = useState(false);
   const [formErrors, setFormErrors] = useState({});
@@ -51,15 +56,6 @@ const SubmitThesisForm = ({
     result();
   };
 
-  const handleRemoveTeacher = (MaCB) => {
-    setFormData((prev) => ({
-      ...prev,
-      teachersList: prev.teachersList.filter(
-        (teacher) => teacher.MaCB !== MaCB
-      ),
-    }));
-  };
-
   useEffect(() => {
     document.body.classList.add("overflow-hidden");
     return () => {
@@ -76,6 +72,17 @@ const SubmitThesisForm = ({
       return [];
     }
   };
+
+  const fetchTopics = async (formId) => {
+    try {
+      const response = await api.get(`/topics?formId=${formId}`);
+      return response.data.result;
+    } catch (error) {
+      console.error("Error fetching topics:", error);
+      return [];
+    }
+  };
+
   useEffect(() => {
     const getForms = async () => {
       const forms = await fetchForms();
@@ -84,8 +91,24 @@ const SubmitThesisForm = ({
     getForms();
   }, []);
 
+  useEffect(() => {
+    const getTopics = async () => {
+      const topics = await fetchTopics(formData.formId);
+      setTopics(topics);
+    };
+    getTopics();
+  }, [formData.formId]);
+
   const handleSelectChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    if (field === "formId") {
+    setSelectedTopic(null); 
+    setFormData((prev) => ({ ...prev, topicId: "" })); // reset topicId
+  }
+    if (field === "topicId") {
+      const topic = topics.find((t) => t.topicId === value);
+      setSelectedTopic(topic || null);
+    }
   };
 
   // Generate years
@@ -112,12 +135,12 @@ const SubmitThesisForm = ({
 
         <form className="w-full" onSubmit={handleSubmit}>
           <h1 className="text-4xl font-headerFont text-darkBlue font-bold text-center mb-6">
-            Thông tin chung
+            THÔNG TIN CHUNG
           </h1>
 
-          {/* Title */}
+          {/* Form */}
           <div className="relative text-start w-full font-textFont text-lg mb-8 px-10">
-            <h3 className="text-black font-semibold">1. Chọn loại biểu mẫu</h3>
+            <h3 className="text-black font-semibold">1. CHỌN LOẠI BIỂU MẪU</h3>
             <SelectField
               className="!m-0"
               key={"formId"}
@@ -132,39 +155,52 @@ const SubmitThesisForm = ({
               showLabel={false}
             ></SelectField>
           </div>
+          <div className="relative text-start w-full font-textFont text-lg mb-8 px-10">
+            <h3 className="text-black font-semibold">2. CHỌN ĐỀ TÀI</h3>
+            <SelectField
+              className="!m-0"
+              key={"topicId"}
+              label={"topicId"}
+              value={formData.topicId}
+              onChange={handleSelectChange}
+              error={""}
+              options={topics.map((topic) => ({
+                key: topic.topicId,
+                value: topic.title,
+              }))}
+              showLabel={false}
+            ></SelectField>
+          </div>
           {/* Student Information */}
           <div className="relative text-start w-full font-textFont text-lg mb-8 px-10">
             <h3 className="text-black font-semibold mb-3">
-              2. NGƯỜI THỰC HIỆN
+              3. NGƯỜI THỰC HIỆN
             </h3>
             {/* Student info */}
             <DisabledField
-              VNTitle="Tên sinh viên"
-              ENTitle="studentName"
-              formData={formData}
+              title="Tên sinh viên"
+              value={formData.student.name}
             ></DisabledField>
             <DisabledField
-              VNTitle="Khóa (MSSV)"
-              ENTitle="studentId"
-              formData={formData}
+              title="Khóa (MSSV)"
+              value={formData.student.studentId}
             ></DisabledField>
             <DisabledField
-              VNTitle="Ngành"
-              ENTitle="majorName"
-              formData={formData}
+              title="Ngành"
+              value={formData.student.majorName}
             ></DisabledField>
             <DisabledField
-              VNTitle="Đơn vị (Khoa/Bộ môn)"
-              ENTitle="departmentName"
-              formData={formData}
+              title="Đơn vị (Khoa/Bộ môn)"
+              value={formData.student.departmentName}
             ></DisabledField>
             <DisabledField
-              VNTitle="Khoa/Trường"
-              ENTitle="facultyName"
-              formData={formData}
+              title="Khoa/Trường"
+              value={formData.student.facultyName}
             ></DisabledField>
+          </div>
+
             {/* Year */}
-            <div className="w-full grid grid-cols-3 items-center mb-3">
+            {/* <div className="w-full grid grid-cols-3 items-center mb-3">
               <p>Năm</p>
               <select
                 className="col-span-2 border rounded-md px-4 py-1 w-1/4"
@@ -178,11 +214,11 @@ const SubmitThesisForm = ({
                   </option>
                 ))}
               </select>
-            </div>
-          </div>
+            </div> */}
+          
 
           {/* Teacher */}
-          <AddingTeacherField
+          {/* <AddingTeacherField
           className="relative flex items-start text-start w-full font-textFont text-lg mb-8 px-10"
             title="3. CÁN BỘ HƯỚNG DẪN"
             teachersList={teachersList}
@@ -190,7 +226,7 @@ const SubmitThesisForm = ({
             formErrors={formErrors}
             openAddTeacherModal={openAddTeacherModal}
             setOpenAddTeacherModal={setOpenAddTeacherModal}
-          ></AddingTeacherField>
+          ></AddingTeacherField> */}
 
           {/* Introduction */}
           {/* <div className="relative text-start w-full font-textFont text-lg mb-8 px-10">
@@ -204,6 +240,17 @@ const SubmitThesisForm = ({
             ></textarea>
           </div> */}
 
+          <div className="relative text-start w-full font-textFont text-lg mb-8 px-10">
+            <h3 className="text-black font-semibold mb-3">
+              4. THÔNG TIN ĐỀ TÀI
+            </h3>
+             <TopicDetail
+              topic={selectedTopic || {}}
+              onChange={handleSelectChange}
+              formErrors={formErrors}
+            ></TopicDetail>
+          </div>
+          
           {/* Submit Button */}
           <div className="mt-6 text-center">
             <button
