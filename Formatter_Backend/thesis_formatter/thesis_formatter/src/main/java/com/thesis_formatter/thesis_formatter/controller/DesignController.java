@@ -6,10 +6,7 @@ import com.thesis_formatter.thesis_formatter.service.DesignService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,4 +22,15 @@ public class DesignController {
     public APIResponse<List<Design>> getDesigns() {
         return designService.getDesigns();
     }
+
+    @PostMapping("/designs")
+    public APIResponse<Design> addDesign(@RequestBody Design design) {
+        return designService.addDesign(design);
+    }
+
+    @GetMapping("/designs/{designId}/download")
+    public APIResponse<Design> downloadDesign(@PathVariable String designId) {
+        return designService.downloadDesign(designId);
+    }
+
 }
