@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
-import { useParams } from "react-router-dom";
 import api from "../../services/api";
 import GridBoard from "./designPage/GridBoard";
 import ConfirmationPopup from "../../component/ConfirmationPopup";
 import PropTypes from "prop-types";
+import { useLocation } from "react-router";
 
 const RightSidebar = ({ formData }) => {
   const [isOpen, setIsOpen] = useState();
@@ -70,7 +69,7 @@ const RightSidebar = ({ formData }) => {
                     {formField.description || "Không có mô tả"}
                   </p>
                   <div className="w-full items-end justify-end flex">
-                    <p className="inline-block border px-2 rounded-md bg-greenCorrect">
+                    <p className="inline-block border px-2 rounded-md bg-darkGray text-white py-1">
                       {formField.fieldType || "Chưa chọn"}
                     </p>
                   </div>
@@ -188,7 +187,7 @@ const DesignMainContent = ({ formData }) => {
 
   const handleSendFormData = async () => {
     try {
-      console.log(designInfo)
+      console.log(designInfo);
       setDisplaySuccessPopup(true);
       const result = await api.post("/designs", designInfo);
       console.log("result" + result);
@@ -259,9 +258,9 @@ const DesignMainContent = ({ formData }) => {
   );
 };
 
-const FormDesignCreationPage = ({
-  formId = "8420a086-160a-4f09-8496-b7d7f5da0ee0",
-}) => {
+const FormDesignCreationPage = () => {
+  const location = useLocation();
+  const formId = location.pathname.split("/").pop();
   const [formData, setFormData] = useState();
 
   useEffect(() => {

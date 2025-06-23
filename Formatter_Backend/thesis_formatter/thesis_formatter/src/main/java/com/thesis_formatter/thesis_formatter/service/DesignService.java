@@ -8,8 +8,20 @@ import com.thesis_formatter.thesis_formatter.utils.PDFDesignUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -70,12 +82,21 @@ public class DesignService {
     }
 
 
-    public APIResponse<Design> downloadDesign(String designId) {
+    public ResponseEntity<Resource> downloadDesign(String designId) throws IOException {
         Design design = designRepo.findById(designId).orElseThrow(() -> new RuntimeException("Design not found"));
         generateDesignPdf(designId);
-        return APIResponse.<Design>builder()
-                .code("200")
-                .result(design)
-                .build();
+
+        Path filePath = Paths.get("user_resource/pdf_design/design-" + designId + ".pdf");
+
+        if (!Files.exists(filePath)) {
+            throw new RuntimeException("PDF design not found");
+        }
+
+        Resource resource = new UrlResource(filePath.toUri());
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
     }
 }

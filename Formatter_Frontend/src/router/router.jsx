@@ -98,7 +98,7 @@ const Router = createBrowserRouter([
     ),
   },
   {
-    path: "/admin/designs",
+    path: "/admin/designs/:formId",
     element: (
       <AdminLayout>
         <FormDesignCreationPage />

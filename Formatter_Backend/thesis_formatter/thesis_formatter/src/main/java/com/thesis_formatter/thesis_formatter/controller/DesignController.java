@@ -6,8 +6,13 @@ import com.thesis_formatter.thesis_formatter.service.DesignService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.net.http.HttpResponse;
 import java.util.List;
 
 @RestController
@@ -28,9 +33,10 @@ public class DesignController {
         return designService.addDesign(design);
     }
 
-    @GetMapping("/designs/{designId}/download")
-    public APIResponse<Design> downloadDesign(@PathVariable String designId) {
+    @GetMapping("/designs/{designId}/downloadPdf")
+    public ResponseEntity<Resource> downloadDesign(@PathVariable String designId) throws IOException {
         return designService.downloadDesign(designId);
     }
+
 
 }

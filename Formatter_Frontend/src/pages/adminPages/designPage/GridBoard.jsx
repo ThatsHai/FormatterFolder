@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 
 import CustomizableInput from "../../../component/CustomizableInput";
 import { CustomToolbar } from "../../../component/CustomizableInput";
-// import CustomizableKeywordBlock from "./CustomizableKeywordBlock";
 import PropTypes from "prop-types";
 
 const GridBoard = ({

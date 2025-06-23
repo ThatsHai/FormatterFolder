@@ -6,8 +6,8 @@ import api from "../../services/api";
 const FormInfoPage = () => {
   const [form, setForm] = useState({});
   const [sortedFields, setSortedFields] = useState([]);
-
   const { formId } = useParams();
+
   useEffect(() => {
     const fetchFormData = async () => {
       const result = await api.get(`/forms/${formId}`);
@@ -23,6 +23,30 @@ const FormInfoPage = () => {
       );
     }
   }, [form]);
+
+  const handleDownloadPDF = async () => {
+    try {
+      const response = await api.get(`/designs/a839a86f-63c3-458b-961e-0cc92bfb5849/downloadPdf`, {
+        responseType: "blob",
+      });
+      console.log(response)
+      const blob = new Blob([response.data], {
+        type: "application/pdf",
+      });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+
+      link.setAttribute("download", "file.pdf");
+      document.body.appendChild(link);
+      link.click();
+
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (e) {
+      console.log("File download failed: " + e);
+    }
+  };
 
   return (
     <div className="p-6">
@@ -88,6 +112,25 @@ const FormInfoPage = () => {
               </table>
             )}
           </div>
+
+          {sortedFields.length > 0 && (
+            <div className="flex justify-end w-full">
+              <Link to={`/admin/designs/${formId}`}>
+                <button className="border px-2 py-1 my-2 mb-4 rounded-md">
+                  Tạo mẫu thiết kế
+                </button>
+              </Link>
+              <button
+                className="border px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+                onClick={async () => {
+                  await handleDownloadPDF();
+                  console.log("done");
+                }}
+              >
+                Download File
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
