@@ -6,8 +6,10 @@ import PropTypes from "prop-types";
 
 const GridBoard = ({
   onUpdateDesignInfo = () => {},
-  gridSize = 12,
+  col = 12,
+  row = 12,
   cellSize = 50,
+  formData = {},
 }) => {
   const editorRefs = useRef({});
 
@@ -15,8 +17,37 @@ const GridBoard = ({
   const [hoverCell, setHoverCell] = useState(null);
   const [mergeRegions, setMergeRegions] = useState([]);
   const [focusedIndex, setFocusedIndex] = useState(null);
+  const [rowSize, setRowSize] = useState(row);
+  const [colSize, setColSize] = useState(col);
 
   useEffect(() => console.log(focusedIndex), [focusedIndex]);
+
+  useEffect(() => {
+    setMergeRegions((prevRegions) => {
+      let hasChanged = false;
+
+      const updated = prevRegions.map((region) => {
+        const placeholders = region.text?.match(/\${{\s*[^}]+\s*}}/g);
+        const cleaned = placeholders
+          ? placeholders.map((m) => m.replace(/\${{|}}/g, "").trim())
+          : [];
+
+        const matches = cleaned.some((p) =>
+          formData?.formFields?.some((field) => field.fieldName === p)
+        );
+
+        if (region.fromDataSource !== matches) {
+          hasChanged = true;
+          return { ...region, fromDataSource: matches };
+        }
+
+        return region;
+      });
+
+      return hasChanged ? updated : prevRegions;
+    });
+    onUpdateDesignInfo("cells", handlePrintData());
+  }, [formData, mergeRegions]);
 
   useEffect(() => {
     function handleGlobalMouseUp() {
@@ -104,12 +135,12 @@ const GridBoard = ({
 
   // Main function to generate print data with filling gaps
   const generateOptimizedCellData = () => {
-    const visited = Array.from({ length: gridSize }, () =>
-      Array(gridSize).fill(false)
+    const visited = Array.from({ length: rowSize }, () =>
+      Array(colSize).fill(false)
     );
 
-    const gridMap = Array.from({ length: gridSize }, () =>
-      Array(gridSize).fill(null)
+    const gridMap = Array.from({ length: rowSize }, () =>
+      Array(colSize).fill(null)
     );
 
     mergeRegions.forEach((region, index) => {
@@ -122,8 +153,8 @@ const GridBoard = ({
 
     const result = [];
 
-    for (let r = gridSize - 1; r >= 0; r--) {
-      for (let c = gridSize - 1; c >= 0; c--) {
+    for (let r = rowSize - 1; r >= 0; r--) {
+      for (let c = colSize - 1; c >= 0; c--) {
         if (visited[r][c]) continue;
 
         const regionIndex = gridMap[r][c];
@@ -136,10 +167,12 @@ const GridBoard = ({
           if (isTopPosLeft) {
             result.push({
               text: region.text || "",
-              colspan: region.width,
-              rowspan: region.height,
+              colSpan: region.width,
+              rowSpan: region.height,
               topPos: r,
               leftPos: c,
+              fromDataSource: region.fromDataSource || false,
+              fromDrag: region.fromDrag || false,
             });
 
             // Mark visited
@@ -195,10 +228,12 @@ const GridBoard = ({
 
           result.push({
             text: "",
-            colspan: spanWidth,
-            rowspan: spanHeight,
+            colSpan: spanWidth,
+            rowSpan: spanHeight,
             topPos: minRow,
             leftPos: minCol,
+            fromDataSource: false,
+            fromDrag: false,
           });
 
           // Skip over already processed leftPos-side cells
@@ -218,6 +253,21 @@ const GridBoard = ({
     onUpdateDesignInfo("cells", data);
     data.reverse();
     console.log("Grid Print Data:", data);
+    //Array of data will filled cells
+    return data;
+  };
+
+  const extractPlaceholders = (text) => {
+    const matches = text?.match(/\${{\s*[^}]+\s*}}/g);
+    return matches ? matches.map((m) => m.replace(/\${{|}}/g, "").trim()) : [];
+  };
+
+  const hasMatchingPlaceholder = (text) => {
+    if (!formData?.formFields) return false;
+    const placeholders = extractPlaceholders(text);
+    return placeholders.some((p) =>
+      formData.formFields.some((field) => field.fieldName === p)
+    );
   };
 
   const getToolbarPosition = () => {
@@ -284,17 +334,17 @@ const GridBoard = ({
       <div
         className="grid gap-[1px] relative select-none justify-center"
         style={{
-          width: gridSize * cellSize + "px",
-          height: gridSize * cellSize + "px",
-          gridTemplateColumns: `repeat(${gridSize}, ${cellSize}px)`,
-          gridTemplateRows: `repeat(${gridSize}, ${cellSize}px)`,
+          width: rowSize * cellSize + "px",
+          height: colSize * cellSize + "px",
+          gridTemplateColumns: `repeat(${colSize}, ${cellSize}px)`,
+          gridTemplateRows: `repeat(${rowSize}, ${cellSize}px)`,
         }}
       >
         {/* Render merged regions */}
         {mergeRegions.map((region, index) => (
           <CustomizableInput
             key={`merged-${index}`}
-            text={region.text}
+            region={region}
             ref={(el) => (editorRefs.current[index] = el)}
             className="font-textFont text-2xl"
             onFocus={() => setFocusedIndex(index)}
@@ -317,7 +367,7 @@ const GridBoard = ({
                 const copy = [...prev];
                 copy[index] = {
                   ...copy[index],
-                  text: "Dữ liệu từ {" + droppedField.fieldName + "}",
+                  text: "Dữ liệu từ ${{" + droppedField.fieldName + "}}",
                   fromDrag: true,
                 };
                 return copy;
@@ -327,7 +377,10 @@ const GridBoard = ({
               gridColumn: `${region.leftPos + 1} / span ${region.width}`,
               gridRow: `${region.topPos + 1} / span ${region.height}`,
               // backgroundColor:  region.fromDrag ? "#D9D9D9" : "#fff",
-              border: "2px solid #3b82f6",
+              border: hasMatchingPlaceholder(region.text)
+                ? "2px dashed #3b82f6"
+                : "2px solid #3b82f6",
+
               fontFamily: "'BaiJamjuree', sans-serif",
               lineHeight: "2rem",
             }}
@@ -343,8 +396,8 @@ const GridBoard = ({
         )}
 
         {/* Render individual cells */}
-        {[...Array(gridSize)].flatMap((_, row) =>
-          [...Array(gridSize)].map((_, col) => {
+        {[...Array(rowSize)].flatMap((_, row) =>
+          [...Array(colSize)].map((_, col) => {
             if (isCovered(row, col)) return null;
 
             const isSelected = isInSelection(row, col);
@@ -385,6 +438,7 @@ const GridBoard = ({
       >
         Print Grid Data
       </button>
+      <button onClick={() => setColSize((prev) => prev + 1)}>Add col</button>
     </>
   );
 };

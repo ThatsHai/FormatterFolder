@@ -47,7 +47,7 @@ api.interceptors.response.use(
 
 const refreshToken = async () => {
   try {
-    const response = await noTokenApi.post(
+    const response = await refreshTokenApi.post(
       "http://localhost:8080/auth/refresh"
     );
     sessionStorage.setItem("accessToken", response.data.result.accesstoken);
@@ -59,6 +59,10 @@ const refreshToken = async () => {
 };
 
 export const noTokenApi = axios.create({
+  baseURL: "http://localhost:8080",
+});
+
+const refreshTokenApi = axios.create({
   baseURL: "http://localhost:8080",
   withCredentials: true,
 });

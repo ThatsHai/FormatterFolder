@@ -21,7 +21,6 @@ const HomePage = () => {
           <Button label="Thêm đề cương" handleClick={handleFormToggle}></Button>
         </div>
       </div>
-
       <ContentHomepage
         year={2025}
         refreshTrigger={refreshCounter}
@@ -35,7 +34,6 @@ const HomePage = () => {
           }}
         />
       )}
-
       <SuccessPopup
         isOpen={showPopup}
         onClose={() => {
@@ -43,6 +41,7 @@ const HomePage = () => {
           setIsThesisFormOpen(false);
         }}
       />
+      
     </div>
   );
 };

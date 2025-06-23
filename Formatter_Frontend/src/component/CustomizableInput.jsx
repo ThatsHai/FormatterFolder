@@ -1,4 +1,5 @@
 import React from "react";
+
 import ReactQuill from "react-quill";
 import { IconButton } from "@mui/material";
 import FormatBoldIcon from "@mui/icons-material/FormatBold";
@@ -89,7 +90,7 @@ CustomToolbar.propTypes = {
 };
 
 const CustomizableInput = React.forwardRef(
-  ({ text, onChange, onDrop, onFocus, onBlur, style, readOnly = false }, ref) => {
+  ({ region, onChange, onDrop, onFocus, onBlur, style, readOnly = false }, ref) => {
     return (
       <div
         tabIndex={0}
@@ -112,7 +113,7 @@ const CustomizableInput = React.forwardRef(
         <ReactQuill
           ref={ref}
           theme="snow"
-          value={text}
+          value={region.text}
           onChange={(content, delta, source, editor) => {
             const html = editor.getHTML();
             onChange(html);
@@ -139,7 +140,7 @@ const CustomizableInput = React.forwardRef(
 
 
 CustomizableInput.propTypes = {
-  text: PropTypes.string,
+  region: PropTypes.object,
   onChange: PropTypes.func,
   onDrop: PropTypes.func,
   onFocus: PropTypes.func,

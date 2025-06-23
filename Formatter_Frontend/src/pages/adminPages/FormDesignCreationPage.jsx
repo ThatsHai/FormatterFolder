@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
-import { useParams } from "react-router-dom";
 import api from "../../services/api";
 import GridBoard from "./designPage/GridBoard";
 import ConfirmationPopup from "../../component/ConfirmationPopup";
+import PropTypes from "prop-types";
+import { useLocation } from "react-router";
 
 const RightSidebar = ({ formData }) => {
   const [isOpen, setIsOpen] = useState();
@@ -69,7 +69,7 @@ const RightSidebar = ({ formData }) => {
                     {formField.description || "Không có mô tả"}
                   </p>
                   <div className="w-full items-end justify-end flex">
-                    <p className="inline-block border px-2 rounded-md bg-greenCorrect">
+                    <p className="inline-block border px-2 rounded-md bg-darkGray text-white py-1">
                       {formField.fieldType || "Chưa chọn"}
                     </p>
                   </div>
@@ -114,7 +114,10 @@ const Tooltip = () => {
                 <p>Kéo thả các ô để tạo khung viền</p>
               </li>
               <li>
-                <p>Kéo dữ liệu trả lời từ thanh bên</p>
+                <p>
+                  Kéo dữ liệu trả lời từ thanh bên hoặc nhập ${"{{"}tên trường
+                  {"}}"}
+                </p>
               </li>
               <li>
                 <p>Định dạng hoặc xóa ô bằng cách chọn ô</p>
@@ -127,9 +130,9 @@ const Tooltip = () => {
   );
 };
 
-const DesignMainContent = () => {
+const DesignMainContent = ({ formData }) => {
   const [designInfo, setDesignInfo] = useState({});
-  const [emptyTitleError, setEmptyTitleError] = useState(true);
+  const [emptyTitleError, setEmptyTitleError] = useState(false);
   const [displayConfirmationPopup, setDisplayConfirmationPopup] =
     useState(false);
   const [displaySuccessPopup, setDisplaySuccessPopup] = useState(false);
@@ -148,14 +151,22 @@ const DesignMainContent = () => {
   };
 
   const onUpdateDesignInfo = (fieldName, value) => {
+    if (typeof fieldName !== "string") {
+      console.warn(
+        "Invalid fieldName passed to onUpdateDesignInfo:",
+        fieldName
+      );
+      return;
+    }
+
     setDesignInfo((prev) => {
       if (fieldName === "cells") {
         return {
           ...prev,
-          cells: value, // value is a new array of cells
+          cells: value,
         };
       }
-      // other fields update
+
       return {
         ...prev,
         [fieldName]: value,
@@ -164,7 +175,9 @@ const DesignMainContent = () => {
   };
 
   const handleSaveForm = () => {
-    if (!designInfo || designInfo.title.trim() === "") {
+    const title = designInfo?.title?.trim?.() || "";
+
+    if (title === "") {
       setEmptyTitleError(true);
     } else {
       setEmptyTitleError(false);
@@ -175,6 +188,9 @@ const DesignMainContent = () => {
   const handleSendFormData = async () => {
     try {
       console.log(designInfo);
+      setDisplaySuccessPopup(true);
+      const result = await api.post("/designs", designInfo);
+      console.log("result" + result);
     } catch (e) {
       console.log("Lỗi không gửi được dữ liệu" + e);
     }
@@ -219,6 +235,7 @@ const DesignMainContent = () => {
           onUpdateDesignInfo={onUpdateDesignInfo}
           gridSize={gridSize}
           cellSize={cellSize}
+          formData={formData}
         ></GridBoard>
         <div className="w-full flex justify-end font-textFont">
           <button
@@ -241,9 +258,9 @@ const DesignMainContent = () => {
   );
 };
 
-const FormDesignCreationPage = ({
-  formId = "283dae97-f71d-4501-ba40-40d4e708e785",
-}) => {
+const FormDesignCreationPage = () => {
+  const location = useLocation();
+  const formId = location.pathname.split("/").pop();
   const [formData, setFormData] = useState();
 
   useEffect(() => {
@@ -257,10 +274,14 @@ const FormDesignCreationPage = ({
 
   return (
     <div className="p-6 h-[200vh]">
-      <DesignMainContent></DesignMainContent>
+      <DesignMainContent formData={formData}></DesignMainContent>
       <RightSidebar formData={formData}></RightSidebar>
     </div>
   );
 };
 
 export default FormDesignCreationPage;
+
+RightSidebar.propTypes = {
+  formData: PropTypes.object,
+};

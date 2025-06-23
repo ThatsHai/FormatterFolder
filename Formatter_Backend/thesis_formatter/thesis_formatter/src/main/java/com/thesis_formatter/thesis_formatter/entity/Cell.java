@@ -1,5 +1,6 @@
 package com.thesis_formatter.thesis_formatter.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -21,5 +22,6 @@ public class Cell {
     int topPos;
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "designId", referencedColumnName = "designId")
+    @JsonBackReference
     Design design;
 }

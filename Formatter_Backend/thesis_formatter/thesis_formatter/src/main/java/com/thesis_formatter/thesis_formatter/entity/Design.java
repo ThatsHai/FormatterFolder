@@ -1,9 +1,11 @@
 package com.thesis_formatter.thesis_formatter.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,6 +20,7 @@ public class Design {
     String designId;
     String title;
     String description;
-    @OneToMany(mappedBy = "design", cascade = CascadeType.ALL)
-    List<Cell> cells;
+    @OneToMany(mappedBy = "design", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    List<Cell> cells = new ArrayList<>();
 }
