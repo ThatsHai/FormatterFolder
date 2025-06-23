@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import FieldInfo from "../component/FieldInfo.jsx";
 import PasswordField from "../component/PasswordField.jsx";
 import { useDispatch } from "react-redux";
-import api, { noTokenApi } from "../services/api.js";
+import api, { refreshTokenApi } from "../services/api.js";
 import { loginSuccess } from "../redux/authSlice";
 
 const Login = () => {
@@ -76,7 +76,7 @@ const Login = () => {
 
     try {
       console.log("Form submitted:", dataToSend);
-      const loginResponse = await noTokenApi.post(`/auth/token`, dataToSend);
+      const loginResponse = await refreshTokenApi.post(`/auth/token`, dataToSend);
       const accessToken = loginResponse.data.result.accesstoken;
 
       await saveToken(accessToken);
