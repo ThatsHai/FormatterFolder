@@ -20,19 +20,22 @@ public class FormRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String formRecordId;
-    String fieldDetail;
 
     @OneToMany(mappedBy = "formRecord", cascade = CascadeType.ALL)
     @JsonManagedReference
     List<FormRecordField> formRecordFields;
+//
+//    @ManyToOne
+//    @JoinColumn(name = "formId")
+//    Form form;
 
     @ManyToOne
-    @JoinColumn(name = "form_id")
-    Form form;
+    @JoinColumn(name = "topicId")
+    Topic topic;
 
     @ManyToOne
 //    @JoinColumn(name = "student_id", nullable = false)
-    @JoinColumn(name = "student_id")
+    @JoinColumn(name = "studentId")
     Student student;
 }
 

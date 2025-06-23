@@ -1,0 +1,25 @@
+package com.thesis_formatter.thesis_formatter.controller;
+
+import com.thesis_formatter.thesis_formatter.entity.FormRecord;
+import com.thesis_formatter.thesis_formatter.service.FormRecordService;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public class FormRecordController {
+    FormRecordService formRecordService;
+
+    @PostMapping("/formRecords/create")
+    public void createFormRecord(@RequestBody FormRecord formRecord) {
+//        formRecordService.createFormRecord(formRecord);
+    }
+}
+

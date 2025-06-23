@@ -27,7 +27,7 @@ const TopicDetail = ({ topic, onChange, formErrors }) => {
 
   return (
     <div>
-      <div className="my-12">
+      <div className="my-1">
         <div>
           <DisabledField title="Tên đề tài" value={topic.title}></DisabledField>
           <DisabledField

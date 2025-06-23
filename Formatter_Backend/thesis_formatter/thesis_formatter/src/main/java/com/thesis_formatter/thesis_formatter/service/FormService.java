@@ -89,34 +89,34 @@ public class FormService {
                 .build();
     }
 
-    public APIResponse<FormRecord> submitForm(FormRecord formRecord) {
-        // Fetch and set the managed Student entity
-        if (formRecord.getStudent() != null && formRecord.getStudent().getAcId() != null) {
-            Student student = studentRepo.findById(formRecord.getStudent().getAcId())
-                    .orElseThrow(() -> new RuntimeException("Student not found"));
-            formRecord.setStudent(student);
-        }
-
-        // Fetch and set the managed Form entity
-        if (formRecord.getForm() != null && formRecord.getForm().getFormId() != null) {
-            Form form = formRepo.findById(formRecord.getForm().getFormId())
-                    .orElseThrow(() -> new RuntimeException("Form not found"));
-            formRecord.setForm(form);
-        }
-
-        // Set formRecord on each formRecordField (to ensure bidirectional consistency)
-        if (formRecord.getFormRecordFields() != null) {
-            formRecord.getFormRecordFields().forEach(field -> field.setFormRecord(formRecord));
-        }
-
-        // Save the complete formRecord
-        FormRecord savedRecord = formRecordRepo.save(formRecord);
-
-        return APIResponse.<FormRecord>builder()
-                .code("200")
-                .result(savedRecord)
-                .build();
-    }
+//    public APIResponse<FormRecord> submitForm(FormRecord formRecord) {
+//        // Fetch and set the managed Student entity
+//        if (formRecord.getStudent() != null && formRecord.getStudent().getAcId() != null) {
+//            Student student = studentRepo.findById(formRecord.getStudent().getAcId())
+//                    .orElseThrow(() -> new RuntimeException("Student not found"));
+//            formRecord.setStudent(student);
+//        }
+//
+//        // Fetch and set the managed Form entity
+//        if (formRecord.getForm() != null && formRecord.getForm().getFormId() != null) {
+//            Form form = formRepo.findById(formRecord.getForm().getFormId())
+//                    .orElseThrow(() -> new RuntimeException("Form not found"));
+//            formRecord.setForm(form);
+//        }
+//
+//        // Set formRecord on each formRecordField (to ensure bidirectional consistency)
+//        if (formRecord.getFormRecordFields() != null) {
+//            formRecord.getFormRecordFields().forEach(field -> field.setFormRecord(formRecord));
+//        }
+//
+//        // Save the complete formRecord
+//        FormRecord savedRecord = formRecordRepo.save(formRecord);
+//
+//        return APIResponse.<FormRecord>builder()
+//                .code("200")
+//                .result(savedRecord)
+//                .build();
+//    }
 
     public APIResponse<Form> getFormById(String formId) {
         Form form = formRepo.findById(formId).orElseThrow(() -> new RuntimeException("Form not found"));

@@ -49,10 +49,10 @@ public class FormController {
         return formService.createForm(form);
     }
 
-    @PostMapping("/forms/submit")
-    public APIResponse<FormRecord> submitForm(@RequestBody FormRecord formRecord) {
-        return formService.submitForm(formRecord);
-    }
+//    @PostMapping("/forms/submit")
+//    public APIResponse<FormRecord> submitForm(@RequestBody FormRecord formRecord) {
+//        return formService.submitForm(formRecord);
+//    }
 
     @GetMapping("/forms/{formId}")
     public APIResponse<Form> getFormByFormId(@PathVariable("formId") String formId) {
