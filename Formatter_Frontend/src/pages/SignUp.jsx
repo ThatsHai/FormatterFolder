@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import FieldInfo from "../component/FieldInfo.jsx";
 import PasswordField from "../component/PasswordField.jsx";
 import SelectField from "../component/SelectField.jsx";
-import api, { noTokenApi } from "../services/api.js";
+import api, { refreshTokenApi } from "../services/api.js";
 import dayjs from "dayjs";
 import { loginSuccess } from "../redux/authSlice";
 import { useDispatch } from "react-redux";
@@ -45,7 +45,7 @@ const SignUp = () => {
 
   const fetchOptions = async (endpoint, setList) => {
     try {
-      const response = await noTokenApi.get(endpoint);
+      const response = await refreshTokenApi.get(endpoint);
       setList(response.data.result);
     } catch (error) {
       setList([]);

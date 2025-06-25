@@ -62,7 +62,7 @@ export const noTokenApi = axios.create({
   baseURL: "http://localhost:8080",
 });
 
-const refreshTokenApi = axios.create({
+export const refreshTokenApi = axios.create({
   baseURL: "http://localhost:8080",
   withCredentials: true,
 });
