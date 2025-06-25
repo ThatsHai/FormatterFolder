@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import SelectField from "../SelectField";
 import TopicDetail from "./SubmitThesisFormComponents/TopicDetail";
 import AddingTeacherField from "../../pages/teacherPages/AddingTeacherField";
+import FormField from "./SubmitThesisFormComponents/FormField";
 
 const SubmitThesisForm = ({
   handleFormToggle = () => {},
@@ -228,7 +229,6 @@ const SubmitThesisForm = ({
                       className="bg-darkBlue text-white px-6 py-2 rounded-full"
                       onClick={() => setCurrentStep(2)}
                     >
-                      
                       Tiếp tục
                     </button>
                   </div>
@@ -240,49 +240,24 @@ const SubmitThesisForm = ({
               ) : null}
             </>
           )}
-
-          {/* Year */}
-          {/* <div className="w-full grid grid-cols-3 items-center mb-3">
-              <p>Năm</p>
-              <select
-                className="col-span-2 border rounded-md px-4 py-1 w-1/4"
-                name="year"
-                value={formData.year}
-                onChange={handleChange}
-              >
-                {yearOptions.map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </select>
-            </div> */}
-
-          {/* Teacher */}
-          {/* <AddingTeacherField
-          className="relative flex items-start text-start w-full font-textFont text-lg mb-8 px-10"
-            title="3. CÁN BỘ HƯỚNG DẪN"
-            teachersList={teachersList}
-            setTeachersList={setTeachersList}
-            formErrors={formErrors}
-            openAddTeacherModal={openAddTeacherModal}
-            setOpenAddTeacherModal={setOpenAddTeacherModal}
-          ></AddingTeacherField> */}
-
-          {/* Introduction */}
-          {/* <div className="relative text-start w-full font-textFont text-lg mb-8 px-10">
-            <h3 className="text-black font-semibold mb-2">4. GIỚI THIỆU</h3>
-            <textarea
-              name="introduction"
-              id=""
-              placeholder="Nội dung giới thiệu"
-              className="border w-full p-3 rounded-md resize-none"
-              onChange={handleChange}
-            ></textarea>
-          </div> */}
           {/* Page 2 */}
           {currentStep === 2 && (
             <>
+              <h1 className="text-4xl font-headerFont text-darkBlue font-bold text-center mb-6">
+                {selectedForm.title}
+              </h1>
+              {selectedForm.formFields
+                ?.slice() // create a copy
+                .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
+                .map((field) => (
+                  <FormField
+                    type={field.filedType || ""}
+                    title={field.fieldName}
+                    order={field.position+1}
+                  >
+                    {" "}
+                  </FormField>
+                ))}
               <div className="mt-6 flex justify-between">
                 <button
                   type="button"

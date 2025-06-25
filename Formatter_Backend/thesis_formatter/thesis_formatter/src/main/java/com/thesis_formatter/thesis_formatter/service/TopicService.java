@@ -65,6 +65,7 @@ public class TopicService {
         List<String> teacherNames = new ArrayList<>();
         for (String teacherId : teacherIds) {
             Teacher teacher = teacherRepo.findByUserId(teacherId);
+            System.out.println(teacherId);
             teachers.add(teacher);
             teacherNames.add(teacher.getName());
             System.out.println(teacherId);

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../../services/api";
-import ShortAnswer from "../teacherPages/ShortAnswer";
+import ShortAnswer from "../../component/forms/SubmitThesisFormComponents/ShortAnswer";
 import ReactQuill from "react-quill";
 import SelectField from "../../component/SelectField";
 import { useSelector } from "react-redux";

@@ -234,7 +234,6 @@ return (
 
         return (
           <FormField
-            key={label}
             type={type === "password" ? "password" : field.type === "select" || isSpecialSelect ? "select" : "fieldInfo"}
             label={label}
             value={formInfo[label]}

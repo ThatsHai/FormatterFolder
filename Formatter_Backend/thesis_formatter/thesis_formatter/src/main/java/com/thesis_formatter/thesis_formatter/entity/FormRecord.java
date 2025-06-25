@@ -3,10 +3,7 @@ package com.thesis_formatter.thesis_formatter.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.List;
@@ -16,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder
 public class FormRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -35,7 +33,7 @@ public class FormRecord {
 
     @ManyToOne
 //    @JoinColumn(name = "student_id", nullable = false)
-    @JoinColumn(name = "studentId")
+    @JoinColumn(name = "acId")
     Student student;
 }
 
