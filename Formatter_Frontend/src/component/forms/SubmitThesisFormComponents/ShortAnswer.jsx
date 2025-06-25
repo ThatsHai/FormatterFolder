@@ -4,6 +4,7 @@ const Title = ({
   order = "0",
   title = "",
   value = "",
+  name ="",
   // VNTitle = "Tựa Việt",
   // ENTitle = "English Title",
   // formData = {},
@@ -16,7 +17,7 @@ const Title = ({
       <input
         type="text"
         className="w-full border-b border-darkBlue focus:outline-none"
-        // name={ENTitle}
+        name={name}
         // value={formData[ENTitle]}
         value={value}
         onChange={handleChange}
@@ -33,6 +34,7 @@ Title.propTypes = {
   // VNTitle: PropTypes.string,
   // ENTitle: PropTypes.string,
   // formData: PropTypes.object,
+  name: PropTypes.string,
   value: PropTypes.string,
   error: PropTypes.string,
   title: PropTypes.string,

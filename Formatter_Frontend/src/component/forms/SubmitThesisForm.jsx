@@ -18,13 +18,8 @@ const SubmitThesisForm = ({
   const [formData, setFormData] = useState({
     formId: "",
     topicId: "",
-    student: {
-      name: student?.name,
-      studentId: student?.userId,
-      majorName: student?.studentClass.major.majorName,
-      departmentName: student?.studentClass.major.department.departmentName,
-      facultyName: student?.studentClass.major.department.faculty.facultyName,
-    },
+    studentId: student.userId,
+    formRecordFields: [],
   });
   const [openAddTeacherTable, setOpenAddTeacherTable] = useState(false);
   const [forms, setForms] = useState([]);
@@ -50,7 +45,7 @@ const SubmitThesisForm = ({
     e.preventDefault();
     const result = async () => {
       try {
-        await api.post("/form/submit", formData);
+        await api.post("/formRecords/create", formData);
         onSuccess();
       } catch (error) {
         console.log("Error submitting " + error);
@@ -114,6 +109,28 @@ const SubmitThesisForm = ({
       const topic = topics.find((t) => t.topicId === value);
       setSelectedTopic(topic || null);
     }
+  };
+  const handleFormFieldChange = (formFieldId, value) => {
+    setFormData((prev) => {
+      const existingIndex = prev.formRecordFields.findIndex(
+        (f) => f.formFieldId === formFieldId
+      );
+
+      let updatedFields;
+      if (existingIndex !== -1) {
+        // Nếu đã có field này, cập nhật value
+        updatedFields = [...prev.formRecordFields];
+        updatedFields[existingIndex].value = value;
+      } else {
+        // Nếu chưa có, thêm mới vào danh sách
+        updatedFields = [...prev.formRecordFields, { formFieldId, value }];
+      }
+
+      return {
+        ...prev,
+        formRecordFields: updatedFields,
+      };
+    });
   };
 
   // Generate years
@@ -189,23 +206,25 @@ const SubmitThesisForm = ({
                 </h3>
                 <DisabledField
                   title="Tên sinh viên"
-                  value={formData.student.name}
+                  value={student?.name}
                 ></DisabledField>
                 <DisabledField
                   title="Khóa (MSSV)"
-                  value={formData.student.studentId}
+                  value={student?.userId}
                 ></DisabledField>
                 <DisabledField
                   title="Ngành"
-                  value={formData.student.majorName}
+                  value={student?.studentClass.major.majorName}
                 ></DisabledField>
                 <DisabledField
                   title="Đơn vị (Khoa/Bộ môn)"
-                  value={formData.student.departmentName}
+                  value={student?.studentClass.major.department.departmentName}
                 ></DisabledField>
                 <DisabledField
                   title="Khoa/Trường"
-                  value={formData.student.facultyName}
+                  value={
+                    student?.studentClass.major.department.faculty.facultyName
+                  }
                 ></DisabledField>
               </div>
               <div className="relative text-start w-full font-textFont text-lg mb-8 px-10">
@@ -251,12 +270,20 @@ const SubmitThesisForm = ({
                 .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
                 .map((field) => (
                   <FormField
+                    key={field.formFieldId}
                     type={field.filedType || ""}
+                    name={field.fieldName}
                     title={field.fieldName}
-                    order={field.position+1}
-                  >
-                    {" "}
-                  </FormField>
+                    order={field.position + 1}
+                    value={
+                      formData.formRecordFields.find(
+                        (f) => f.formFieldId === field.formFieldId
+                      )?.value || ""
+                    }
+                    handleChange={(e) =>
+                      handleFormFieldChange(field.formFieldId, e.target.value)
+                    }
+                  />
                 ))}
               <div className="mt-6 flex justify-between">
                 <button
