@@ -11,10 +11,11 @@ import ThesisInfoLayout from "../layout/ThesisInfoLayout";
 import AdminLayout from "../layout/AdminLayout";
 import AccountManagementPage from "../pages/adminPages/AccountManagementPage";
 import FormCreationPage from "../pages/adminPages/FormCreationPage";
-import FormManagementPage from "../pages/adminPages/FormManagementPage"
+import FormManagementPage from "../pages/adminPages/FormManagementPage";
 import FormInfoPage from "../pages/adminPages/FormInfoPage";
 import FormDesignCreationPage from "../pages/adminPages/FormDesignCreationPage";
 import TopicSuggestionPage from "../pages/teacherPages/TopicSuggestionPage";
+import RepoManagementPage from "../pages/adminPages/RepoManagementPage";
 import Test from "../pages/Test";
 
 const Router = createBrowserRouter([
@@ -107,6 +108,14 @@ const Router = createBrowserRouter([
     ),
   },
   {
+    path: "/admin/repo",
+    element: (
+      <AdminLayout>
+        <RepoManagementPage></RepoManagementPage>
+      </AdminLayout>
+    ),
+  },
+  {
     path: "/teacher/topic/suggests",
     element: (
       <DefaultLayout>
@@ -114,7 +123,7 @@ const Router = createBrowserRouter([
       </DefaultLayout>
     ),
   },
- { 
+  {
     path: "/test",
     element: (
       <AdminLayout>
