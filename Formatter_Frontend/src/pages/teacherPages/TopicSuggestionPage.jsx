@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import api from "../../services/api";
-import ShortAnswer from "../teacherPages/ShortAnswer";
+import ShortAnswer from "../../component/forms/SubmitThesisFormComponents/ShortAnswer";
 import ReactQuill from "react-quill";
 import SelectField from "../../component/SelectField";
 import { useSelector } from "react-redux";
 import AddingTeacherField from "./AddingTeacherField";
-import AddingMajorField from "./major/AddingMajorField"
+import AddingMajorField from "./major/AddingMajorField";
 import { major } from "@mui/material";
 const TopicSuggestionPage = ({
   handleFormToggle = () => {},
@@ -32,14 +32,24 @@ const TopicSuggestionPage = ({
   const [forms, setForms] = useState([]);
   const [openAddMajorModal, setOpenAddMajorModal] = useState(false);
 
-
   const onUpdateFormData = (fieldName, value) => {
     setFormData((prev) => ({ ...prev, [fieldName]: value }));
+    setFormErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[fieldName];
+      return newErrors;
+    });
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    setFormErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[name];
+      return newErrors;
+    });
   };
 
   const handleSelectChange = (field, value) => {
@@ -78,6 +88,13 @@ const TopicSuggestionPage = ({
       ...prev,
       teacherIds: teachersList.map((t) => t.userId),
     }));
+    if (teachersList.length > 0) {
+      setFormErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.teacherIds;
+        return newErrors;
+      });
+    }
   }, [teachersList]);
 
   useEffect(() => {
@@ -86,15 +103,27 @@ const TopicSuggestionPage = ({
         ...prev,
         contactInfo: teachersList[0].email,
       }));
+      setFormErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.teacherIds;
+        return newErrors;
+      });
     }
   }, [teachersList]);
 
   useEffect(() => {
-  setFormData((prev) => ({
-    ...prev,
-    majorIds: majorsList.map((major) => major.majorId), 
-  }));
-}, [majorsList]);
+    setFormData((prev) => ({
+      ...prev,
+      majorIds: majorsList.map((major) => major.majorId),
+    }));
+    if (majorsList.length > 0) {
+      setFormErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.majorIds;
+        return newErrors;
+      });
+    }
+  }, [majorsList]);
 
   // const handleRemoveTeacher = (userId) => {
   //   setTeachersList((prev) => prev.filter(t => t.userId !== userId || t.isDefault));
@@ -170,7 +199,7 @@ const TopicSuggestionPage = ({
             Đề xuất đề tài
           </h1>
           {/* Form */}
-         <div className="relative text-start font-textFont text-lg m-8 px-10">
+          <div className="relative text-start font-textFont text-lg m-8 px-10">
             <h2 className="text-black font-semibold">
               LOẠI BIỂU MẪU TƯƠNG ỨNG
             </h2>
@@ -189,23 +218,21 @@ const TopicSuggestionPage = ({
             ></SelectField>
           </div>
           <div className="relative text-start font-textFont text-lg m-8 px-10">
-           <h2 className="text-lightBlue font-semibold">
-              THÔNG TIN ĐỀ TÀI
-            </h2>
+            <h2 className="text-lightBlue font-semibold">THÔNG TIN ĐỀ TÀI</h2>
           </div>
           <ShortAnswer
             order="1"
-            VNTitle="TÊN ĐỀ TÀI"
-            ENTitle="title"
-            formData={formData}
+            title="TÊN ĐỀ TÀI"
+            name="title"
+            value={formData.title}
             error={formErrors.title}
             handleChange={handleChange}
           ></ShortAnswer>
           <ShortAnswer
             order="2"
-            VNTitle="MÔ TẢ"
-            ENTitle="description"
-            formData={formData}
+            title="MÔ TẢ"
+            name="description"
+            value={formData.description}
             error={formErrors.description}
             handleChange={handleChange}
           ></ShortAnswer>
@@ -226,26 +253,26 @@ const TopicSuggestionPage = ({
 
           <ShortAnswer
             order="4"
-            VNTitle="KINH PHÍ"
-            ENTitle="funding"
-            formData={formData}
+            title="KINH PHÍ"
+            name="funding"
+            value={formData.funding}
             error={formErrors.funding}
             handleChange={handleChange}
           ></ShortAnswer>
           <ShortAnswer
             order="5"
-            VNTitle="NGUỒN KINH PHÍ"
-            ENTitle="fundingSource"
-            formData={formData}
+            title="NGUỒN KINH PHÍ"
+            name="fundingSource"
+            value={formData.fundingSource}
             error={formErrors.fundingSource}
             handleChange={handleChange}
           ></ShortAnswer>
 
           <ShortAnswer
             order="6"
-            VNTitle="THỜI GIAN THỰC HIỆN"
-            ENTitle="implementationTime"
-            formData={formData}
+            title="THỜI GIAN THỰC HIỆN"
+            name="implementationTime"
+            value={formData.implementationTime}
             error={formErrors.implementationTime}
             handleChange={handleChange}
           ></ShortAnswer>
@@ -261,9 +288,9 @@ const TopicSuggestionPage = ({
           ></AddingTeacherField>
           <ShortAnswer
             order="8"
-            VNTitle="THÔNG TIN LIÊN HỆ"
-            ENTitle="contactInfo"
-            formData={formData}
+            title="THÔNG TIN LIÊN HỆ"
+            name="contactInfo"
+            value={formData.contactInfo}
             error={formErrors.contactInfo}
             handleChange={handleChange}
           ></ShortAnswer>
@@ -287,7 +314,7 @@ const TopicSuggestionPage = ({
 
           <AddingMajorField
             className="flex items-center relative text-start font-textFont text-lg m-8 px-10"
-            title="8. DÀNH CHO SINH VIÊN NGÀNH"
+            title="9. DÀNH CHO SINH VIÊN NGÀNH"
             majorsList={majorsList}
             setMajorsList={setMajorsList}
             formErrors={formErrors}
@@ -307,7 +334,6 @@ const TopicSuggestionPage = ({
         </form>
       </div>
     </div>
-  
   );
 };
 

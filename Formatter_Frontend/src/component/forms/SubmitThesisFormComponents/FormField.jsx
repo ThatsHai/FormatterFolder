@@ -16,7 +16,6 @@ const FormField = ({ type = "text", ...rest }) => {
         return <DisableField {...rest} />;
       case "fieldInfo":
         return <FieldInfo {...rest} />;
-    case "addTeacher":
       default:
         return <ShortAnswer {...rest} />;
     }

@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import SelectField from "../SelectField";
 import TopicDetail from "./SubmitThesisFormComponents/TopicDetail";
 import AddingTeacherField from "../../pages/teacherPages/AddingTeacherField";
+import FormField from "./SubmitThesisFormComponents/FormField";
 
 const SubmitThesisForm = ({
   handleFormToggle = () => {},
@@ -17,13 +18,8 @@ const SubmitThesisForm = ({
   const [formData, setFormData] = useState({
     formId: "",
     topicId: "",
-    student: {
-      name: student?.name,
-      studentId: student?.userId,
-      majorName: student?.studentClass.major.majorName,
-      departmentName: student?.studentClass.major.department.departmentName,
-      facultyName: student?.studentClass.major.department.faculty.facultyName,
-    },
+    studentId: student.userId,
+    formRecordFields: [],
   });
   const [openAddTeacherTable, setOpenAddTeacherTable] = useState(false);
   const [forms, setForms] = useState([]);
@@ -49,7 +45,7 @@ const SubmitThesisForm = ({
     e.preventDefault();
     const result = async () => {
       try {
-        await api.post("/form/submit", formData);
+        await api.post("/formRecords/create", formData);
         onSuccess();
       } catch (error) {
         console.log("Error submitting " + error);
@@ -113,6 +109,28 @@ const SubmitThesisForm = ({
       const topic = topics.find((t) => t.topicId === value);
       setSelectedTopic(topic || null);
     }
+  };
+  const handleFormFieldChange = (formFieldId, value) => {
+    setFormData((prev) => {
+      const existingIndex = prev.formRecordFields.findIndex(
+        (f) => f.formFieldId === formFieldId
+      );
+
+      let updatedFields;
+      if (existingIndex !== -1) {
+        // Nếu đã có field này, cập nhật value
+        updatedFields = [...prev.formRecordFields];
+        updatedFields[existingIndex].value = value;
+      } else {
+        // Nếu chưa có, thêm mới vào danh sách
+        updatedFields = [...prev.formRecordFields, { formFieldId, value }];
+      }
+
+      return {
+        ...prev,
+        formRecordFields: updatedFields,
+      };
+    });
   };
 
   // Generate years
@@ -188,23 +206,25 @@ const SubmitThesisForm = ({
                 </h3>
                 <DisabledField
                   title="Tên sinh viên"
-                  value={formData.student.name}
+                  value={student?.name}
                 ></DisabledField>
                 <DisabledField
                   title="Khóa (MSSV)"
-                  value={formData.student.studentId}
+                  value={student?.userId}
                 ></DisabledField>
                 <DisabledField
                   title="Ngành"
-                  value={formData.student.majorName}
+                  value={student?.studentClass.major.majorName}
                 ></DisabledField>
                 <DisabledField
                   title="Đơn vị (Khoa/Bộ môn)"
-                  value={formData.student.departmentName}
+                  value={student?.studentClass.major.department.departmentName}
                 ></DisabledField>
                 <DisabledField
                   title="Khoa/Trường"
-                  value={formData.student.facultyName}
+                  value={
+                    student?.studentClass.major.department.faculty.facultyName
+                  }
                 ></DisabledField>
               </div>
               <div className="relative text-start w-full font-textFont text-lg mb-8 px-10">
@@ -228,7 +248,6 @@ const SubmitThesisForm = ({
                       className="bg-darkBlue text-white px-6 py-2 rounded-full"
                       onClick={() => setCurrentStep(2)}
                     >
-                      
                       Tiếp tục
                     </button>
                   </div>
@@ -240,49 +259,32 @@ const SubmitThesisForm = ({
               ) : null}
             </>
           )}
-
-          {/* Year */}
-          {/* <div className="w-full grid grid-cols-3 items-center mb-3">
-              <p>Năm</p>
-              <select
-                className="col-span-2 border rounded-md px-4 py-1 w-1/4"
-                name="year"
-                value={formData.year}
-                onChange={handleChange}
-              >
-                {yearOptions.map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </select>
-            </div> */}
-
-          {/* Teacher */}
-          {/* <AddingTeacherField
-          className="relative flex items-start text-start w-full font-textFont text-lg mb-8 px-10"
-            title="3. CÁN BỘ HƯỚNG DẪN"
-            teachersList={teachersList}
-            setTeachersList={setTeachersList}
-            formErrors={formErrors}
-            openAddTeacherModal={openAddTeacherModal}
-            setOpenAddTeacherModal={setOpenAddTeacherModal}
-          ></AddingTeacherField> */}
-
-          {/* Introduction */}
-          {/* <div className="relative text-start w-full font-textFont text-lg mb-8 px-10">
-            <h3 className="text-black font-semibold mb-2">4. GIỚI THIỆU</h3>
-            <textarea
-              name="introduction"
-              id=""
-              placeholder="Nội dung giới thiệu"
-              className="border w-full p-3 rounded-md resize-none"
-              onChange={handleChange}
-            ></textarea>
-          </div> */}
           {/* Page 2 */}
           {currentStep === 2 && (
             <>
+              <h1 className="text-4xl font-headerFont text-darkBlue font-bold text-center mb-6">
+                {selectedForm.title}
+              </h1>
+              {selectedForm.formFields
+                ?.slice() // create a copy
+                .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
+                .map((field) => (
+                  <FormField
+                    key={field.formFieldId}
+                    type={field.filedType || ""}
+                    name={field.fieldName}
+                    title={field.fieldName}
+                    order={field.position + 1}
+                    value={
+                      formData.formRecordFields.find(
+                        (f) => f.formFieldId === field.formFieldId
+                      )?.value || ""
+                    }
+                    handleChange={(e) =>
+                      handleFormFieldChange(field.formFieldId, e.target.value)
+                    }
+                  />
+                ))}
               <div className="mt-6 flex justify-between">
                 <button
                   type="button"

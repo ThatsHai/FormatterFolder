@@ -2,10 +2,7 @@ package com.thesis_formatter.thesis_formatter.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Entity
@@ -13,6 +10,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder
 public class FormRecordField {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -21,11 +19,11 @@ public class FormRecordField {
     
 
     @ManyToOne
-    @JoinColumn(name = "form_field_id")
+    @JoinColumn(name = "formFieldId")
     FormField formField;
 
     @ManyToOne
-    @JoinColumn(name = "form_record_id")
+    @JoinColumn(name = "formRecordId")
     @JsonBackReference
     FormRecord formRecord;
 }

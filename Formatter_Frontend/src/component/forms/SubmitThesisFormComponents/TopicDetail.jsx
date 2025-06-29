@@ -37,10 +37,10 @@ const TopicDetail = ({ topic, onChange, formErrors }) => {
           <div className="w-full grid grid-cols-3 items-start mb-3">
             <label className="text-black">Mục tiêu</label>
             <div
-              className="col-span-2 bg-[#e4e4e4] text-[#686868] rounded-md py-1 min-h-[40px] text-lg
+              className="col-span-2 bg-[#e4e4e4] text-[#686868] rounded-md px-4 py-1 min-h-[40px] text-lg
                pointer-events-none prose prose-sm 
                prose-ul:list-disc prose-ol:list-decimal prose-li:ml-5 
-               prose-li:marker:text-[#686868] prose-p:text-[#e4e4e4]"
+               prose-li:marker:text-[#686868] prose-p:text-[#686868]"
               dangerouslySetInnerHTML={{ __html: topic.objective || "" }}
             />
           </div>
