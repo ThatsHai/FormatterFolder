@@ -2,6 +2,7 @@ package com.thesis_formatter.thesis_formatter.service;
 
 import com.thesis_formatter.thesis_formatter.dto.request.TeacherFiltersDTO;
 import com.thesis_formatter.thesis_formatter.dto.request.TeacherSearchCriteria;
+import com.thesis_formatter.thesis_formatter.dto.response.PaginationResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.TeacherDTO;
 import com.thesis_formatter.thesis_formatter.dto.response.TeacherFiltersReponseDTO;
 import com.thesis_formatter.thesis_formatter.entity.Department;
@@ -20,6 +21,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -47,6 +51,7 @@ public class TeacherService {
 //    private final FacultyRepo facultyRepo;
 
     private final FacultyRepo facultyRepo;
+
     @PreAuthorize("hasRole('ADMIN')")
 //    @PreAuthorize("hasAuthority('CREATE_TEACHER')")
 
@@ -162,9 +167,26 @@ public class TeacherService {
                 .build();
     }
 
-    public APIResponse<List<TeacherDTO>> searchTeachers(TeacherSearchCriteria criteria) {
-        List<Teacher> teachers = teacherRepo.findAll(TeacherSpecification.withCriteria(criteria));
-        return buildTeacherResponse(teachers);
+    public APIResponse<PaginationResponse<TeacherDTO>> searchTeachers(TeacherSearchCriteria criteria, String page, String numberOfRecords) {
+        Pageable pageable = PageRequest.of(Integer.parseInt(page), Integer.parseInt(numberOfRecords));
+
+        Page<Teacher> teacherPage = teacherRepo.findAll(TeacherSpecification.withCriteria(criteria), pageable);
+        List<TeacherDTO> teacherDTOList = teacherPage.getContent()
+                .stream()
+                .map(teacherMapper::toDTO)
+                .toList();
+
+        PaginationResponse<TeacherDTO> pageResponse = new PaginationResponse<>();
+        pageResponse.setCurrentPage(teacherPage.getNumber());
+        pageResponse.setContent(teacherDTOList);
+        pageResponse.setTotalElements(teacherPage.getTotalElements());
+        pageResponse.setTotalPages(teacherPage.getTotalPages());
+
+        return APIResponse.<PaginationResponse<TeacherDTO>>builder()
+                .result(pageResponse)
+                .code("200")
+                .build();
+//        return buildTeacherResponse(teachers);
     }
 
 

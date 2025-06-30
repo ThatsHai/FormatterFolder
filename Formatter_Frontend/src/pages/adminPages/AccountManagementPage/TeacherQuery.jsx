@@ -103,6 +103,12 @@ const TeacherQuery = ({ handleQueryCriteria, handleSearch }) => {
             placeholder="Mã CB"
             name="userId"
             onChange={(e) => handleQueryCriteria(e)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleSearch();
+              }
+            }}
           />
         </div>
 

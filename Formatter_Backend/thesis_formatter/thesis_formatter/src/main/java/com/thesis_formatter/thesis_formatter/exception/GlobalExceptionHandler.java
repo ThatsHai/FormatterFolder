@@ -37,13 +37,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(errorCode.getHttpStatusCode()).body(apiResponse);
     }
 
-    @ExceptionHandler(value = SQLIntegrityConstraintViolationException.class)
-    ResponseEntity<APIResponse> handleSQLException(SQLIntegrityConstraintViolationException e) {
-        APIResponse apiResponse = new APIResponse();
-        apiResponse.setCode(ErrorCode.USER_EXISTED.getCode());
-        apiResponse.setMessage(ErrorCode.USER_EXISTED.getMessage());
-        return ResponseEntity.badRequest().body(apiResponse);
-    }
+//    @ExceptionHandler(value = SQLIntegrityConstraintViolationException.class)
+//    ResponseEntity<APIResponse> handleSQLException(SQLIntegrityConstraintViolationException e) {
+//        APIResponse apiResponse = new APIResponse();
+//        apiResponse.setCode(ErrorCode.DUPLICATE_KEY.getCode());
+//        apiResponse.setMessage(ErrorCode.DUPLICATE_KEY.getMessage());
+//        return ResponseEntity.badRequest().body(apiResponse);
+//    }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     ResponseEntity<APIResponse> handlingValidation(MethodArgumentNotValidException exception) {

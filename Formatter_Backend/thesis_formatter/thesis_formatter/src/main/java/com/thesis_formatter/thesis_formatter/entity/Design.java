@@ -23,4 +23,7 @@ public class Design {
     @OneToMany(mappedBy = "design", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     List<Cell> cells = new ArrayList<>();
+    @ManyToOne
+    @JoinColumn(name = "formId")
+    Form form;
 }

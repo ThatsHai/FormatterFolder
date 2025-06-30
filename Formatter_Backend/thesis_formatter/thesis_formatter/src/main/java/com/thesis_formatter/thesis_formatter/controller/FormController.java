@@ -7,13 +7,14 @@ import com.thesis_formatter.thesis_formatter.service.FormService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@CrossOrigin
+//@CrossOrigin
 public class FormController {
     FormService formService;
 
@@ -48,14 +49,23 @@ public class FormController {
         return formService.createForm(form);
     }
 
-    @PostMapping("/forms/submit")
-    public APIResponse<FormRecord> submitForm(@RequestBody FormRecord formRecord) {
-        return formService.submitForm(formRecord);
-    }
+//    @PostMapping("/forms/submit")
+//    public APIResponse<FormRecord> submitForm(@RequestBody FormRecord formRecord) {
+//        return formService.submitForm(formRecord);
+//    }
 
     @GetMapping("/forms/{formId}")
     public APIResponse<Form> getFormByFormId(@PathVariable("formId") String formId) {
         return formService.getFormById(formId);
     }
-    
+
+    @GetMapping("/forms/students")
+    public APIResponse<Form> getStudentForm() {
+        return formService.getFormForReader("STUDENT");
+    }
+
+    @GetMapping("/forms/teachers")
+    public APIResponse<Form> getTeacherForm() {
+        return formService.getFormForReader("TEACHER");
+    }
 }

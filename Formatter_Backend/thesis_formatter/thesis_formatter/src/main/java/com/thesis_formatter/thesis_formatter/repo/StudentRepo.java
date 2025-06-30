@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface StudentRepo extends JpaRepository<Student, String>, JpaSpecificationExecutor<Student> {
     Student findByUserId(String studentId);
+    Student findByAcId(String acId);
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TeachersTable from "./accountManagementPage/TeachersTable";
 import TeacherQuery from "./accountManagementPage/TeacherQuery";
 import StudentQuery from "./accountManagementPage/StudentQuery";

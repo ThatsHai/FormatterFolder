@@ -34,4 +34,9 @@ public class MajorController {
             return majorService.getMajorsByDepartmentId(deparmentId);
         }
     }
+
+    @GetMapping("/majors/search")
+    public APIResponse<List<Major>> getMajor(@RequestParam String name) {
+        return majorService.getMajorsByName(name);
+    }
 }

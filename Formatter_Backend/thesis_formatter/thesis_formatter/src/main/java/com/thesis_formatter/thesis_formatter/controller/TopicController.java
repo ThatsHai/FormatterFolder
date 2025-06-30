@@ -1,6 +1,8 @@
 package com.thesis_formatter.thesis_formatter.controller;
 
+import com.thesis_formatter.thesis_formatter.dto.request.TopicRequest;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
+import com.thesis_formatter.thesis_formatter.dto.response.TopicResponse;
 import com.thesis_formatter.thesis_formatter.entity.Topic;
 import com.thesis_formatter.thesis_formatter.service.TopicService;
 import lombok.AccessLevel;
@@ -19,12 +21,14 @@ public class TopicController {
     TopicService topicService;
 
     @GetMapping("/topics")
-    public APIResponse<List<Topic>> getTopics() {
-        return topicService.getAll();
+    public APIResponse<List<Topic>> getTopics(@RequestParam(required = false) String formId) {
+        if (formId==null)
+            return topicService.getAll();
+        else return topicService.getTopicByFormId(formId);
     }
 
     @PostMapping("/topics/create")
-    public APIResponse<Topic> createTopic(@RequestBody Topic topic) {
+    public APIResponse<TopicResponse> createTopic(@RequestBody TopicRequest topic) {
         return topicService.create(topic);
     }
 }

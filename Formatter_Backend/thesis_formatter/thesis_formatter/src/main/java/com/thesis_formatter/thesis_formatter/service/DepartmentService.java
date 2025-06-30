@@ -2,6 +2,8 @@ package com.thesis_formatter.thesis_formatter.service;
 
 import com.thesis_formatter.thesis_formatter.entity.Department;
 import com.thesis_formatter.thesis_formatter.entity.Faculty;
+import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
+import com.thesis_formatter.thesis_formatter.exception.AppException;
 import com.thesis_formatter.thesis_formatter.repo.DepartmentRepo;
 import com.thesis_formatter.thesis_formatter.repo.FacultyRepo;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
@@ -20,6 +22,10 @@ public class DepartmentService {
     FacultyRepo facultyRepo;
 
     public APIResponse<Department> addDepartment(Department department) {
+        Department departmentFinding = departmentRepo.findByDepartmentId(department.getDepartmentId());
+        if (departmentFinding != null) {
+            throw new AppException(ErrorCode.DUPLICATE_KEY);
+        }
         Faculty faculty = facultyRepo.findByFacultyId(department.getFaculty().getFacultyId());
         department.setFaculty(faculty);
         departmentRepo.save(department);

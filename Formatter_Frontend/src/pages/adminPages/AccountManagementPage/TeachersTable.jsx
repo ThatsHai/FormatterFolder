@@ -29,7 +29,7 @@ const TeachersTable = ({ teachers }) => {
             </th>
           </tr>
         </thead>
-        <tbody className="bg-lightGray">
+        <tbody className="bg-lightGray ">
           {teachers?.length > 0 ? (
             teachers.map((teacher, index) => (
               <tr key={index}>

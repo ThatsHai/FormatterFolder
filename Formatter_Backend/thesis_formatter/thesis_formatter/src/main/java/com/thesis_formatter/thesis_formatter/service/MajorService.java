@@ -4,6 +4,8 @@ import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.entity.Department;
 import com.thesis_formatter.thesis_formatter.entity.Faculty;
 import com.thesis_formatter.thesis_formatter.entity.Major;
+import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
+import com.thesis_formatter.thesis_formatter.exception.AppException;
 import com.thesis_formatter.thesis_formatter.repo.DepartmentRepo;
 import com.thesis_formatter.thesis_formatter.repo.MajorRepo;
 import lombok.AccessLevel;
@@ -21,8 +23,11 @@ public class MajorService {
     DepartmentRepo departmentRepo;
 
     public APIResponse<Major> addMajor(Major major) {
+        Major majorFinding = majorRepo.findByMajorId(major.getMajorId());
+        if (majorFinding != null) {
+            throw new AppException(ErrorCode.DUPLICATE_KEY);
+        }
         Department department = departmentRepo.findByDepartmentId(major.getDepartment().getDepartmentId());
-
         major.setDepartment(department);
         majorRepo.save(major);
         return APIResponse
@@ -42,6 +47,14 @@ public class MajorService {
 
     public APIResponse<List<Major>> getMajorsByDepartmentId(String departmentId) {
         List<Major> majors = majorRepo.findByDepartment_DepartmentId(departmentId);
+        return APIResponse.<List<Major>>builder()
+                .code("200")
+                .result(majors)
+                .build();
+    }
+
+    public APIResponse<List<Major>> getMajorsByName(String name) {
+        List<Major> majors = majorRepo.findByMajorNameContainingIgnoreCase(name);
         return APIResponse.<List<Major>>builder()
                 .code("200")
                 .result(majors)

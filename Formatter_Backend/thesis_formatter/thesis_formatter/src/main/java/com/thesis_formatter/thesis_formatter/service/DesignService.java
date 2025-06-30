@@ -1,15 +1,23 @@
 package com.thesis_formatter.thesis_formatter.service;
 
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
+import com.thesis_formatter.thesis_formatter.dto.response.PaginationResponse;
 import com.thesis_formatter.thesis_formatter.entity.Cell;
 import com.thesis_formatter.thesis_formatter.entity.Design;
+import com.thesis_formatter.thesis_formatter.entity.Form;
+import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
+import com.thesis_formatter.thesis_formatter.exception.AppException;
 import com.thesis_formatter.thesis_formatter.repo.DesignRepo;
+import com.thesis_formatter.thesis_formatter.repo.FormRepo;
 import com.thesis_formatter.thesis_formatter.utils.PDFDesignUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -30,6 +38,7 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class DesignService {
     DesignRepo designRepo;
+    FormRepo formRepo;
 
     public APIResponse<List<Design>> getDesigns() {
         List<Design> designs = designRepo.findAll();
@@ -98,5 +107,21 @@ public class DesignService {
                 .contentType(MediaType.APPLICATION_PDF)
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
+    }
+
+    public APIResponse<PaginationResponse<Design>> getDesignsByFormId(String formId, String page, String numberOfRecords) {
+        Form form = formRepo.findById(formId).orElseThrow(() -> new AppException(ErrorCode.FORM_NOT_FOUND));
+        Pageable pageable = PageRequest.of(Integer.parseInt(page), Integer.parseInt((numberOfRecords)));
+        Page<Design> designsList = designRepo.findAllByForm_FormId(formId, pageable);
+
+        PaginationResponse<Design> pageResponse = new PaginationResponse<>();
+        pageResponse.setCurrentPage(designsList.getNumber());
+        pageResponse.setContent(designsList.getContent());
+        pageResponse.setTotalPages(designsList.getTotalPages());
+        pageResponse.setTotalElements(designsList.getTotalElements());
+        return APIResponse.<PaginationResponse<Design>>builder()
+                .result(pageResponse)
+                .code("200")
+                .build();
     }
 }

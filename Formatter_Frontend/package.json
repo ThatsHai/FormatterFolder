@@ -16,6 +16,7 @@
     "@mui/icons-material": "^6.4.11",
     "@mui/material": "^6.4.11",
     "@reduxjs/toolkit": "^2.8.2",
+    "@tailwindcss/typography": "^0.5.16",
     "antd": "^5.22.5",
     "axios": "^1.7.9",
     "class-variance-authority": "^0.7.1",

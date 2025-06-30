@@ -1,18 +1,19 @@
 import PropTypes from "prop-types";
 
 const DisabledField = ({
-  VNTitle = "Tựa Việt",
-  ENTitle = "English Title",
-  formData = {},
+  title = "Tựa đề",
+  value = "",
+  onChange = () => {},
+  error = "",
 }) => {
   return (
     <div className="w-full grid grid-cols-3 items-center mb-3">
-      <p>{VNTitle}</p>
+      <p className="text-black">{title}</p>
       <select
         className="col-span-2 bg-gray rounded-md px-4 py-1 appearance-none"
         disabled
       >
-        <option>{formData[ENTitle]}</option>
+        <option className="text-black">{value}</option>
       </select>
     </div>
   );

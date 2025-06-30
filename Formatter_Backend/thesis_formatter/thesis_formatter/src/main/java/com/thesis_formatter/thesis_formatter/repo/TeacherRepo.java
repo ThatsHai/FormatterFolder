@@ -15,6 +15,7 @@ import java.util.Optional;
 
 @Repository
 public interface TeacherRepo extends JpaRepository<Teacher, String>, JpaSpecificationExecutor<Teacher> {
+    Teacher findByUserId(String userId);
 
     @Query("SELECT t FROM Teacher t WHERE t.department.departmentName = :departmentName " +
             "AND t.department.faculty.facultyName = :faculty AND t.name = :teacherName " +
@@ -23,6 +24,4 @@ public interface TeacherRepo extends JpaRepository<Teacher, String>, JpaSpecific
                                   @Param("departmentName") String departmentName,
                                   @Param("teacherId") String teacherId,
                                   @Param("teacherName") String teacherName);
-
-    Teacher findByUserId(String teacherId);
 }

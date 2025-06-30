@@ -68,8 +68,7 @@ public class StudentService {
         student.setStatus("ACTIVE");
         authenticationService.encodePassword(student);
         studentRepo.save(student);
-        System.out.println(studentRequest.getClassId());
-        System.out.println(studentClass);
+
         StudentDTO studentDTO = studentMapper.toDTO(student);
         return APIResponse
                 .<StudentDTO>builder()

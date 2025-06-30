@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +38,7 @@ public class FormRecordService {
 
         formRecord.setStudent(student);
         formRecord.setTopic(topic);
+        formRecord.setStatus("WAITING");
         if (request.getFormRecordFields() != null) {
             List<FormRecordField> recordFields = new ArrayList<>();
 

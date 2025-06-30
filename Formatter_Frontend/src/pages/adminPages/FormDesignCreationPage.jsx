@@ -130,7 +130,7 @@ const Tooltip = () => {
   );
 };
 
-const DesignMainContent = ({ formData }) => {
+const DesignMainContent = ({ formData, fetchFormInfo }) => {
   const [designInfo, setDesignInfo] = useState({});
   const [emptyTitleError, setEmptyTitleError] = useState(false);
   const [displayConfirmationPopup, setDisplayConfirmationPopup] =
@@ -187,10 +187,18 @@ const DesignMainContent = ({ formData }) => {
 
   const handleSendFormData = async () => {
     try {
-      console.log(designInfo);
+      if (Object.keys(formData).length === 0) {
+        await fetchFormInfo();
+      }
+
+      console.log(formData);
       setDisplaySuccessPopup(true);
-      const result = await api.post("/designs", designInfo);
-      console.log("result" + result);
+
+      const latestDesignInfo = { ...designInfo, form: formData };
+      const result = await api.post("/designs", latestDesignInfo);
+      console.log(JSON.stringify(result));
+
+      setDesignInfo(latestDesignInfo);
     } catch (e) {
       console.log("Lỗi không gửi được dữ liệu" + e);
     }
@@ -263,19 +271,25 @@ const FormDesignCreationPage = () => {
   const formId = location.pathname.split("/").pop();
   const [formData, setFormData] = useState();
 
+  const fetchFormInfo = async () => {
+    const result = await api.get(`/forms/${formId}`);
+    setFormData(result.data.result);
+  };
+
   useEffect(() => {
-    const fetchFormInfo = async () => {
-      const result = await api.get(`/forms/${formId}`);
-      setFormData(result.data.result);
-      console.log(result);
-    };
     fetchFormInfo();
   }, [formId]);
 
   return (
     <div className="p-6 h-[200vh]">
-      <DesignMainContent formData={formData}></DesignMainContent>
-      <RightSidebar formData={formData}></RightSidebar>
+      <DesignMainContent
+        formData={formData}
+        fetchFormInfo={fetchFormInfo}
+      ></DesignMainContent>
+      <RightSidebar
+        formData={formData}
+        fetchFormInfo={fetchFormInfo}
+      ></RightSidebar>
     </div>
   );
 };
@@ -284,4 +298,9 @@ export default FormDesignCreationPage;
 
 RightSidebar.propTypes = {
   formData: PropTypes.object,
+};
+
+DesignMainContent.propTypes = {
+  formData: PropTypes.object,
+  fetchFormInfo: PropTypes.func,
 };
