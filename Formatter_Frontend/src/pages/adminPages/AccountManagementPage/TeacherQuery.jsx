@@ -61,7 +61,7 @@ const TeacherQuery = ({ handleQueryCriteria, handleSearch }) => {
         </div>
 
         <div className="flex flex-col px-8">
-          <label className="font-semibold mb-1">Mã BM</label>
+          <label className="font-semibold mb-1">Tên ngành</label>
           <select
             name="departmentId"
             id="departmentId"

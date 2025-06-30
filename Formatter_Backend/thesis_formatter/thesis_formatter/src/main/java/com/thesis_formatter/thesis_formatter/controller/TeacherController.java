@@ -2,6 +2,7 @@ package com.thesis_formatter.thesis_formatter.controller;
 
 import com.thesis_formatter.thesis_formatter.dto.request.TeacherFiltersDTO;
 import com.thesis_formatter.thesis_formatter.dto.request.TeacherSearchCriteria;
+import com.thesis_formatter.thesis_formatter.dto.response.PaginationResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.TeacherDTO;
 import com.thesis_formatter.thesis_formatter.dto.response.TeacherFiltersReponseDTO;
 import com.thesis_formatter.thesis_formatter.entity.Account;
@@ -49,8 +50,8 @@ public class TeacherController {
     }
 
     @PostMapping("/teachers/search")
-    public APIResponse<List<TeacherDTO>> getTeachersByCriteria(@RequestBody TeacherSearchCriteria teacherSearchCriteria) {
-        return teacherService.searchTeachers(teacherSearchCriteria);
+    public APIResponse<PaginationResponse<TeacherDTO>> getTeachersByCriteria(@RequestBody TeacherSearchCriteria teacherSearchCriteria, @RequestParam("p") String page, @RequestParam("n") String numberOfRecords) {
+        return teacherService.searchTeachers(teacherSearchCriteria, page, numberOfRecords);
     }
 
     @GetMapping("teachers/getTeacherByFilters")

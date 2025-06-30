@@ -23,6 +23,7 @@ public enum ErrorCode {
     DUPLICATE_KEY("1009", "Duplicate key", HttpStatus.BAD_REQUEST),
     TEACHER_NOT_EXISTED("1010", "Teacher not existed", HttpStatus.NOT_FOUND),
     MAJOR_NOT_EXISTED("1011", "Major not existed", HttpStatus.NOT_FOUND),
+    FORM_NOT_FOUND("1012", "Form not found", HttpStatus.NOT_FOUND),
     ;
 
     private String code;

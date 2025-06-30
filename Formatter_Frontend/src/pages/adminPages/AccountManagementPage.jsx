@@ -1,19 +1,23 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TeachersTable from "./accountManagementPage/TeachersTable";
 import TeacherQuery from "./accountManagementPage/TeacherQuery";
 import PropTypes from "prop-types";
 import api from "../../services/api";
+import PageNumberFooter from "../../component/PageNumberFooter";
 
 const QueryContent = ({ selectedTab }) => {
   const [queryCriteria, setQueryCriteria] = useState({});
   const [teachers, setTeachers] = useState([]);
+  const [students, setStudents] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   const handleQueryCriteria = (e) => {
     const { name, value } = e.target;
     setQueryCriteria((prevState) => ({ ...prevState, [name]: value }));
   };
 
-  const handleSearch = async () => {
+  const handleSearchTeacher = async () => {
     if (queryCriteria) {
       try {
         const cleanQueryCriteria = Object.fromEntries(
@@ -21,8 +25,12 @@ const QueryContent = ({ selectedTab }) => {
             ([, value]) => value !== "" && value !== null && value !== undefined
           )
         );
-        const result = await api.post("/teachers/search", cleanQueryCriteria);
-        setTeachers(result.data.result);
+        const result = await api.post(
+          `/teachers/search?p=${currentPage}&n=3`,
+          cleanQueryCriteria
+        );
+        setTeachers(result.data.result.content);
+        setTotalPages(result.data.result.totalPages);
         return;
       } catch (e) {
         console.log("Error fetching teachers with query, error: ", e);
@@ -30,6 +38,10 @@ const QueryContent = ({ selectedTab }) => {
     }
     setTeachers({});
   };
+
+  useEffect(() => {
+    handleSearchTeacher();
+  }, [currentPage])
 
   return (
     <>
@@ -41,12 +53,18 @@ const QueryContent = ({ selectedTab }) => {
           <TeacherQuery
             queryCriteria={queryCriteria}
             handleQueryCriteria={handleQueryCriteria}
-            handleSearch={handleSearch}
+            handleSearch={handleSearchTeacher}
           ></TeacherQuery>
           <TeachersTable
             teachers={teachers}
             setTeachers={setTeachers}
           ></TeachersTable>
+          <PageNumberFooter
+            totalPages={totalPages}
+            maxPage={3}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+          ></PageNumberFooter>
         </div>
       )}
       {selectedTab === "student" && (

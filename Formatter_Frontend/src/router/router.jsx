@@ -11,10 +11,11 @@ import ThesisInfoLayout from "../layout/ThesisInfoLayout";
 import AdminLayout from "../layout/AdminLayout";
 import AccountManagementPage from "../pages/adminPages/AccountManagementPage";
 import FormCreationPage from "../pages/adminPages/FormCreationPage";
-import FormManagementPage from "../pages/adminPages/FormManagementPage"
+import FormManagementPage from "../pages/adminPages/FormManagementPage";
 import FormInfoPage from "../pages/adminPages/FormInfoPage";
 import FormDesignCreationPage from "../pages/adminPages/FormDesignCreationPage";
 import TopicSuggestionPage from "../pages/teacherPages/TopicSuggestionPage";
+import RepoManagementPage from "../pages/adminPages/RepoManagementPage";
 import Test from "../pages/Test";
 import PDFViewer from "../component/forms/SubmitThesisFormComponents/PDFViewer";
 
@@ -115,7 +116,7 @@ const Router = createBrowserRouter([
       </DefaultLayout>
     ),
   },
- { 
+  {
     path: "/test",
     element: (
       <AdminLayout>
