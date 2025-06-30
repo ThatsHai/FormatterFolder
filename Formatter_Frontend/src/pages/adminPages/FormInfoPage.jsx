@@ -26,7 +26,7 @@ const FormInfoPage = () => {
 
   const handleDownloadPDF = async () => {
     try {
-      const response = await api.get(`/designs/a839a86f-63c3-458b-961e-0cc92bfb5849/downloadPdf`, {
+      const response = await api.get(`/designs/2b9580b3-f202-461c-aa8b-d251ae4b3e37/downloadPdf`, {
         responseType: "blob",
       });
       console.log(response)

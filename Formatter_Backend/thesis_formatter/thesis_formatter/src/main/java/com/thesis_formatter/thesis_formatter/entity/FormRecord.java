@@ -19,6 +19,8 @@ public class FormRecord {
     @GeneratedValue(strategy = GenerationType.UUID)
     String formRecordId;
 
+    String status;
+
     @OneToMany(mappedBy = "formRecord", cascade = CascadeType.ALL)
     @JsonManagedReference
     List<FormRecordField> formRecordFields;

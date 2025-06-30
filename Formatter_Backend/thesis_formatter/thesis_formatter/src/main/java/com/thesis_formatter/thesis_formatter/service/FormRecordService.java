@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +36,7 @@ public class FormRecordService {
 
         formRecord.setStudent(student);
         formRecord.setTopic(topic);
+        formRecord.setStatus("WAITING");
         if (request.getFormRecordFields() != null) {
             List<FormRecordField> recordFields = new ArrayList<>();
 
@@ -58,6 +60,18 @@ public class FormRecordService {
         return APIResponse.<FormRecord>builder()
                 .code("200")
                 .result(savedFormRecord)
+                .build();
+    }
+
+    public APIResponse<List<FormRecord>> findFormRecordsByStudentId(String acId) {
+        Student student = studentRepo.findByAcId(acId);
+        List<FormRecord> formRecords = formRecordRepo.findByStudent_AcId(student.getAcId());
+        if (formRecords.isEmpty()) {
+            throw new RuntimeException("Không có record ");
+        }
+        return APIResponse.<List<FormRecord>>builder()
+                .result(formRecords)
+                .code("200")
                 .build();
     }
 }

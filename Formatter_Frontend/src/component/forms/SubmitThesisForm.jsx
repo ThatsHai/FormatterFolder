@@ -18,7 +18,7 @@ const SubmitThesisForm = ({
   const [formData, setFormData] = useState({
     formId: "",
     topicId: "",
-    studentId: student.userId,
+    studentId: student?.userId,
     formRecordFields: [],
   });
   const [openAddTeacherTable, setOpenAddTeacherTable] = useState(false);

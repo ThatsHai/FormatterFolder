@@ -7,6 +7,7 @@ const AddingTeacherField = ({
   teachersList,
   setTeachersList,
   formErrors,
+  swapTeachers,
   openAddTeacherModal,
   setOpenAddTeacherModal,
   className = "",
@@ -27,6 +28,7 @@ const AddingTeacherField = ({
         <TeachersTable teachers={teachersList} 
         selectedTeachers={teachersList}
         setSelectedTeachers={setTeachersList}
+        swapTeachers={swapTeachers}
         />
         {formErrors?.teacherIds && (
           <p className="text-redError pt-2">{formErrors.teacherIds}</p>
@@ -59,6 +61,7 @@ AddingTeacherField.propTypes = {
   title: PropTypes.string.isRequired,
   teachersList: PropTypes.array.isRequired,
   setTeachersList: PropTypes.func.isRequired,
+  swapTeachers: PropTypes.func,
   formErrors: PropTypes.object,
   openAddTeacherModal: PropTypes.bool.isRequired,
   setOpenAddTeacherModal: PropTypes.func.isRequired,

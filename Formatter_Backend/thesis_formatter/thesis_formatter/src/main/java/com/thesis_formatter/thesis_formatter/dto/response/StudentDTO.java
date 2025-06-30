@@ -14,6 +14,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StudentDTO {
+
+    String acId;
     String userId;
     String name;
     String gender;

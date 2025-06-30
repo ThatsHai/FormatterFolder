@@ -7,10 +7,9 @@ import com.thesis_formatter.thesis_formatter.service.FormRecordService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping
@@ -22,6 +21,11 @@ public class FormRecordController {
     @PostMapping("/formRecords/create")
     public APIResponse<FormRecord> createFormRecord(@RequestBody AddFormRecordRequest request) {
         return formRecordService.createFormRecord(request);
+    }
+
+    @GetMapping("/formRecords/student")
+    public APIResponse<List<FormRecord>> getFormRecordsByStudentId(@RequestParam String acId) {
+        return formRecordService.findFormRecordsByStudentId(acId);
     }
 }
 

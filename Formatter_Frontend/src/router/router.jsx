@@ -16,6 +16,7 @@ import FormInfoPage from "../pages/adminPages/FormInfoPage";
 import FormDesignCreationPage from "../pages/adminPages/FormDesignCreationPage";
 import TopicSuggestionPage from "../pages/teacherPages/TopicSuggestionPage";
 import Test from "../pages/Test";
+import PDFViewer from "../component/forms/SubmitThesisFormComponents/PDFViewer";
 
 const Router = createBrowserRouter([
   {
@@ -107,7 +108,7 @@ const Router = createBrowserRouter([
     ),
   },
   {
-    path: "/teacher/topic/suggests",
+    path: "/teachers/topics/suggest",
     element: (
       <DefaultLayout>
         <TopicSuggestionPage />
@@ -119,6 +120,16 @@ const Router = createBrowserRouter([
     element: (
       <AdminLayout>
         <Test />
+      </AdminLayout>
+    ),
+  },
+  { 
+    path: "/pdfviewer",
+    element: (
+      <AdminLayout>
+        <PDFViewer>
+
+        </PDFViewer>
       </AdminLayout>
     ),
   },
