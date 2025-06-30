@@ -37,6 +37,7 @@ public class PDFDesignUtils {
         BaseFont unicodeBaseFont = BaseFont.createFont(fontUrl.getPath(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
         Font unicodeFont = new Font(unicodeBaseFont, 13, Font.NORMAL, BaseColor.BLACK);
         Font unicodeFontBold = new Font(unicodeBaseFont, 13, Font.BOLD, BaseColor.BLACK);
+        Font unicodeFontItalic = new Font(unicodeBaseFont, 13, Font.ITALIC, BaseColor.BLACK);
 
         // Title & description
         if (design.title != null) {

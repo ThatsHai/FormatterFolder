@@ -20,6 +20,8 @@ public class Cell {
     String text;
     int leftPos;
     int topPos;
+    boolean fromDataSource;
+    boolean fromDrag;
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "designId", referencedColumnName = "designId")
     @JsonBackReference

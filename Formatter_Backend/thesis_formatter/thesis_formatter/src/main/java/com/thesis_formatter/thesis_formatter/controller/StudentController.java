@@ -1,6 +1,8 @@
 package com.thesis_formatter.thesis_formatter.controller;
 
 import com.thesis_formatter.thesis_formatter.dto.request.AddStudentRequest;
+import com.thesis_formatter.thesis_formatter.dto.request.StudentSearchCriteria;
+import com.thesis_formatter.thesis_formatter.dto.response.PaginationResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.StudentDTO;
 import com.thesis_formatter.thesis_formatter.entity.Student;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
@@ -28,5 +30,10 @@ public class StudentController {
     @GetMapping("/students")
     public APIResponse<List<Student>> getStudents() {
         return studentService.getAll();
+    }
+
+    @PostMapping("/students/search")
+    public APIResponse<PaginationResponse<StudentDTO>> getStudentsByCriteria(@RequestBody StudentSearchCriteria studentSearchCriteria, @RequestParam("p") String page, @RequestParam("n") String numberOfRecords) {
+        return studentService.searchStudents(studentSearchCriteria, page, numberOfRecords);
     }
 }

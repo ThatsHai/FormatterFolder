@@ -3,13 +3,24 @@ import Button from "../component/Button";
 import SubmitThesisForm from "../component/forms/SubmitThesisForm";
 import ContentHomepage from "../component/pageComponents/homepage/ContentHomepage";
 import SuccessPopup from "../component/SuccessPopup";
+import api from "../services/api";
+import { useNavigate } from "react-router";
 
 const HomePage = () => {
   const [thesisFormOpen, setIsThesisFormOpen] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [refreshCounter, setRefreshCounter] = useState(0);
 
-  const handleFormToggle = () => {
+  const navigate = useNavigate();
+
+  const handleFormToggle = async () => {
+    const result = await api.get("/myInfo");
+    const userId = result.data.result.useId;
+    console.log(result.data.result.userId);
+    if (userId === "") {
+      alert("Phiên đăng nhập hết hạn");
+      navigate("/login");
+    }
     setIsThesisFormOpen((prev) => !prev);
   };
 
@@ -41,7 +52,6 @@ const HomePage = () => {
           setIsThesisFormOpen(false);
         }}
       />
-      
     </div>
   );
 };

@@ -1,28 +1,46 @@
 import { useState } from "react";
 import TeachersTable from "./accountManagementPage/TeachersTable";
 import TeacherQuery from "./accountManagementPage/TeacherQuery";
+import StudentQuery from "./accountManagementPage/StudentQuery";
+import StudentsTable from "./accountManagementPage/StudentsTable";
 import PropTypes from "prop-types";
 import api from "../../services/api";
+import PageNumberFooter from "../../component/PageNumberFooter";
+
 
 const QueryContent = ({ selectedTab }) => {
-  const [queryCriteria, setQueryCriteria] = useState({});
+  const [teacherQueryCriteria, setTeacherQueryCriteria] = useState({});
+  const [studentQueryCriteria, setStudentQueryCriteria] = useState({});
   const [teachers, setTeachers] = useState([]);
+  const [students, setStudents] = useState([]);
+  const [currentTeacherPage, setCurrentTeacherPage] = useState(0);
+  const [currentStudentPage, setCurrentStudentPage] = useState(0);
+  const [totalTeacherPages, setTotalTeacherPages] = useState(0);
+  const [totalStudentPages, setTotalStudentPages] = useState(0);
 
   const handleQueryCriteria = (e) => {
     const { name, value } = e.target;
-    setQueryCriteria((prevState) => ({ ...prevState, [name]: value }));
+    if (selectedTab === "teacher") {
+      setTeacherQueryCriteria((prevState) => ({ ...prevState, [name]: value }));
+    } else if (selectedTab === "student") {
+      setStudentQueryCriteria((prevState) => ({ ...prevState, [name]: value }));
+    }
   };
 
-  const handleSearch = async () => {
-    if (queryCriteria) {
+  const handleSearchTeacher = async () => {
+    if (teacherQueryCriteria) {
       try {
         const cleanQueryCriteria = Object.fromEntries(
-          Object.entries(queryCriteria).filter(
+          Object.entries(teacherQueryCriteria).filter(
             ([, value]) => value !== "" && value !== null && value !== undefined
           )
         );
-        const result = await api.post("/teachers/search", cleanQueryCriteria);
-        setTeachers(result.data.result);
+        const result = await api.post(
+          `/teachers/search?p=${currentTeacherPage}&n=5`,
+          cleanQueryCriteria
+        );
+        setTeachers(result.data.result.content);
+        setTotalTeacherPages(result.data.result.totalPages);
         return;
       } catch (e) {
         console.log("Error fetching teachers with query, error: ", e);
@@ -30,6 +48,37 @@ const QueryContent = ({ selectedTab }) => {
     }
     setTeachers({});
   };
+
+  const handleSearchStudent = async () => {
+    if (studentQueryCriteria) {
+      try {
+        const cleanQueryCriteria = Object.fromEntries(
+          Object.entries(studentQueryCriteria).filter(
+            ([, value]) => value !== "" && value !== null && value !== undefined
+          )
+        );
+        const result = await api.post(
+          `/students/search?p=${currentStudentPage}&n=5`,
+          cleanQueryCriteria
+        );
+        console.log(result);
+        setStudents(result.data.result.content);
+        setTotalStudentPages(result.data.result.totalPages);
+        return;
+      } catch (e) {
+        console.log("Error fetching students with query, error: ", e);
+      }
+    }
+    setTeachers({});
+  };
+
+  useEffect(() => {
+    handleSearchTeacher();
+  }, [currentTeacherPage]);
+
+  useEffect(() => {
+    handleSearchStudent();
+  }, [currentStudentPage]);
 
   return (
     <>
@@ -39,14 +88,20 @@ const QueryContent = ({ selectedTab }) => {
             Quản lý tài khoản giáo viên
           </h2>
           <TeacherQuery
-            queryCriteria={queryCriteria}
+            queryCriteria={teacherQueryCriteria}
             handleQueryCriteria={handleQueryCriteria}
-            handleSearch={handleSearch}
+            handleSearch={handleSearchTeacher}
           ></TeacherQuery>
           <TeachersTable
             teachers={teachers}
             setTeachers={setTeachers}
           ></TeachersTable>
+          <PageNumberFooter
+            totalPages={totalTeacherPages}
+            maxPage={3}
+            currentPage={currentTeacherPage}
+            setCurrentPage={setCurrentTeacherPage}
+          ></PageNumberFooter>
         </div>
       )}
       {selectedTab === "student" && (
@@ -54,6 +109,21 @@ const QueryContent = ({ selectedTab }) => {
           <h2 className="border-b border-b-darkBlue text-xl font-medium">
             Quản lý tài khoản sinh viên
           </h2>
+          <StudentQuery
+            queryCriteria={studentQueryCriteria}
+            handleQueryCriteria={handleQueryCriteria}
+            handleSearch={handleSearchStudent}
+          ></StudentQuery>
+          <StudentsTable
+            students={students}
+            setStudents={setStudents}
+          ></StudentsTable>
+          <PageNumberFooter
+            totalPages={totalStudentPages}
+            maxPage={3}
+            currentPage={currentStudentPage}
+            setCurrentPage={setCurrentStudentPage}
+          ></PageNumberFooter>
         </div>
       )}
     </>

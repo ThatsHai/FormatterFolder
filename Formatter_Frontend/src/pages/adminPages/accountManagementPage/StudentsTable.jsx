@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 
-const TeachersTable = ({ teachers }) => {
+const StudentsTable = ({ students }) => {
   return (
     <>
       <table className="table-fixed w-full border-collapse text-center">
@@ -10,36 +10,36 @@ const TeachersTable = ({ teachers }) => {
               STT
             </th>
             <th className="border border-gray py-1 bg-lightBlue bg-opacity-70">
-              Mã CB
+              Mã SV
             </th>
             <th
               className="border border-gray py-1 bg-lightBlue bg-opacity-70"
               colSpan="2"
             >
-              Tên CB
+              Tên SV
             </th>
             <th
               className="border border-gray py-1 bg-lightBlue bg-opacity-70"
               colSpan="2"
             >
-              Bộ môn
+              Lớp
             </th>
             <th className="border border-gray py-1 bg-lightBlue bg-opacity-70">
               Chọn
             </th>
           </tr>
         </thead>
-        <tbody className="bg-lightGray">
-          {teachers?.length > 0 ? (
-            teachers.map((teacher, index) => (
+        <tbody className="bg-lightGray ">
+          {students?.length > 0 ? (
+            students.map((student, index) => (
               <tr key={index}>
                 <td className="border border-gray py-1">{index + 1}</td>
-                <td className="border border-gray py-1">{teacher.userId}</td>
+                <td className="border border-gray py-1">{student.userId}</td>
                 <td className="border border-gray py-1" colSpan="2">
-                  {teacher.name || "N/A"}
+                  {student.name}
                 </td>
                 <td className="border border-gray py-1" colSpan="2">
-                  {teacher.department?.faculty?.name || "N/A"}
+                  {student.studentClass?.studentClassName || "N/A"}
                 </td>
 
                 <td className="border border-gray py-1">
@@ -62,8 +62,8 @@ const TeachersTable = ({ teachers }) => {
     </>
   );
 };
-export default TeachersTable;
+export default StudentsTable;
 
-TeachersTable.propTypes = {
-  teachers: PropTypes.array,
+StudentsTable.propTypes = {
+  students: PropTypes.array,
 };
