@@ -3,17 +3,24 @@ import ThesisCard from "../../ThesisCard";
 import PropTypes from "prop-types";
 import api from "../../../services/api";
 import { useSelector } from "react-redux";
-import PDFViewer from "../../forms/SubmitThesisFormComponents/PDFViewer";
+import { useNavigate } from "react-router";
 
 const ContentHomepage = ({
   year = new Date().getFullYear(),
   refreshTrigger,
 }) => {
+
   const [thesisList, setThesisList] = useState([]);
   const user = useSelector((state) => state.auth.user);
+  const navigate = useNavigate()
+
   useEffect(() => {
     const result = async () => {
-      const result = await api.get(`/formRecords/student?acId=${user.acId}`);
+      if (user === null) {
+        alert("Phiên đăng nhập hết hạn");
+        navigate("/login");
+      }
+      const result = await api.get(`/formRecords/student?studentId=${user.userId}`);
       setThesisList(result.data.result);
       console.log(result);
     };

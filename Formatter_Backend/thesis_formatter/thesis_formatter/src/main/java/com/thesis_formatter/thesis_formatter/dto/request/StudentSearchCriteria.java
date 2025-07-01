@@ -13,4 +13,6 @@ public class StudentSearchCriteria {
     String facultyId;
     String name;
     String userId;
+    String classId;
+    String majorId;
 }

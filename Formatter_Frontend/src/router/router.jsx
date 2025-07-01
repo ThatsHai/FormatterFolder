@@ -4,7 +4,7 @@ import Login from "../pages/Login";
 import SignUp from "../pages/SignUp";
 import AuthLayout from "../layout/AuthLayout";
 import DefaultLayout from "../layout/DefaultLayout";
-import HomePage from "../pages/HomePage";
+import HomePage from "../pages/StudentHomePage";
 import ThesisInfo from "../pages/ThesisInfo";
 import AdminHomePage from "../pages/adminPages/AdminHomePage";
 import ThesisInfoLayout from "../layout/ThesisInfoLayout";
@@ -15,6 +15,7 @@ import FormManagementPage from "../pages/adminPages/FormManagementPage";
 import FormInfoPage from "../pages/adminPages/FormInfoPage";
 import FormDesignCreationPage from "../pages/adminPages/FormDesignCreationPage";
 import TopicSuggestionPage from "../pages/teacherPages/TopicSuggestionPage";
+import TeacherHomePage from "../pages/teacherPages/TeacherHomePage";
 import RepoManagementPage from "../pages/adminPages/RepoManagementPage";
 import Test from "../pages/Test";
 import PDFViewer from "../component/forms/SubmitThesisFormComponents/PDFViewer";
@@ -49,7 +50,7 @@ const Router = createBrowserRouter([
     path: "/teacher",
     element: (
       <DefaultLayout>
-        <HomePage />
+        <TeacherHomePage />
       </DefaultLayout>
     ),
   },

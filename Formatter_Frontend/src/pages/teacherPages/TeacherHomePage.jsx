@@ -1,22 +1,38 @@
-import { useState} from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Button from "../component/Button";
-import SubmitThesisForm from "../component/forms/SubmitThesisForm";
-import ContentHomepage from "../component/pageComponents/homepage/ContentHomepage";
-import SuccessPopup from "../component/SuccessPopup";
+import Button from "../../component/Button";
+import SubmitThesisForm from "../../component/forms/SubmitThesisForm";
+import ContentHomepage from "../../component/pageComponents/homepage/ContentHomepage";
+import SuccessPopup from "../../component/SuccessPopup";
+import api from "../../services/api";
 
-const HomePage = () => {
+const TeacherHomePage = () => {
   const [thesisFormOpen, setIsThesisFormOpen] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [refreshCounter, setRefreshCounter] = useState(0);
   const navigate = useNavigate();
 
-  const handleFormToggle = () => {
+  const handleFormToggle = async () => {
+    const result = await api.get("/myInfo");
+    const userId = result.data.result.useId;
+    console.log(result.data.result.userId);
+    if (userId === "") {
+      alert("Phiên đăng nhập hết hạn");
+      navigate("/login");
+    }
     setIsThesisFormOpen((prev) => !prev);
   };
-  const handleSearch = () =>{
-    navigate("/teacher/topic/suggests");
-  }
+
+  const handleSearch = async () => {
+    const result = await api.get("/myInfo");
+    const userId = result.data.result.useId;
+    console.log(result.data.result.userId);
+    if (userId === "") {
+      alert("Phiên đăng nhập hết hạn");
+      navigate("/login");
+    }
+    navigate("/teachers/topics/suggest");
+  };
 
   return (
     <div className="pt-6">
@@ -46,9 +62,8 @@ const HomePage = () => {
           setIsThesisFormOpen(false);
         }}
       />
-      
     </div>
   );
 };
 
-export default HomePage;
+export default TeacherHomePage;

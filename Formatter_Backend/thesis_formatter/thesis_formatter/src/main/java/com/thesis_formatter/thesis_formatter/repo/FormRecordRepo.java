@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface FormRecordRepo extends JpaRepository<FormRecord, String> {
-    List<FormRecord> findByStudent_AcId(String id);
+    List<FormRecord> findAllByStudent_UserId(String userId);
 }

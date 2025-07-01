@@ -5,11 +5,14 @@ import com.thesis_formatter.thesis_formatter.dto.response.PaginationResponse;
 import com.thesis_formatter.thesis_formatter.entity.Cell;
 import com.thesis_formatter.thesis_formatter.entity.Design;
 import com.thesis_formatter.thesis_formatter.entity.Form;
+import com.thesis_formatter.thesis_formatter.entity.FormRecord;
 import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
 import com.thesis_formatter.thesis_formatter.exception.AppException;
 import com.thesis_formatter.thesis_formatter.repo.DesignRepo;
+import com.thesis_formatter.thesis_formatter.repo.FormRecordRepo;
 import com.thesis_formatter.thesis_formatter.repo.FormRepo;
 import com.thesis_formatter.thesis_formatter.utils.PDFDesignUtils;
+import com.thesis_formatter.thesis_formatter.utils.HtmlToStyledTextParser;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -39,6 +42,7 @@ import java.util.stream.Collectors;
 public class DesignService {
     DesignRepo designRepo;
     FormRepo formRepo;
+    private final FormRecordRepo formRecordRepo;
 
     public APIResponse<List<Design>> getDesigns() {
         List<Design> designs = designRepo.findAll();
@@ -73,7 +77,20 @@ public class DesignService {
         data.description = design.getDescription();
         data.cells = design.getCells().stream().map(cell -> {
             PDFDesignUtils.CellData c = new PDFDesignUtils.CellData();
-            c.text = cell.getText();
+            c.fromDrag = cell.isFromDrag();
+            c.fromDataSource = cell.isFromDataSource();
+            // Convert HTML to styled text list
+            String finalText;
+
+            if (c.fromDrag) {
+                finalText = "";
+            } else if (c.fromDataSource) {
+                finalText = cell.getText().replaceAll("\\$\\{\\{.*?}}", ""); // Remove all placeholders
+            } else {
+                finalText = cell.getText();
+            }
+
+            c.styledTexts = HtmlToStyledTextParser.parseHtml(finalText);
             c.colSpan = cell.getColSpan();
             c.rowSpan = cell.getRowSpan();
             c.topPos = cell.getTopPos();
@@ -81,15 +98,13 @@ public class DesignService {
             return c;
         }).collect(Collectors.toList());
 
-        String outputPath = "design-" + designId + ".pdf";
+        String fileName = "design-" + designId + ".pdf";
         try {
-            PDFDesignUtils.generatePdfFromDesign(data, outputPath);
+            PDFDesignUtils.generatePdfFromDesign(data, fileName, "./user_resource/pdf_design/");
         } catch (Exception e) {
             throw new RuntimeException("PDF generation failed", e);
         }
-
     }
-
 
     public ResponseEntity<Resource> downloadDesign(String designId) throws IOException {
         Design design = designRepo.findById(designId).orElseThrow(() -> new RuntimeException("Design not found"));
@@ -122,6 +137,16 @@ public class DesignService {
         return APIResponse.<PaginationResponse<Design>>builder()
                 .result(pageResponse)
                 .code("200")
+                .build();
+    }
+
+    public APIResponse<List<Design>> getDesignByFormRecordId(String formRecordId) {
+        FormRecord formRecord = formRecordRepo.findById(formRecordId).orElseThrow(() -> new AppException(ErrorCode.RECORD_NOT_FOUND));
+        String formId = formRecord.getTopic().getForm().getFormId();
+        List<Design> designs = designRepo.findAllByForm_FormId(formId);
+        return APIResponse.<List<Design>>builder()
+                .code("200")
+                .result(designs)
                 .build();
     }
 }

@@ -1,5 +1,6 @@
 package com.thesis_formatter.thesis_formatter.controller;
 
+import com.thesis_formatter.thesis_formatter.entity.Major;
 import com.thesis_formatter.thesis_formatter.entity.StudentClass;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.service.StudentClassService;

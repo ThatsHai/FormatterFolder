@@ -17,13 +17,11 @@ const DirectoryPanel = ({ onMouseEnter, onMouseLeave }) => {
               </button>
             </Link>
           </li>
-          <Link to={"/admin/accounts"}>
-            <li className="">
-              <button className="hover:bg-gray border py-2 px-4 rounded-none border-gray w-full">
-                Quản lý đơn vị
-              </button>
-            </li>
-          </Link>
+          <li className="">
+            <button className="hover:bg-gray border py-2 px-4 rounded-none border-gray w-full">
+              Quản lý đơn vị
+            </button>
+          </li>
         </ul>
       </div>
     </>
@@ -51,9 +49,11 @@ const AdminNavbar = () => {
           ></DirectoryPanel>
         )}
       </div>
-      <button className="hover:bg-gray border border-transparent hover:border-black p-2 px-4 my-1 rounded-lg">
-        Quản lý tài khoản
-      </button>
+      <Link to={"/admin/accounts"}>
+        <button className="hover:bg-gray border border-transparent hover:border-black p-2 px-4 my-1 rounded-lg">
+          Quản lý tài khoản
+        </button>
+      </Link>
       <button className="hover:bg-gray border border-transparent hover:border-black p-2 px-4 my-1 rounded-lg">
         Phân số lượng đề tài
       </button>

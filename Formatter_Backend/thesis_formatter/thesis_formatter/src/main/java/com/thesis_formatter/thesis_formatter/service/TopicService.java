@@ -84,6 +84,9 @@ public class TopicService {
         }
 
         Form form = formRepo.findByFormId(topicRequest.getFormId());
+        if (form == null) {
+            throw new AppException(ErrorCode.FORM_NOT_FOUND);
+        }
 
         Topic topic = topicMapper.toTopic(topicRequest);
         topic.setTeachers(teachers);

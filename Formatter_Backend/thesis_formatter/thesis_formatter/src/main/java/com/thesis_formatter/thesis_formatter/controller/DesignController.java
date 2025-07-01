@@ -45,4 +45,9 @@ public class DesignController {
     public APIResponse<PaginationResponse<Design>> getDesignByFormId(@RequestParam("formId") String formId, @RequestParam("p") String page, @RequestParam("n") String numberOfRecords) {
         return designService.getDesignsByFormId(formId, page, numberOfRecords);
     }
+
+    @GetMapping("/designs/searchByRecords")
+    public APIResponse<List<Design>> getDesignsByFormRecordId(@RequestParam("formRecordId") String formRecordId) {
+        return designService.getDesignByFormRecordId(formRecordId);
+    }
 }

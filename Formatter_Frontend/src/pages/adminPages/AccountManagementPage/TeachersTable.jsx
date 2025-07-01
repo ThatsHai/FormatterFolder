@@ -18,8 +18,11 @@ const TeachersTable = ({ teachers }) => {
             >
               Tên CB
             </th>
-            <th className="border border-gray py-1 bg-lightBlue bg-opacity-70" colSpan="2">
-              Ngành
+            <th
+              className="border border-gray py-1 bg-lightBlue bg-opacity-70"
+              colSpan="2"
+            >
+              Bộ môn
             </th>
             <th className="border border-gray py-1 bg-lightBlue bg-opacity-70">
               Chọn
@@ -33,9 +36,11 @@ const TeachersTable = ({ teachers }) => {
                 <td className="border border-gray py-1">{index + 1}</td>
                 <td className="border border-gray py-1">{teacher.userId}</td>
                 <td className="border border-gray py-1" colSpan="2">
-                  {teacher.name}
+                  {teacher.name || "N/A"}
                 </td>
-                <td className="border border-gray py-1" colSpan="2">{teacher.department.faculty.facultyName}</td>
+                <td className="border border-gray py-1" colSpan="2">
+                  {teacher.department?.faculty?.name || "N/A"}
+                </td>
 
                 <td className="border border-gray py-1">
                   <input type="checkbox" />
@@ -45,7 +50,7 @@ const TeachersTable = ({ teachers }) => {
           ) : (
             <tr>
               <td
-                colSpan={5}
+                colSpan={7}
                 className="bg-lightGray py-2 text-center text-gray-500"
               >
                 <p>Không có dữ liệu</p>
