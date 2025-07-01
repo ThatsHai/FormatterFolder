@@ -3,6 +3,7 @@ import ThesisCard from "../../ThesisCard";
 import PropTypes from "prop-types";
 import api from "../../../services/api";
 import { useSelector } from "react-redux";
+import PDFViewer from "../../forms/SubmitThesisFormComponents/PDFViewer";
 
 const ContentHomepage = ({
   year = new Date().getFullYear(),
@@ -36,7 +37,9 @@ const ContentHomepage = ({
             introduction={thesis.topic.description}
             status={thesis.status}
           ></ThesisCard>
+          
         ))}
+        
       </div>
     </div>
   );

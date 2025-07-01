@@ -22,7 +22,7 @@ public class TopicController {
 
     @GetMapping("/topics")
     public APIResponse<List<Topic>> getTopics(@RequestParam(required = false) String formId) {
-        if (formId==null)
+        if (formId == null)
             return topicService.getAll();
         else return topicService.getTopicByFormId(formId);
     }
@@ -30,5 +30,10 @@ public class TopicController {
     @PostMapping("/topics/create")
     public APIResponse<TopicResponse> createTopic(@RequestBody TopicRequest topic) {
         return topicService.create(topic);
+    }
+
+    @GetMapping("topics/teacher")
+    public APIResponse<List<Topic>> getTeacherTopics(@RequestParam String teacherId) {
+        return topicService.getTopicByTeacher_AcId(teacherId);
     }
 }

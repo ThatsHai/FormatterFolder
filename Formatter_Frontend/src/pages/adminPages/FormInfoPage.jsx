@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import api from "../../services/api";
+import PDFViewer from "../../component/forms/SubmitThesisFormComponents/PDFViewer";
 
 const PageNumberFooter = ({
   totalPages = 1,
@@ -66,6 +67,7 @@ const DesignsListWindow = ({
   const [designsList, setDesignsList] = useState();
   const [totalPages, setTotalPages] = useState();
   const [currentPage, setCurrentPage] = useState(0);
+  const [selectedDesignId, setSelectedDesignId] = useState(null);
 
   useEffect(() => {
     const fetchDesignsFromFormId = async () => {
@@ -131,12 +133,25 @@ const DesignsListWindow = ({
                 {design.description || "Không có mô tả"}
               </p>
               <div className="flex justify-end">
+                 <button
+                  className="text-white font-bold p-1 px-3 m-2 rounded-md bg-lightBlue"
+                  onClick={() => setSelectedDesignId(design.designId)}
+                >
+                  Xem trước PDF
+                </button>
                 <button
-                  className="text-white font-bold p-1 px-3 mb-2 rounded-md bg-lightBlue"
+                  className="text-white font-bold p-1 px-3 m-2 rounded-md bg-lightBlue"
                   onClick={() => handleDownloadPDF(design)}
                 >
-                  Tải file PDF
+                  Tải PDF
                 </button>
+               
+                {selectedDesignId && (
+                  <PDFViewer
+                    designId={selectedDesignId}
+                    onClose={() => setSelectedDesignId(null)}
+                  />
+                )}
               </div>
             </div>
           ))}

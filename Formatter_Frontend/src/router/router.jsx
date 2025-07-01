@@ -18,6 +18,7 @@ import TopicSuggestionPage from "../pages/teacherPages/TopicSuggestionPage";
 import RepoManagementPage from "../pages/adminPages/RepoManagementPage";
 import Test from "../pages/Test";
 import PDFViewer from "../component/forms/SubmitThesisFormComponents/PDFViewer";
+import TopicContent from "../pages/teacherPages/topic/TopicContent";
 
 const Router = createBrowserRouter([
   {
@@ -109,10 +110,18 @@ const Router = createBrowserRouter([
     ),
   },
   {
-    path: "/teachers/topics/suggest",
+    path: "/teacher/topics/suggest",
     element: (
       <DefaultLayout>
         <TopicSuggestionPage />
+      </DefaultLayout>
+    ),
+  },
+  {
+    path: "/teacher/topics",
+    element: (
+      <DefaultLayout>
+        <TopicContent />
       </DefaultLayout>
     ),
   },
