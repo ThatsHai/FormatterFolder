@@ -1,13 +1,20 @@
 import React, { useEffect, useState } from "react";
 import api from "../../../services/api";
 
-const PDFViewer = ({ designId, onClose }) => {
+const PDFViewer = ({ designId, formRecordId, onClose }) => {
   const [pdfUrl, setPdfUrl] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPdf = async () => {
-      const response = await api.get(`/designs/${designId}/downloadPdf`, {
+      let getUrl="";
+      if (formRecordId) {
+        getUrl = `/formRecords/${formRecordId}/downloadPdf/${designId}`;
+      } else {
+        getUrl = `/designs/${designId}/downloadPdf`;
+      }
+      console.log("url ds:",getUrl);
+      const response = await api.get(getUrl, {
         responseType: "blob",
       });
       const blob = new Blob([response.data], { type: "application/pdf" });

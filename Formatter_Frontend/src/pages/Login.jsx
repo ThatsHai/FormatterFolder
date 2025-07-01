@@ -76,7 +76,10 @@ const Login = () => {
 
     try {
       console.log("Form submitted:", dataToSend);
-      const loginResponse = await refreshTokenApi.post(`/auth/token`, dataToSend);
+      const loginResponse = await refreshTokenApi.post(
+        `/auth/token`,
+        dataToSend
+      );
       const accessToken = loginResponse.data.result.accesstoken;
 
       await saveToken(accessToken);
@@ -87,7 +90,11 @@ const Login = () => {
       setFormInfo(Object.fromEntries(fields.map((f) => [f.label, ""])));
       setResetSignal((prev) => prev + 1);
       alert(JSON.stringify(user));
-      navigate("/");
+      if (user.role.name === "STUDENT") {
+        navigate("/student");
+      } else if (user.role.name === "TEACHER") {
+        navigate("/teacher");
+      } else navigate("/admin");
     } catch (error) {
       setError(error.response?.data?.message || "Đăng nhập thất bại");
     }

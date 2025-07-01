@@ -3,8 +3,9 @@ import api from "../../../services/api";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-import Button from "../../../component/Button"
-
+import Button from "../../../component/Button";
+import TopicForm from "../TopicSuggestionPage";
+import SuccessPopup from "../../../component/SuccessPopup";
 const TopicCard = ({ topic }) => {
   return (
     <Link to={``}>
@@ -27,7 +28,10 @@ const TopicCard = ({ topic }) => {
 
 const TopicContent = () => {
   const [topicsList, setTopicsList] = useState([]);
+  const [topicFormOpen, setIsTopicFormOpen] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
   const user = useSelector((state) => state.auth.user);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   useEffect(() => {
     const result = async () => {
       const result = await api.get(`/topics/teacher?teacherId=${user.acId}`);
@@ -35,30 +39,44 @@ const TopicContent = () => {
       console.log(result);
     };
     result();
-  }, []);
+  }, [refreshTrigger,user]);
 
-  // if (!formsList) {
-  //   <div className="bg-lightGray m-5 p-6 rounded-md">
-  //     <p className="mb-3 text-2xl">Năm {year}</p>
-  //   </div>;
-  // }
-
+  const handleFormToggle = async () => {
+    setIsTopicFormOpen((prev) => !prev);
+  };
   return (
     <div className="pt-6">
       <div className="flex justify-end">
-              <div className="w-1/3 flex mr-3">
-                <Button label="Tìm kiếm..." ></Button>
-                <Button label="Thêm đề tài" ></Button>
-              </div>
-            </div>
-      <div className="bg-lightGray m-5 p-6 rounded-md">
-        {/* <p className="mb-3 text-2xl">Năm {year}</p> */}
-        <div className="min-h-[400px]  rounded-md grid grid-cols-2 md:grid-cols-4 gap-3">
-          {topicsList.length > 0 &&
-            topicsList.map((t) => (
-              <TopicCard topic={t}></TopicCard>
-            ))}
+        <div className="w-1/3 flex mr-3">
+          <Button label="Tìm kiếm..." ></Button>
+          <Button label="Thêm đề tài" handleClick={handleFormToggle}></Button>
         </div>
+      </div>
+      <div className="bg-lightGray m-5 p-6 rounded-md">
+        <p className="mb-3 text-2xl">ĐỀ TÀI CỦA BẠN</p>
+        <div className="min-h-[400px]  rounded-md grid grid-cols-2 md:grid-cols-4 gap-3">
+          {topicsList.length > 0 ? (
+            topicsList.map((t) => <TopicCard topic={t}></TopicCard>)
+          ) : (
+            <p>Chưa có đề tài nào</p>
+          )}
+        </div>
+        {topicFormOpen && (
+          <TopicForm
+            handleFormToggle={handleFormToggle}
+            onSuccess={() => {
+              setShowPopup(true);
+              setRefreshTrigger((prev) => prev+1);
+            }}
+          ></TopicForm>
+        )}
+        <SuccessPopup
+          isOpen={showPopup}
+          onClose={() => {
+            setShowPopup(false);
+            setIsTopicFormOpen(false);
+          }}
+        />
       </div>
     </div>
   );
