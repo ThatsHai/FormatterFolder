@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import api from "../../services/api";
+import PropTypes from "prop-types";
 
 const PageNumberFooter = ({
   totalPages = 1,
@@ -156,7 +157,7 @@ const DesignsListWindow = ({
 const FormInfoPage = () => {
   const [form, setForm] = useState({});
   const [sortedFields, setSortedFields] = useState([]);
-  const [openDesignsListWindow, setOpenDesignsListWindow] = useState(true);
+  const [openDesignsListWindow, setOpenDesignsListWindow] = useState(false);
   const { formId } = useParams();
 
   const closeDesignsListWindow = () => {
@@ -259,7 +260,7 @@ const FormInfoPage = () => {
                 className="border px-4 py-1 my-2 ml-2 mb-4 rounded-md bg-lightBlue text-white hover:bg-blue-600"
                 onClick={displayDesignsListWindow}
               >
-                Download File
+                Tải file
               </button>
             </div>
           )}
@@ -277,3 +278,10 @@ const FormInfoPage = () => {
 };
 
 export default FormInfoPage;
+
+DesignsListWindow.propTypes = {
+  isOpen: PropTypes.bool,
+  text: PropTypes.string,
+  form: PropTypes.object,
+  onDecline: PropTypes.func,
+};

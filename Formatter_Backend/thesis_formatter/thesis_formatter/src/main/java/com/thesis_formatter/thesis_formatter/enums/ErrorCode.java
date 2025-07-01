@@ -24,7 +24,8 @@ public enum ErrorCode {
     TEACHER_NOT_EXISTED("1010", "Teacher not existed", HttpStatus.NOT_FOUND),
     MAJOR_NOT_EXISTED("1011", "Major not existed", HttpStatus.NOT_FOUND),
     FORM_NOT_FOUND("1012", "Form not found", HttpStatus.NOT_FOUND),
-    ;
+    RECORD_NOT_FOUND("1013", "Form record not found", HttpStatus.NOT_FOUND),
+    DESIGN_NOT_FOUND("1014", "Design not found", HttpStatus.NOT_FOUND);
 
     private String code;
     private String message;

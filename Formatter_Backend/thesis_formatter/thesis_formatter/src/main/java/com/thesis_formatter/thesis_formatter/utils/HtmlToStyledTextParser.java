@@ -10,6 +10,10 @@ import java.util.List;
 
 public class HtmlToStyledTextParser {
 
+    // Prevent instantiation
+    private HtmlToStyledTextParser() {
+    }
+
     public static class StyledText {
         public String text;
         public boolean bold = false;
@@ -22,17 +26,17 @@ public class HtmlToStyledTextParser {
         }
     }
 
-    public List<StyledText> parseHtml(String html) {
+    public enum ListType {NONE, UL, OL}
+
+    public static List<StyledText> parseHtml(String html) {
         Element body = Jsoup.parse(html).body();
         List<StyledText> result = new ArrayList<>();
         traverse(body, false, false, result, ListType.NONE, 0);
         return result;
     }
 
-    private enum ListType {NONE, UL, OL}
-
-    private void traverse(Node node, boolean isBold, boolean isItalic, List<StyledText> result,
-                          ListType currentListType, int itemIndex) {
+    private static void traverse(Node node, boolean isBold, boolean isItalic, List<StyledText> result,
+                                 ListType currentListType, int itemIndex) {
 
         if (node instanceof TextNode) {
             String text = ((TextNode) node).text();
@@ -55,7 +59,6 @@ public class HtmlToStyledTextParser {
                 case "li":
                     String prefix = currentListType == ListType.UL ? "• " :
                             currentListType == ListType.OL ? (itemIndex + 1) + ". " : "";
-                    // Start a new line for each list item
                     result.add(new StyledText("\n" + prefix, false, false));
                     traverse(child, bold, italic, result, currentListType,
                             currentListType == ListType.OL ? itemIndex + 1 : itemIndex);

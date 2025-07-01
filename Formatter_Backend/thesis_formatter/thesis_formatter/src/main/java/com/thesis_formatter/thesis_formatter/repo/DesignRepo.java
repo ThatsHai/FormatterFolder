@@ -12,4 +12,6 @@ import java.util.List;
 @Repository
 public interface DesignRepo extends JpaRepository<Design, String> {
     Page<Design> findAllByForm_FormId(String formId, Pageable pageable);
+
+    List<Design> findAllByForm_FormId(String formId);
 }
