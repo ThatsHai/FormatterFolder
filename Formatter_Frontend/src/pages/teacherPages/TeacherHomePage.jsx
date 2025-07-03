@@ -31,15 +31,14 @@ const TeacherHomePage = () => {
       alert("Phiên đăng nhập hết hạn");
       navigate("/login");
     }
-    navigate("/teachers/topics/suggest");
+    
   };
 
   return (
     <div className="pt-6">
       <div className="flex justify-end">
         <div className="w-1/3 flex mr-3">
-          <Button label="Tìm kiếm..." handleClick={handleSearch}></Button>
-          <Button label="Thêm đề cương" handleClick={handleFormToggle}></Button>
+          <Button label="Tìm kiếm đề cương..." handleClick={handleSearch}></Button>
         </div>
       </div>
       <ContentHomepage

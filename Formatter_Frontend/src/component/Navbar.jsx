@@ -10,7 +10,7 @@ const Navbar = () => {
         <button className="hover:bg-gray border border-transparent hover:border-black p-2 px-4 my-1 rounded-lg">
           Tiến độ
         </button>
-        <button onClick = {() => navigate("/teachers/topics/suggest")} className="hover:bg-gray border border-transparent hover:border-black p-2 px-4 my-1 rounded-lg">
+        <button onClick = {() => navigate("/teacher/topics")} className="hover:bg-gray border border-transparent hover:border-black p-2 px-4 my-1 rounded-lg">
           Đề tài gợi ý
         </button >
         <button className="hover:bg-gray border border-transparent hover:border-black p-2 px-4 my-1 rounded-lg">

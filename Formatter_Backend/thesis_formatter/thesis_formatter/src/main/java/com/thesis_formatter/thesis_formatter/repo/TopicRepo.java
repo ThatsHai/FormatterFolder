@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface TopicRepo extends JpaRepository<Topic, String> {
     List<Topic> findTopicsByForm_FormId(String formId);
+
+    List<Topic> findTopicsByTeachers_AcId(String AcId);
 }

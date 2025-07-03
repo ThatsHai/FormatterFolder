@@ -112,4 +112,12 @@ public class TopicService {
                 .result(topics).build();
     }
 
+    public APIResponse<List<Topic>> getTopicByTeacher_AcId(String acId) {
+        List<Topic> topics = topicRepo.findTopicsByTeachers_AcId(acId);
+
+        return APIResponse.<List<Topic>>builder()
+                .code("200")
+                .result(topics).build();
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.thesis_formatter.thesis_formatter.dto.response;
 
 import com.thesis_formatter.thesis_formatter.entity.Department;
+import com.thesis_formatter.thesis_formatter.entity.Role;
 import com.thesis_formatter.thesis_formatter.entity.StudentClass;
 import com.thesis_formatter.thesis_formatter.enums.EducationLevel;
 import lombok.AccessLevel;
@@ -23,6 +24,7 @@ public class StudentDTO {
     String phoneNumber;
     String email;
     String avatar;
+    Role role;
     EducationLevel educationLevel;
     StudentClass studentClass;
 }
