@@ -51,7 +51,7 @@ public class FormRecordService {
 
         formRecord.setStudent(student);
         formRecord.setTopic(topic);
-//        formRecord.setStatus("Chưa nộp");
+        formRecord.setStatus("Chưa nộp");
         if (request.getFormRecordFields() != null) {
             List<FormRecordField> recordFields = new ArrayList<>();
 
@@ -189,7 +189,7 @@ public class FormRecordService {
     }
 
     public APIResponse<FormRecord> getFormRecordById(String formRecordId) {
-        FormRecord formRecord = formRecordRepo.findById(formRecordId).orElseThrow(() -> new RuntimeException("không tìm thấy record"));
+        FormRecord formRecord = formRecordRepo.findById(formRecordId).orElseThrow(()->new RuntimeException("không tìm thấy record"));
         return APIResponse.<FormRecord>builder()
                 .result(formRecord)
                 .code("200")
