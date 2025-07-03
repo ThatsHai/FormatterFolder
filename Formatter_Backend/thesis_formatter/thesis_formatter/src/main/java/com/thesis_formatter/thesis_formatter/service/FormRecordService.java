@@ -96,6 +96,7 @@ public class FormRecordService {
                 .build();
     }
 
+    
     private String replacePlaceholders(String text, Map<String, String> placeholderValueMap) {
         Pattern pattern = Pattern.compile("\\$\\{\\{(.*?)}}");
         Matcher matcher = pattern.matcher(text);

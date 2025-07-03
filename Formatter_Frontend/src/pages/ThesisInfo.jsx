@@ -173,14 +173,14 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
           )}
 
           {/* Các trang chứa FormRecordFields */}
-          {currentPage > 0 && formRecord && (
+          {/* {currentPage > 0 && formRecord && (
             <FormRecordFieldsPaginated
               formRecordFields={formRecord.formRecordFields}
               externalPage={currentPage - 1} // offset 1 do page 0 là thông tin chung
               onTotalPageChange={(num) => setFieldPages(num)}
               forceRerenderOnPageChange={currentPage}
             />
-          )}
+          )} */}
 
           <div className="mt-4">
             <PageNumberFooter
