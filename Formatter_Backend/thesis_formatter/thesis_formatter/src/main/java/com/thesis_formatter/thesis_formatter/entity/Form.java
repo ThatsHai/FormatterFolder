@@ -23,8 +23,6 @@ public class Form {
     String introduction;
     @ElementCollection
     List<String> readersList;
-    @Enumerated(EnumType.STRING)
-    FormStatus status = FormStatus.WAITING;
     @OneToMany(mappedBy = "form", cascade = CascadeType.ALL)
     @JsonManagedReference
     List<FormField> formFields;

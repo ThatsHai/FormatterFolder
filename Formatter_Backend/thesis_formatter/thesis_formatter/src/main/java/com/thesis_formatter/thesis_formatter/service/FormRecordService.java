@@ -51,7 +51,6 @@ public class FormRecordService {
 
         formRecord.setStudent(student);
         formRecord.setTopic(topic);
-        formRecord.setStatus("WAITING");
         if (request.getFormRecordFields() != null) {
             List<FormRecordField> recordFields = new ArrayList<>();
 

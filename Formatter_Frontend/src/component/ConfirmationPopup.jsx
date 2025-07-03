@@ -4,6 +4,7 @@ import SuccessPopup from "./SuccessPopup";
 const ConfirmationPopup = ({
   isOpen = false,
   displaySuccessPopup = false,
+  successPopupText="",
   text = "",
   onDecline = () => {},
   onConfirm = () => {},
@@ -33,7 +34,7 @@ const ConfirmationPopup = ({
       </div>
       <SuccessPopup
         isOpen={displaySuccessPopup}
-        text={"Đã lưu biểu mẫu"}
+        successPopupText={successPopupText}
         onClose={onSuccessPopupClosed}
       ></SuccessPopup>
     </div>
@@ -47,6 +48,7 @@ ConfirmationPopup.propTypes = {
   onDecline: PropTypes.func,
   displaySuccessPopup: PropTypes.bool,
   onSuccessPopupClosed: PropTypes.func,
+  successPopupText: PropTypes.string,
 };
 
 export default ConfirmationPopup;

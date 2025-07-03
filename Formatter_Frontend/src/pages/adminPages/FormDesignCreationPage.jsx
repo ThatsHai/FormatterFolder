@@ -258,6 +258,7 @@ const DesignMainContent = ({ formData, fetchFormInfo }) => {
             onDecline={() => setDisplayConfirmationPopup(false)}
             onConfirm={() => handleSendFormData()}
             displaySuccessPopup={displaySuccessPopup}
+            successPopupText={"Đã lưu"}
             onSuccessPopupClosed={() => onSuccessPopupClosed()}
           ></ConfirmationPopup>
         </div>{" "}
