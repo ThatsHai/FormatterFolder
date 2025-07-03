@@ -130,15 +130,24 @@ public class FormRecordService {
             c.fromDrag = cell.isFromDrag();
             c.fromDataSource = cell.isFromDataSource();
 
-            String finalText;
+            String finalText = "";
 
             if (c.fromDrag) {
-                // If fromDrag: use the value from the placeholder map
-                // Assuming cell.getText() is the placeholder name
-                finalText = placeholderValueMap.getOrDefault(cell.getText(), "");
+                // Extract the first placeholder inside ${{ }}
+                Pattern pattern = Pattern.compile("\\$\\{\\{(.*?)}}");
+                Matcher matcher = pattern.matcher(cell.getText());
+
+                if (matcher.find()) {
+                    String placeholder = matcher.group(1).trim();
+                    finalText = placeholderValueMap.getOrDefault(placeholder, "");
+                }
+
+                System.out.println("c text: " + cell.getText());
+                System.out.println("Noi dung: " + finalText);
             } else if (c.fromDataSource) {
                 // If fromDataSource: replace all placeholders with field values
                 finalText = replacePlaceholders(cell.getText(), placeholderValueMap);
+
             } else {
                 finalText = cell.getText();
             }
