@@ -51,7 +51,7 @@ public class FormRecordService {
 
         formRecord.setStudent(student);
         formRecord.setTopic(topic);
-        formRecord.setStatus("WAITING");
+        formRecord.setStatus("Chưa nộp");
         if (request.getFormRecordFields() != null) {
             List<FormRecordField> recordFields = new ArrayList<>();
 
@@ -177,5 +177,13 @@ public class FormRecordService {
                 .contentType(MediaType.APPLICATION_PDF)
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
+    }
+
+    public APIResponse<FormRecord> getFormRecordById(String formRecordId) {
+        FormRecord formRecord = formRecordRepo.findById(formRecordId).orElseThrow(()->new RuntimeException("không tìm thấy record"));
+        return APIResponse.<FormRecord>builder()
+                .result(formRecord)
+                .code("200")
+                .build();
     }
 }

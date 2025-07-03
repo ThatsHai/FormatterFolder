@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState} from "react";
 import api from "../../../services/api";
 
 const PDFViewer = ({ designId, formRecordId, onClose }) => {
   const [pdfUrl, setPdfUrl] = useState(null);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
+    let url=null;
     const fetchPdf = async () => {
       let getUrl="";
       if (formRecordId) {
@@ -18,12 +18,17 @@ const PDFViewer = ({ designId, formRecordId, onClose }) => {
         responseType: "blob",
       });
       const blob = new Blob([response.data], { type: "application/pdf" });
-      const url = URL.createObjectURL(blob);
+      url = URL.createObjectURL(blob);
       setPdfUrl(url);
       setLoading(false);
     };
     fetchPdf();
-  }, [designId]);
+    return () => {
+    if (url) {
+      URL.revokeObjectURL(url); // giải phóng blob khi component unmount hoặc re-render
+    }
+  };
+  }, [designId,formRecordId]);
 
   return (
     <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-90 z-[9999] flex flex-col pt-16">

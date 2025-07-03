@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import { useState } from "react";
 import { useEffect } from "react";
 import PDFViewer from "./forms/SubmitThesisFormComponents/PDFViewer";
-import api from "../services/api"
+import api from "../services/api";
 const PageNumberFooter = ({
   totalPages = 1,
   maxPage = 3,
@@ -76,9 +76,9 @@ const DesignsListWindow = ({
         url = `/designs/search?formId=${formId}&n=3&p=${currentPage}`;
       } else return;
 
-      console.log("formRecordId:",formRecordId);
+      console.log("formRecordId:", formRecordId);
       const result = await api.get(url);
-      
+
       setDesignsList(result.data.result.content);
       setTotalPages(result.data.result.totalPages);
     };
@@ -87,18 +87,15 @@ const DesignsListWindow = ({
 
   const handleDownloadPDF = async (design, formRecordId) => {
     try {
-       let getUrl = "";
+      let getUrl = "";
       if (!formRecordId) {
         getUrl = `/designs/${design.designId}/downloadPdf`;
-      } else{
+      } else {
         getUrl = `/formRecords/${formRecordId}/downloadPdf/${design.designId}`;
       }
-      const response = await api.get(
-        getUrl,
-        {
-          responseType: "blob",
-        }
-      );
+      const response = await api.get(getUrl, {
+        responseType: "blob",
+      });
       console.log(response);
       const blob = new Blob([response.data], {
         type: "application/pdf",
@@ -145,27 +142,31 @@ const DesignsListWindow = ({
               <div className="flex justify-end">
                 <button
                   className="text-white font-bold p-1 px-3 m-2 rounded-md bg-lightBlue"
-                  onClick={() => setSelectedDesignId(design.designId)}
+                  onClick={() => {
+                    if (selectedDesignId !== design.designId) {
+                      setSelectedDesignId(design.designId);
+                    }
+                  }}
                 >
                   Xem trước PDF
                 </button>
                 <button
                   className="text-white font-bold p-1 px-3 m-2 rounded-md bg-lightBlue"
-                  onClick={() => handleDownloadPDF(design,formRecordId)}
+                  onClick={() => handleDownloadPDF(design, formRecordId)}
                 >
                   Tải PDF
                 </button>
-
-                {selectedDesignId && (
-                  <PDFViewer
-                    designId={selectedDesignId}
-                    formRecordId={formRecordId||""}
-                    onClose={() => setSelectedDesignId(null)}
-                  />
-                )}
               </div>
             </div>
           ))}
+          {selectedDesignId && (
+            <PDFViewer
+              key={selectedDesignId}
+              designId={selectedDesignId}
+              formRecordId={formRecordId || ""}
+              onClose={() => setSelectedDesignId(null)}
+            />
+          )}
         </div>
 
         <PageNumberFooter

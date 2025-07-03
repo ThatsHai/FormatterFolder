@@ -36,6 +36,11 @@ public class FormRecordController {
         return formRecordService.searchByStudentId(studentId);
     }
 
+    @GetMapping("/formRecords/{id}")
+    public APIResponse<FormRecord> getFormRecord(@PathVariable String id) {
+        return formRecordService.getFormRecordById(id);
+    }
+
     @GetMapping("/formRecords/{formRecordId}/downloadPdf/{designId}")
     public ResponseEntity<Resource> downloadFormRecordPdf(@PathVariable String formRecordId, @PathVariable String designId) throws IOException {
         return formRecordService.downloadFormRecordPdf(formRecordId, designId);

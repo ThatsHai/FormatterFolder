@@ -63,7 +63,7 @@ const Router = createBrowserRouter([
     ),
   },
   {
-    path: "/thesis",
+    path: "/thesis/:formRecordId",
     element: (
       <ThesisInfoLayout>
         <ThesisInfo />
