@@ -1,5 +1,6 @@
 package com.thesis_formatter.thesis_formatter.entity;
 
+import com.thesis_formatter.thesis_formatter.enums.Semester;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -53,4 +54,6 @@ public class Topic {
     LocalDateTime createdAt;
     @UpdateTimestamp
     LocalDateTime updatedAt;
+    @Enumerated
+    Semester semester;
 }
