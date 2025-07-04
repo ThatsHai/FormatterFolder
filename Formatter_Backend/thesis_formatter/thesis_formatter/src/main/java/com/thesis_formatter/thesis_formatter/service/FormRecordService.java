@@ -3,6 +3,7 @@ package com.thesis_formatter.thesis_formatter.service;
 import com.thesis_formatter.thesis_formatter.dto.request.AddFormRecordRequest;
 import com.thesis_formatter.thesis_formatter.dto.request.FormRecordFieldRequest;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
+import com.thesis_formatter.thesis_formatter.dto.response.PaginationResponse;
 import com.thesis_formatter.thesis_formatter.entity.*;
 import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
 import com.thesis_formatter.thesis_formatter.exception.AppException;
@@ -15,6 +16,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -77,15 +81,21 @@ public class FormRecordService {
                 .build();
     }
 
-    public APIResponse<List<FormRecord>> searchByStudentId(String studentId) {
+    public APIResponse<PaginationResponse<FormRecord>> searchByStudentId(String studentId, String page, String numberOfRecords) {
         Student student = studentRepo.findByUserId(studentId);
         if (student == null) {
             throw new AppException(ErrorCode.USER_NOT_EXISTED);
         }
-        List<FormRecord> formRecords = formRecordRepo.findAllByStudent_UserId(studentId);
-        return APIResponse.<List<FormRecord>>builder()
+        Pageable pageable = PageRequest.of(Integer.parseInt(page), Integer.parseInt((numberOfRecords)));
+        Page<FormRecord> formRecords = formRecordRepo.findAllByStudent_UserId(studentId, pageable);
+        PaginationResponse<FormRecord> paginationResponse = new PaginationResponse<>();
+        paginationResponse.setContent(formRecords.getContent());
+        paginationResponse.setTotalElements(formRecords.getTotalElements());
+        paginationResponse.setTotalPages(formRecords.getTotalPages());
+        paginationResponse.setCurrentPage(formRecords.getNumber());
+        return APIResponse.<PaginationResponse<FormRecord>>builder()
                 .code("200")
-                .result(formRecords)
+                .result(paginationResponse)
                 .build();
     }
 
@@ -95,14 +105,15 @@ public class FormRecordService {
                 .result(formRecordRepo.findAll())
                 .build();
     }
+
     public APIResponse<FormRecord> getFormRecordById(String formRecordId) {
-        FormRecord formRecord = formRecordRepo.findById(formRecordId).orElseThrow(()->new RuntimeException("không tìm thấy record"));
+        FormRecord formRecord = formRecordRepo.findById(formRecordId).orElseThrow(() -> new RuntimeException("không tìm thấy record"));
         return APIResponse.<FormRecord>builder()
                 .result(formRecord)
                 .code("200")
                 .build();
     }
-    
+
     private String replacePlaceholders(String text, Map<String, String> placeholderValueMap) {
         Pattern pattern = Pattern.compile("\\$\\{\\{(.*?)}}");
         Matcher matcher = pattern.matcher(text);

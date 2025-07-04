@@ -8,6 +8,7 @@ import DesignsListWindow from "../../DesignListWindow";
 import { use } from "react";
 import ThesisInfo from "../../../pages/ThesisInfo";
 import ThesisInfoLayout from "../../../layout/ThesisInfoLayout";
+import PageNumberFooter from "../../PageNumberFooter";
 
 const ContentHomepage = ({
   year = new Date().getFullYear(),
@@ -16,6 +17,8 @@ const ContentHomepage = ({
   const [thesisList, setThesisList] = useState([]);
   const user = useSelector((state) => state.auth.user);
   const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     const result = async () => {
@@ -24,13 +27,14 @@ const ContentHomepage = ({
         navigate("/login");
       }
       const result = await api.get(
-        `/formRecords/student?studentId=${user.userId}`
+        `/formRecords/student?studentId=${user.userId}&p=${currentPage}&n=4`
       );
-      setThesisList(result.data.result);
+      setThesisList(result.data.result.content||[]);
+      setTotalPages(result.data.result.totalPages||1);
       console.log(result);
     };
     result();
-  }, [refreshTrigger]);
+  }, [refreshTrigger, currentPage]);
 
   
 
@@ -45,17 +49,19 @@ const ContentHomepage = ({
   return (
     <div className="bg-lightGray m-5 p-6 rounded-md">
       <p className="mb-3 text-2xl">Năm {year}</p>
-      <div className="min-h-[400px]  rounded-md grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="min-h-[300px]  rounded-md grid grid-cols-2 md:grid-cols-4 gap-3 mb-0">
         {thesisList.map((thesis, index) => (
           <ThesisCard
             key={thesis.formRecordId}
             formRecord={thesis}
           ></ThesisCard>
         ))}
-
-        
-
-      </div>  
+      </div>
+      <PageNumberFooter
+      totalPages={totalPages}
+      currentPage={currentPage}
+      setCurrentPage={setCurrentPage}
+    />  
     </div>
     
   );

@@ -22,9 +22,9 @@ public class TopicResponse {
     String funding;
     String fundingSource;
     String implementationTime;
-    List<String> teacherNames;
+    List<TeacherDTO> teachers;
     String contactInfo;
-    List<String> majorNames;
+    List<Major> majors;
     String formName;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;

@@ -1,15 +1,16 @@
 package com.thesis_formatter.thesis_formatter.dto.response;
 
 import com.thesis_formatter.thesis_formatter.entity.Topic;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.util.List;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class TeacherTopicsResponse {
     private String userId;
     private String name;
