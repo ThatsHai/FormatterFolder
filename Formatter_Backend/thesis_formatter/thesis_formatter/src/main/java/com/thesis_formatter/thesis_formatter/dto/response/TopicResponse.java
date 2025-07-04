@@ -2,6 +2,7 @@ package com.thesis_formatter.thesis_formatter.dto.response;
 
 import com.thesis_formatter.thesis_formatter.entity.Major;
 import com.thesis_formatter.thesis_formatter.entity.Teacher;
+import com.thesis_formatter.thesis_formatter.enums.Semester;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -27,4 +28,5 @@ public class TopicResponse {
     String formName;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
+    Semester semester;
 }
