@@ -124,9 +124,13 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
                 </div>
                 <div className="w-full grid grid-cols-3 items-center mb-3">
                   <p>Mục tiêu đề tài</p>
-                  <p className="col-span-2 rounded-md px-4 py-1 ">
-                    {formData.topic.objective}
-                  </p>
+                  <div
+                    className="col-span-1 bg-[#e4e4e4] rounded-md min-h-[40px] text-lg col-span-2 rounded-md px-4 py-1 prose prose-sm 
+                    prose-ul:list-disc prose-ol:list-decimal prose-li:ml-1 text-black  prose-li:marker:text-black"
+                    dangerouslySetInnerHTML={{
+                      __html: formData.topic.objective,
+                    }}
+                  ></div>
                 </div>
                 <div className="w-full grid grid-cols-3 items-center mb-3">
                   <p>Kinh phí</p>
@@ -147,12 +151,14 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
                   </p>
                 </div>
                 <div className="w-full grid grid-cols-3 items-center mb-3">
-                  <p>Cán bộ hướng dẫn</p>
-                  {formData.topic.teachers.map((teacher, index) => (
-                    <p className="col-span-2 rounded-md px-4 py-1 ">
-                      {index + 1}. {teacher.name}
-                    </p>
-                  ))}
+                  <p className="self-start">Cán bộ hướng dẫn</p>
+                  <div className="rounded-md bg-[#e4e4e4] px-4 py-1">
+                    {formData.topic.teachers.map((teacher, index) => (
+                      <div key={index}>
+                        {index + 1}. {teacher.name}
+                      </div>
+                    ))}
+                  </div>
                 </div>
                 <div className="w-full grid grid-cols-3 items-center mb-3">
                   <p>Thông tin liên hệ</p>
@@ -161,12 +167,14 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
                   </p>
                 </div>
                 <div className="w-full grid grid-cols-3 items-center mb-3">
-                  <p>Dành cho sinh viên ngành</p>
-                  {formData.topic.majors.map((major, index) => (
-                    <p className="col-span-2 rounded-md px-4 py-1 ">
-                      {index + 1}. {major.majorName}
-                    </p>
-                  ))}
+                  <p className="self-start">Dành cho sinh viên ngành</p>
+                  <div className="rounded-md bg-[#e4e4e4] px-4 py-1">
+                    {formData.topic.majors.map((major, index) => (
+                      <div key={index}>
+                        {index + 1}. {major.majorName}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -182,6 +190,18 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
             />
           )} */}
 
+          {currentPage > 0 &&
+            [...formRecord.formRecordFields]
+              .sort((a, b) => a.position - b.position)
+              .map((field, index) => (
+                <div className="flex items-center font-textFont text-lg mb-8 px-10">
+                  <h3 className="w-1/3 text-black font-semibold">
+                    {index + 1}. {field.formField.fieldName}
+                  </h3>
+
+                  <p className="w-2/3 rounded-md px-4 py-1">{field.value}</p>
+                </div>
+              ))}
           <div className="mt-4">
             <PageNumberFooter
               currentPage={currentPage}

@@ -3,17 +3,20 @@ import TeachersTable from "./TeachersTable";
 import TeacherQuery from "../adminPages/AccountManagementPage/TeacherQuery";
 import PropTypes from "prop-types";
 import api from "../../services/api";
+import PageNumberFooter from "../../component/PageNumberFooter"
 
 const QueryContent = ({ setSelectedTeachers, selectedTeachers }) => {
   const [queryCriteria, setQueryCriteria] = useState({});
   const [teachers, setTeachers] = useState([]);
+  const [currentTeacherPage, setCurrentTeacherPage] = useState(0);
+  const [totalTeacherPages, setTotalTeacherPages] = useState(1);
 
   const handleQueryCriteria = (e) => {
     const { name, value } = e.target;
     setQueryCriteria((prevState) => ({ ...prevState, [name]: value }));
   };
 
-  const handleSearch = async () => {
+  const handleSearch = async (page =0) => {
     if (queryCriteria) {
       try {
         const cleanQueryCriteria = Object.fromEntries(
@@ -21,8 +24,8 @@ const QueryContent = ({ setSelectedTeachers, selectedTeachers }) => {
             ([, value]) => value !== "" && value !== null && value !== undefined
           )
         );
-        const result = await api.post("/teachers/search", cleanQueryCriteria);
-        const newTeachers = result.data.result;
+        const result = await api.post(`/teachers/search?p=${page}&n=5`, cleanQueryCriteria);
+        const newTeachers = result.data.result.content || [];
         const updatedTeachers = [
           ...selectedTeachers,
           ...newTeachers.filter(
@@ -31,12 +34,17 @@ const QueryContent = ({ setSelectedTeachers, selectedTeachers }) => {
           ),
         ];
         setTeachers(updatedTeachers);
+        setTotalTeacherPages(result.data.result.totalPages || 1);
+        setCurrentTeacherPage(page);
         return;
       } catch (e) {
         console.log("Error fetching teachers with query, error: ", e);
       }
     }
     setTeachers({});
+  };
+  const handlePageChange = (page) => {
+    handleSearch(page);
   };
 
   return (
@@ -48,14 +56,19 @@ const QueryContent = ({ setSelectedTeachers, selectedTeachers }) => {
         <TeacherQuery
           queryCriteria={queryCriteria}
           handleQueryCriteria={handleQueryCriteria}
-          handleSearch={handleSearch}
+          handleSearch={()=>handleSearch(0)}
         ></TeacherQuery>
         <TeachersTable
           teachers={teachers}
           selectedTeachers={selectedTeachers}
           setSelectedTeachers={setSelectedTeachers}
           selectable={true}
-        ></TeachersTable>
+        ></TeachersTable> 
+        <PageNumberFooter
+          totalPages={totalTeacherPages}
+          currentPage={currentTeacherPage}
+          setCurrentPage={handlePageChange}
+        />
       </div>
     </>
   );

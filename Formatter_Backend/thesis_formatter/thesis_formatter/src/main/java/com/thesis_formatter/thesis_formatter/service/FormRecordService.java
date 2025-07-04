@@ -95,7 +95,13 @@ public class FormRecordService {
                 .result(formRecordRepo.findAll())
                 .build();
     }
-
+    public APIResponse<FormRecord> getFormRecordById(String formRecordId) {
+        FormRecord formRecord = formRecordRepo.findById(formRecordId).orElseThrow(()->new RuntimeException("không tìm thấy record"));
+        return APIResponse.<FormRecord>builder()
+                .result(formRecord)
+                .code("200")
+                .build();
+    }
     
     private String replacePlaceholders(String text, Map<String, String> placeholderValueMap) {
         Pattern pattern = Pattern.compile("\\$\\{\\{(.*?)}}");
