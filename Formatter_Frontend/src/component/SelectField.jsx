@@ -1,15 +1,27 @@
 import PropTypes from "prop-types";
 
-const SelectField = ({ label, value, onChange, error, options = [], className = "", showLabel = true }) => {
+const SelectField = ({
+  label,
+  value,
+  onChange,
+  error,
+  options = [],
+  className = "",
+  showLabel = true,
+   disabled = false,
+}) => {
   return (
     <div className={`my-12 ${className}`}>
-      {showLabel && (<p className="text-gray text-lg opacity-80 py-2">{label}</p>)}
+      {showLabel && (
+        <p className="text-gray text-lg opacity-80 py-2">{label}</p>
+      )}
       <div className="relative w-full flex items-center">
         <select
           className="text-xl w-full outline-none bg-transparent border-b border-darkBlue"
           value={value}
           onChange={(e) => onChange(label, e.target.value)}
           name={label}
+          disabled={disabled}
         >
           <option value="">-- Chọn --</option>
           {options.map((opt) =>
@@ -35,13 +47,16 @@ SelectField.propTypes = {
   value: PropTypes.string,
   onChange: PropTypes.func,
   error: PropTypes.string,
-  options: PropTypes.arrayOf(PropTypes.oneOfType([
+  options: PropTypes.arrayOf(
+    PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.shape({
         key: PropTypes.string.isRequired,
         value: PropTypes.string.isRequired,
       }),
-    ])),
+    ])
+  ),
+  disable: PropTypes.bool,
 };
 
 export default SelectField;

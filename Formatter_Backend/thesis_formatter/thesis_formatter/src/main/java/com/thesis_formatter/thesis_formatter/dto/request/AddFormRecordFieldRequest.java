@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class FormRecordFieldRequest {
+public class AddFormRecordFieldRequest {
     String formFieldId;
     String value;
 }

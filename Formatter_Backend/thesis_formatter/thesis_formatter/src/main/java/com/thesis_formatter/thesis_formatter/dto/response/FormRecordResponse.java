@@ -15,7 +15,7 @@ import java.util.List;
 public class FormRecordResponse {
     String formRecordId;
     List<FormRecordField> formRecordFields;
-    String topicId;
+    TopicResponse topic;
     StudentDTO student;
     FormStatus status;
 }

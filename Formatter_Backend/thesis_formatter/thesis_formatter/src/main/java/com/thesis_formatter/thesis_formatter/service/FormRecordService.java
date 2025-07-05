@@ -1,16 +1,20 @@
 package com.thesis_formatter.thesis_formatter.service;
 
 import com.thesis_formatter.thesis_formatter.dto.request.AddFormRecordRequest;
-import com.thesis_formatter.thesis_formatter.dto.request.FormRecordFieldRequest;
+import com.thesis_formatter.thesis_formatter.dto.request.AddFormRecordFieldRequest;
+import com.thesis_formatter.thesis_formatter.dto.request.UpdateFormRecordFieldRequest;
+import com.thesis_formatter.thesis_formatter.dto.request.UpdateFormRecordRequest;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
+import com.thesis_formatter.thesis_formatter.dto.response.FormRecordResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.PaginationResponse;
 import com.thesis_formatter.thesis_formatter.entity.*;
 import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
+import com.thesis_formatter.thesis_formatter.enums.FormStatus;
 import com.thesis_formatter.thesis_formatter.exception.AppException;
+import com.thesis_formatter.thesis_formatter.mapper.FormRecordMapper;
 import com.thesis_formatter.thesis_formatter.repo.*;
 import com.thesis_formatter.thesis_formatter.utils.HtmlToStyledTextParser;
 import com.thesis_formatter.thesis_formatter.utils.PDFDesignUtils;
-import jakarta.persistence.criteria.From;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,12 +27,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -45,8 +49,10 @@ public class FormRecordService {
     private final StudentRepo studentRepo;
     private final TopicRepo topicRepo;
     private final DesignRepo designRepo;
+    private final FormRecordMapper formRecordMapper;
+    private final FormRecordFieldRepo formRecordFieldRepo;
 
-    public APIResponse<FormRecord> createFormRecord(AddFormRecordRequest request) {
+    public APIResponse<FormRecordResponse> createFormRecord(AddFormRecordRequest request) {
         Student student = studentRepo.findByUserId(request.getStudentId());
         Topic topic = topicRepo.findById(request.getTopicId())
                 .orElseThrow(() -> new RuntimeException("ko co topic trong formrecord"));
@@ -58,7 +64,7 @@ public class FormRecordService {
         if (request.getFormRecordFields() != null) {
             List<FormRecordField> recordFields = new ArrayList<>();
 
-            for (FormRecordFieldRequest fieldRequest : request.getFormRecordFields()) {
+            for (AddFormRecordFieldRequest fieldRequest : request.getFormRecordFields()) {
                 FormField formField = formFieldRepo.findById(fieldRequest.getFormFieldId())
                         .orElseThrow(() -> new RuntimeException("Không tìm thấy formField"));
 
@@ -75,41 +81,102 @@ public class FormRecordService {
         }
 
         FormRecord savedFormRecord = formRecordRepo.save(formRecord);
-        return APIResponse.<FormRecord>builder()
+        FormRecordResponse formRecordResponse = formRecordMapper.toResponse(savedFormRecord);
+        return APIResponse.<FormRecordResponse>builder()
                 .code("200")
-                .result(savedFormRecord)
+                .result(formRecordResponse)
                 .build();
     }
 
-    public APIResponse<PaginationResponse<FormRecord>> searchByStudentId(String studentId, String page, String numberOfRecords) {
+    @Transactional
+    public APIResponse<FormRecordResponse> updateFormRecord(UpdateFormRecordRequest request) {
+        FormRecord formRecord = formRecordRepo.findById(request.getFormRecordId()).orElseThrow(
+                () -> new AppException(ErrorCode.FormRecord_NOT_FOUND));
+        System.out.println("request: " + request);
+        List<FormRecordField> updatedFields = new ArrayList<>();
+
+        for (UpdateFormRecordFieldRequest fieldRequest : request.getFormRecordFields()) {
+            if (fieldRequest.getFormRecordFieldId() != null) {
+                FormRecordField existingRecordField = formRecordFieldRepo.findByFormRecordFieldId(fieldRequest.getFormRecordFieldId());
+
+                existingRecordField.setValue(fieldRequest.getValue());
+                updatedFields.add(existingRecordField);
+            } else {
+                FormField formField = formFieldRepo.findById(fieldRequest.getFormFieldId())
+                        .orElseThrow(() -> new RuntimeException("khong có form field"));
+                FormRecordField newRecordField = FormRecordField.builder()
+                        .value(fieldRequest.getValue())
+                        .formField(formField)
+                        .formRecord(formRecord)
+                        .build();
+                updatedFields.add(newRecordField);
+            }
+        }
+        formRecord.getFormRecordFields().clear();
+        formRecord.getFormRecordFields().addAll(updatedFields);
+        FormRecord savedRecord = formRecordRepo.save(formRecord);
+
+        FormRecordResponse formRecordResponse = formRecordMapper.toResponse(savedRecord);
+        return APIResponse.<FormRecordResponse>builder()
+                .code("200")
+                .result(formRecordResponse)
+                .build();
+    }
+
+    public APIResponse<FormRecordResponse> updateStatus(String formRecordId, String status) {
+
+        FormRecord formRecord = formRecordRepo.findById(formRecordId).orElseThrow(() -> new AppException(ErrorCode.FormRecord_NOT_FOUND));
+
+        try {
+            FormStatus newStatus = FormStatus.valueOf(status.toUpperCase()); // String to Enum
+            formRecord.setStatus(newStatus);
+        } catch (IllegalArgumentException e) {
+            throw new AppException(ErrorCode.INVALID_FORM_STATUS); // bạn nên thêm enum này trong ErrorCode
+        }
+
+        formRecordRepo.save(formRecord);
+        FormRecordResponse formRecordResponse = formRecordMapper.toResponse(formRecord);
+        return APIResponse.<FormRecordResponse>builder()
+                .code("200")
+                .result(formRecordResponse)
+                .build();
+    }
+
+    public APIResponse<PaginationResponse<FormRecordResponse>> searchByStudentId(String studentId, String page, String numberOfRecords) {
         Student student = studentRepo.findByUserId(studentId);
         if (student == null) {
             throw new AppException(ErrorCode.USER_NOT_EXISTED);
         }
         Pageable pageable = PageRequest.of(Integer.parseInt(page), Integer.parseInt((numberOfRecords)));
         Page<FormRecord> formRecords = formRecordRepo.findAllByStudent_UserId(studentId, pageable);
-        PaginationResponse<FormRecord> paginationResponse = new PaginationResponse<>();
-        paginationResponse.setContent(formRecords.getContent());
+
+        List<FormRecordResponse> dtoList = formRecordMapper.toResponses(formRecords.getContent());
+
+        PaginationResponse<FormRecordResponse> paginationResponse = new PaginationResponse<>();
+        paginationResponse.setContent(dtoList);
         paginationResponse.setTotalElements(formRecords.getTotalElements());
         paginationResponse.setTotalPages(formRecords.getTotalPages());
         paginationResponse.setCurrentPage(formRecords.getNumber());
-        return APIResponse.<PaginationResponse<FormRecord>>builder()
+        return APIResponse.<PaginationResponse<FormRecordResponse>>builder()
                 .code("200")
                 .result(paginationResponse)
                 .build();
     }
 
-    public APIResponse<List<FormRecord>> getAll() {
-        return APIResponse.<List<FormRecord>>builder()
+    public APIResponse<List<FormRecordResponse>> getAll() {
+        List<FormRecord> formRecords = formRecordRepo.findAll();
+        List<FormRecordResponse> formRecordResponses = formRecordMapper.toResponses(formRecords);
+        return APIResponse.<List<FormRecordResponse>>builder()
                 .code("200")
-                .result(formRecordRepo.findAll())
+                .result(formRecordResponses)
                 .build();
     }
 
-    public APIResponse<FormRecord> getFormRecordById(String formRecordId) {
+    public APIResponse<FormRecordResponse> getFormRecordById(String formRecordId) {
         FormRecord formRecord = formRecordRepo.findById(formRecordId).orElseThrow(() -> new RuntimeException("không tìm thấy record"));
-        return APIResponse.<FormRecord>builder()
-                .result(formRecord)
+        FormRecordResponse formRecordResponse = formRecordMapper.toResponse(formRecord);
+        return APIResponse.<FormRecordResponse>builder()
+                .result(formRecordResponse)
                 .code("200")
                 .build();
     }

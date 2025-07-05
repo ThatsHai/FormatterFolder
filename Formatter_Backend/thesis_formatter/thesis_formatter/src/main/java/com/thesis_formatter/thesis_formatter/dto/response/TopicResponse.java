@@ -1,5 +1,6 @@
 package com.thesis_formatter.thesis_formatter.dto.response;
 
+import com.thesis_formatter.thesis_formatter.entity.Form;
 import com.thesis_formatter.thesis_formatter.entity.Major;
 import com.thesis_formatter.thesis_formatter.entity.Teacher;
 import com.thesis_formatter.thesis_formatter.enums.Semester;
@@ -25,7 +26,7 @@ public class TopicResponse {
     List<TeacherDTO> teachers;
     String contactInfo;
     List<Major> majors;
-    String formName;
+    Form form;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     Semester semester;
