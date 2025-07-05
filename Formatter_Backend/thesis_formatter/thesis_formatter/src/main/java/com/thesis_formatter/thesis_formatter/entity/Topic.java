@@ -56,4 +56,5 @@ public class Topic {
     LocalDateTime updatedAt;
     @Enumerated
     Semester semester;
+    String year;
 }
