@@ -1,16 +1,14 @@
 package com.thesis_formatter.thesis_formatter.service;
 
 import com.thesis_formatter.thesis_formatter.dto.request.TopicRequest;
-import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
-import com.thesis_formatter.thesis_formatter.dto.response.PaginationResponse;
-import com.thesis_formatter.thesis_formatter.dto.response.TeacherTopicsResponse;
-import com.thesis_formatter.thesis_formatter.dto.response.TopicResponse;
+import com.thesis_formatter.thesis_formatter.dto.response.*;
 import com.thesis_formatter.thesis_formatter.entity.Form;
 import com.thesis_formatter.thesis_formatter.entity.Major;
 import com.thesis_formatter.thesis_formatter.entity.Teacher;
 import com.thesis_formatter.thesis_formatter.entity.Topic;
 import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
 import com.thesis_formatter.thesis_formatter.exception.AppException;
+import com.thesis_formatter.thesis_formatter.mapper.TeacherMapper;
 import com.thesis_formatter.thesis_formatter.mapper.TopicMapper;
 import com.thesis_formatter.thesis_formatter.repo.FormRepo;
 import com.thesis_formatter.thesis_formatter.repo.MajorRepo;
@@ -35,44 +33,28 @@ public class TopicService {
     private final MajorRepo majorRepo;
     private final TopicMapper topicMapper;
     private final FormRepo formRepo;
+    private final TeacherMapper teacherMapper;
 
-    public APIResponse<List<Topic>> getAll() {
+    public APIResponse<List<TopicResponse>> getAll() {
         List<Topic> topics = topicRepo.findAll();
-        return APIResponse.<List<Topic>>builder()
+        List<TopicResponse> topicResponses = topicMapper.toTopicResponses(topics);
+        return APIResponse.<List<TopicResponse>>builder()
                 .code("200")
-                .result(topics)
+                .result(topicResponses)
                 .build();
     }
-
-    //    public APIResponse<Topic> create(Topic topic) {
-//        if (topic.getTeacher() == null || topic.getTeacher().getAcId() == null) {
-//            throw new IllegalArgumentException("Teacher ID must be provided");
-//        }
-//
-//
-//        Teacher teacher = teacherRepo.findById(topic.getTeacher().getAcId())
-//                .orElseThrow(() -> new RuntimeException("Teacher not found"));
-//
-//        topic.setTeacher(teacher);
-//        Topic savedTopic = topicRepo.save(topic);
-//        return APIResponse.<Topic>builder()
-//                .code("200")
-//                .result(savedTopic)
-//                .build();
-//    }
+    
     public APIResponse<TopicResponse> create(TopicRequest topicRequest) {
         List<String> teacherIds = topicRequest.getTeacherIds();
         if (teacherIds.isEmpty()) {
             throw new AppException(ErrorCode.TEACHER_NOT_EXISTED);
         }
         List<Teacher> teachers = new ArrayList<>();
-        List<String> teacherNames = new ArrayList<>();
+        List<TeacherDTO> teacherDTOs = new ArrayList<>();
         for (String teacherId : teacherIds) {
             Teacher teacher = teacherRepo.findByUserId(teacherId);
-            System.out.println(teacherId);
             teachers.add(teacher);
-            teacherNames.add(teacher.getName());
-            System.out.println(teacherId);
+            teacherDTOs.add(teacherMapper.toDTO(teacher));
         }
 
         List<String> majorIds = topicRequest.getMajorIds();
@@ -80,11 +62,9 @@ public class TopicService {
             throw new AppException(ErrorCode.MAJOR_NOT_EXISTED);
         }
         List<Major> majors = new ArrayList<>();
-        List<String> majorNames = new ArrayList<>();
         for (String majorId : majorIds) {
             Major major = majorRepo.findByMajorId(majorId);
             majors.add(major);
-            majorNames.add(major.getMajorName());
         }
 
         Form form = formRepo.findByFormId(topicRequest.getFormId());
@@ -99,8 +79,8 @@ public class TopicService {
         topicRepo.save(topic);
 
         TopicResponse topicResponse = topicMapper.toTopicResponse(topic);
-        topicResponse.setTeacherNames(teacherNames);
-        topicResponse.setMajorNames(majorNames);
+        topicResponse.setTeachers(teacherDTOs);
+        topicResponse.setMajors(majors);
         topicResponse.setFormName(form.getTitle());
         return APIResponse.<TopicResponse>builder()
                 .code("200")
@@ -108,12 +88,12 @@ public class TopicService {
                 .build();
     }
 
-    public APIResponse<List<Topic>> getTopicByFormId(String formId) {
+    public APIResponse<List<TopicResponse>> getTopicByFormId(String formId) {
         List<Topic> topics = topicRepo.findTopicsByForm_FormId(formId);
-
-        return APIResponse.<List<Topic>>builder()
+        List<TopicResponse> topicResponses = topicMapper.toTopicResponses(topics);
+        return APIResponse.<List<TopicResponse>>builder()
                 .code("200")
-                .result(topics).build();
+                .result(topicResponses).build();
     }
 
     public APIResponse<List<Topic>> getTopicByTeacher_AcId(String acId) {

@@ -2,6 +2,7 @@ package com.thesis_formatter.thesis_formatter.controller;
 
 import com.thesis_formatter.thesis_formatter.dto.request.AddFormRecordRequest;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
+import com.thesis_formatter.thesis_formatter.dto.response.PaginationResponse;
 import com.thesis_formatter.thesis_formatter.entity.FormRecord;
 import com.thesis_formatter.thesis_formatter.service.FormRecordService;
 import lombok.AccessLevel;
@@ -32,8 +33,8 @@ public class FormRecordController {
     }
 
     @GetMapping("/formRecords/student")
-    public APIResponse<List<FormRecord>> searchFormRecord(@RequestParam String studentId) {
-        return formRecordService.searchByStudentId(studentId);
+    public APIResponse<PaginationResponse<FormRecord>> searchFormRecord(@RequestParam String studentId, @RequestParam("p") String page, @RequestParam("n") String numberOfRecords) {
+        return formRecordService.searchByStudentId(studentId, page, numberOfRecords);
     }
 
     @GetMapping("/formRecords/{id}")
