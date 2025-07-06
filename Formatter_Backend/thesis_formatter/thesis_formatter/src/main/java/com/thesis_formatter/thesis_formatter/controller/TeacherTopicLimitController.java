@@ -25,4 +25,6 @@ public class TeacherTopicLimitController {
     public APIResponse<List<TeacherTopicLimit>> getAllTeacherTopicLimitController() {
         return teacherTopicLimitService.getAll();
     }
+
+    
 }

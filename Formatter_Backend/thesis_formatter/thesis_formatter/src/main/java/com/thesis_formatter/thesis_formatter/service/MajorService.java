@@ -60,4 +60,21 @@ public class MajorService {
                 .result(majors)
                 .build();
     }
+
+    public APIResponse<List<Major>> getMajorById(String majorId) {
+        Major major = majorRepo.findById(majorId).orElse(null);
+
+        if (major == null) {
+            return APIResponse.<List<Major>>builder()
+                    .code("404")
+                    .result(List.of())
+                    .build();
+        }
+
+        return APIResponse.<List<Major>>builder()
+                .code("200")
+                .result(List.of(major))
+                .build();
+    }
+
 }

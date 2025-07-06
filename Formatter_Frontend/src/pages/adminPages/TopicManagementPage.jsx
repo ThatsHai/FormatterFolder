@@ -2,21 +2,32 @@ import { useEffect, useState } from "react";
 import React from "react";
 import api from "../../services/api";
 import PropTypes from "prop-types";
+import PageNumberFooter from "../../component/PageNumberFooter";
 
-const TopicQuery = ({ handleQueryCriteria, handleSearch }) => {
-  const [semester, setSemester] = useState("");
-  const [schoolYear, setSchoolYear] = useState("");
-
+const TopicQuery = ({
+  semester,
+  schoolYear,
+  setSemester,
+  setSchoolYear,
+  teacherName,
+  setTeacherName,
+  // handleQueryCriteria,
+  handleSearch,
+}) => {
   const semesters = ["HK1", "HK2", "HK3"];
 
   const handleSemesterChange = (e) => {
     setSemester(e.target.value);
-    handleQueryCriteria(e);
+    // handleQueryCriteria(e);
   };
 
   const handleSchoolYearChange = (e) => {
     setSchoolYear(e.target.value);
-    handleQueryCriteria(e);
+    // handleQueryCriteria(e);
+  };
+
+  const handleTeacherNameChange = (e) => {
+    setTeacherName(e.target.value);
   };
 
   return (
@@ -30,14 +41,8 @@ const TopicQuery = ({ handleQueryCriteria, handleSearch }) => {
               type="text"
               className="border px-2 py-1 rounded-md"
               placeholder="Tên CB"
-              name="teacherName"
-              onChange={handleQueryCriteria}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleSearch();
-                }
-              }}
+              name="name"
+              onChange={handleTeacherNameChange}
             />
           </div>
 
@@ -105,20 +110,34 @@ const TopicManagementPage = () => {
   const [semester, setSemester] = useState();
   const [schoolYear, setSchoolYear] = useState();
   const [expandedTeachers, setExpandedTeachers] = useState({});
-
-  useEffect(() => {
-    const fetchTopicsByTeacher = async () => {
-      const result = await api.get("/topics/groupByTeacher");
-      setTopicsGroupByTeacher(result.data.result.content);
-      console.log(result.data.result.content);
-    };
-    fetchTopicsByTeacher();
-  }, []);
+  const [teacherName, setTeacherName] = useState("");
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
     getCurrentSemester();
     setSchoolYear(new Date().getFullYear());
   }, []);
+
+  useEffect(() => {
+    fetchTopicsByTeacher();
+  }, [currentPage]);
+
+  const fetchTopicsByTeacher = async () => {
+    if (schoolYear) {
+      // Only require year
+      let url = `/topics/groupByTeacher?year=${schoolYear}&name=${teacherName}&n=5&p=${currentPage}`;
+
+      if (semester && semester !== "") {
+        url = `/topics/groupByTeacher?semester=${semester}&year=${schoolYear}&name=${teacherName}&n=5&p=${currentPage}`;
+      }
+
+      const result = await api.get(url);
+      setTopicsGroupByTeacher(result.data.result.content);
+      setTotalPages(result.data.result.totalPages);
+      console.log(result.data.result.content);
+    }
+  };
 
   const toggleTeacherTopics = (userId) => {
     setExpandedTeachers((prev) => ({
@@ -130,7 +149,7 @@ const TopicManagementPage = () => {
   const getCurrentSemester = () => {
     //Month is zero-based
     const date = new Date().getMonth() + 1;
-    const semesterStr = date >= 9 ? "HK1 " : date >= 6 ? "HK3 " : "HK2 ";
+    const semesterStr = date >= 9 ? "HK1" : date >= 6 ? "HK3" : "HK2";
     setSemester(semesterStr);
   };
 
@@ -142,7 +161,44 @@ const TopicManagementPage = () => {
           <h2 className="border-b border-b-darkBlue text-xl font-medium ">
             Phân chia số lượng đề tài
           </h2>
-          <p className="text-gray-500">Không có dữ liệu.</p>
+          <TopicQuery
+            semester={semester}
+            schoolYear={schoolYear}
+            setSemester={setSemester}
+            setSchoolYear={setSchoolYear}
+            teacherName={teacherName}
+            setTeacherName={setTeacherName}
+            handleSearch={fetchTopicsByTeacher}
+          ></TopicQuery>
+          <table className="w-full table-fixed mt-3 mb-2">
+            <colgroup>
+              <col className="w-[20%]" />
+              <col className="w-[30%]" />
+              <col className="w-[20%]" />
+              <col className="w-[30%]" />
+            </colgroup>
+            <thead className="">
+              <tr>
+                <th className="border p-1">Mã số CB</th>
+                <th className="border p-1">Họ và tên CB</th>
+                <th className="border p-1">Số lượng đề tài</th>
+                <th className="border p-1">Danh sách đề tài</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colSpan={7} className="border text-center">
+                  <p className="text-gray-500 w-full p-1">Không có dữ liệu.</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <PageNumberFooter
+            totalPages={totalPages}
+            maxPage={5}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+          ></PageNumberFooter>
         </div>
       </div>
     );
@@ -157,7 +213,15 @@ const TopicManagementPage = () => {
           <h2>{semester}</h2>
           <h2>{schoolYear}</h2>
         </span>
-        <TopicQuery></TopicQuery>
+        <TopicQuery
+          semester={semester}
+          schoolYear={schoolYear}
+          setSemester={setSemester}
+          setSchoolYear={setSchoolYear}
+          teacherName={teacherName}
+          setTeacherName={setTeacherName}
+          handleSearch={fetchTopicsByTeacher}
+        ></TopicQuery>
         <table className="w-full table-fixed mt-3">
           <colgroup>
             <col className="w-[20%]" />
@@ -167,10 +231,10 @@ const TopicManagementPage = () => {
           </colgroup>
           <thead className="">
             <tr>
-              <th className="border">Mã số CB</th>
-              <th className="border">Họ và tên CB</th>
-              <th className="border">Số lượng đề tài</th>
-              <th className="border">Danh sách đề tài</th>
+              <th className="border p-1">Mã số CB</th>
+              <th className="border p-1">Họ và tên CB</th>
+              <th className="border p-1">Số lượng đề tài</th>
+              <th className="border p-1">Danh sách đề tài</th>
             </tr>
           </thead>
           <tbody>
@@ -183,7 +247,7 @@ const TopicManagementPage = () => {
                     <td className="p-1 border">
                       <div className="flex justify-center rounded-md">
                         <input
-                          className="bg-gray w-1/4 px-1"
+                          className="border rounded w-1/4 px-1"
                           type="number"
                           max={20}
                           min={0}
@@ -196,15 +260,21 @@ const TopicManagementPage = () => {
                           onClick={() => toggleTeacherTopics(teacher.userId)}
                           className="text-blue-500 "
                         >
-                          {expandedTeachers[teacher.userId]
-                            ? "Ẩn danh sách"
-                            : <div className="text-md px-2 flex gap-2">
-                            <p className=""> Đề tài đã nhập </p>
-                            {teacher.topicResponses &&
-                              teacher.topicResponses.length > 0 && (
-                                <p className="font-bold">{teacher.topicResponses.length}</p>
-                              )}
-                          </div>}
+                          {expandedTeachers[teacher.userId] ? (
+                            <p className="text-center  p-2 rounded-full">
+                              Ẩn danh sách
+                            </p>
+                          ) : (
+                            <div className="text-md px-2 flex gap-2 items-center">
+                              <p className=""> Đề tài đã nhập </p>
+                              {teacher.topicResponses &&
+                                teacher.topicResponses.length > 0 && (
+                                  <p className="text-center bg-lightBlue text-white p-2 py-1 rounded-full">
+                                    {teacher.topicResponses.length}
+                                  </p>
+                                )}
+                            </div>
+                          )}
                         </button>
                       </div>
                       {/* {expandedTeachers[teacher.userId] ? (
@@ -260,8 +330,14 @@ const TopicManagementPage = () => {
               ))}
           </tbody>
         </table>
+        <PageNumberFooter
+          totalPages={totalPages}
+          maxPage={5}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+        ></PageNumberFooter>
         <div className="w-full flex my-2 justify-end">
-          <button className="text-xl bg-darkBlue px-2 rounded-md text-white">
+          <button className="text-lg bg-darkBlue px-4 py-1 rounded-md text-white">
             Lưu
           </button>
         </div>

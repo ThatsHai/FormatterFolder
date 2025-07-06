@@ -26,17 +26,23 @@ public class MajorController {
     }
 
     @GetMapping("/majors")
-    public APIResponse<List<Major>> getMajors(@RequestParam(required = false) String deparmentId) {
-        if (deparmentId == null) {
-            System.out.println("deparmentId is null");
+    public APIResponse<List<Major>> getMajors(
+            @RequestParam(required = false) String departmentId,
+            @RequestParam(required = false) String majorId) {
+
+        if (departmentId == null && majorId == null) {
             return majorService.getAll();
+        } else if (departmentId != null) {
+            return majorService.getMajorsByDepartmentId(departmentId);
         } else {
-            return majorService.getMajorsByDepartmentId(deparmentId);
+            return majorService.getMajorById(majorId);
         }
     }
+
 
     @GetMapping("/majors/search")
     public APIResponse<List<Major>> getMajor(@RequestParam String name) {
         return majorService.getMajorsByName(name);
     }
+
 }

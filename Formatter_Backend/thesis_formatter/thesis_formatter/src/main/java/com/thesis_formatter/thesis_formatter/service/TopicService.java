@@ -7,6 +7,7 @@ import com.thesis_formatter.thesis_formatter.entity.Major;
 import com.thesis_formatter.thesis_formatter.entity.Teacher;
 import com.thesis_formatter.thesis_formatter.entity.Topic;
 import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
+import com.thesis_formatter.thesis_formatter.enums.Semester;
 import com.thesis_formatter.thesis_formatter.exception.AppException;
 import com.thesis_formatter.thesis_formatter.mapper.TeacherMapper;
 import com.thesis_formatter.thesis_formatter.mapper.TopicMapper;
@@ -75,6 +76,8 @@ public class TopicService {
         topic.setTeachers(teachers);
         topic.setMajors(majors);
         topic.setForm(form);
+        topic.setSemester(topicRequest.getSemester());
+        topic.setYear(topicRequest.getYear());
         topicRepo.save(topic);
 
         TopicResponse topicResponse = topicMapper.toTopicResponse(topic);
@@ -136,8 +139,9 @@ public class TopicService {
 //                .result(paginationResponse)
 //                .build();
 //    }
-    public APIResponse<PaginationResponse<TeacherTopicsResponse>> getTopicsGroupByTeacher() {
-        List<Object[]> results = topicRepo.findTopicsGroupedByUserIdAndName();
+    public APIResponse<PaginationResponse<TeacherTopicsResponse>> getTopicsGroupByTeacher(String semester, String year, String teacherQueryName, String page, String numberOfRecords) {
+        Semester semesterObj = Semester.valueOf(semester);
+        List<Object[]> results = topicRepo.findTopicsGroupedByUserIdAndName(semesterObj, year, teacherQueryName);
 
         Map<String, TeacherTopicsResponse> groupedMap = new LinkedHashMap<>();
 
@@ -156,9 +160,10 @@ public class TopicService {
         List<TeacherTopicsResponse> groupedList = new ArrayList<>(groupedMap.values());
 
         // Manual pagination (you can parameterize page and size later)
-        int page = 0;
-        int size = 4;
-        int start = page * size;
+        int pageInt = Integer.parseInt(page);
+        int size = Integer.parseInt(numberOfRecords);
+
+        int start = pageInt * size;
         int end = Math.min(start + size, groupedList.size());
         List<TeacherTopicsResponse> paginatedContent = groupedList.subList(start, end);
 
@@ -166,7 +171,46 @@ public class TopicService {
         paginationResponse.setTotalPages((int) Math.ceil((double) groupedList.size() / size));
         paginationResponse.setTotalElements(groupedList.size());
         paginationResponse.setContent(paginatedContent);
-        paginationResponse.setCurrentPage(page);
+        paginationResponse.setCurrentPage(pageInt);
+
+        return APIResponse.<PaginationResponse<TeacherTopicsResponse>>builder()
+                .code("200")
+                .result(paginationResponse)
+                .build();
+    }
+
+    public APIResponse<PaginationResponse<TeacherTopicsResponse>> getTopicsGroupByTeacher(String year, String teacherQueryName, String page, String numberOfRecords) {
+        List<Object[]> results = topicRepo.findTopicsGroupedByUserIdAndName(year, teacherQueryName);
+
+        Map<String, TeacherTopicsResponse> groupedMap = new LinkedHashMap<>();
+
+        for (Object[] result : results) {
+            String userId = (String) result[0];
+            String name = (String) result[1];
+            Topic topic = (Topic) result[2];
+
+            // Use MapStruct to map directly
+            TopicResponse topicResponse = topicMapper.toTopicResponse(topic);
+
+            groupedMap.computeIfAbsent(userId, k -> new TeacherTopicsResponse(userId, name, new ArrayList<>()))
+                    .getTopicResponses().add(topicResponse);
+        }
+
+        List<TeacherTopicsResponse> groupedList = new ArrayList<>(groupedMap.values());
+
+        // Manual pagination (you can parameterize page and size later)
+        int pageInt = Integer.parseInt(page);
+        int size = Integer.parseInt(numberOfRecords);
+
+        int start = pageInt * size;
+        int end = Math.min(start + size, groupedList.size());
+        List<TeacherTopicsResponse> paginatedContent = groupedList.subList(start, end);
+
+        PaginationResponse<TeacherTopicsResponse> paginationResponse = new PaginationResponse<>();
+        paginationResponse.setTotalPages((int) Math.ceil((double) groupedList.size() / size));
+        paginationResponse.setTotalElements(groupedList.size());
+        paginationResponse.setContent(paginatedContent);
+        paginationResponse.setCurrentPage(pageInt);
 
         return APIResponse.<PaginationResponse<TeacherTopicsResponse>>builder()
                 .code("200")
