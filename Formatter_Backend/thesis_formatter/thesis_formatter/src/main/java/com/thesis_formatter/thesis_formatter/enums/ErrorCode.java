@@ -1,5 +1,6 @@
 package com.thesis_formatter.thesis_formatter.enums;
 
+import com.thesis_formatter.thesis_formatter.entity.FormRecord;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
@@ -25,7 +26,9 @@ public enum ErrorCode {
     MAJOR_NOT_EXISTED("1011", "Major not existed", HttpStatus.NOT_FOUND),
     FORM_NOT_FOUND("1012", "Form not found", HttpStatus.NOT_FOUND),
     RECORD_NOT_FOUND("1013", "Form record not found", HttpStatus.NOT_FOUND),
-    DESIGN_NOT_FOUND("1014", "Design not found", HttpStatus.NOT_FOUND);
+    DESIGN_NOT_FOUND("1014", "Design not found", HttpStatus.NOT_FOUND),
+    FormRecord_NOT_FOUND("1015", "Form record not found",HttpStatus.NOT_FOUND),
+    INVALID_FORM_STATUS("1016", "Invalid form status", HttpStatus.BAD_REQUEST),;
 
     private String code;
     private String message;

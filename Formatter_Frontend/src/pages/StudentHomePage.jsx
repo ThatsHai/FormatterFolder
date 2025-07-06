@@ -8,7 +8,6 @@ import api from "../services/api";
 
 const StudentHomePage = () => {
   const [thesisFormOpen, setIsThesisFormOpen] = useState(false);
-  const [showPopup, setShowPopup] = useState(false);
   const [refreshCounter, setRefreshCounter] = useState(0);
   const navigate = useNavigate();
 
@@ -50,18 +49,11 @@ const StudentHomePage = () => {
         <SubmitThesisForm
           handleFormToggle={handleFormToggle}
           onSuccess={() => {
-            setShowPopup(true);
+            handleFormToggle();
             setRefreshCounter((prev) => prev + 1); //Trigger a new refresh
           }}
         />
       )}
-      <SuccessPopup
-        isOpen={showPopup}
-        onClose={() => {
-          setShowPopup(false);
-          setIsThesisFormOpen(false);
-        }}
-      />
     </div>
   );
 };

@@ -8,10 +8,13 @@ import SelectField from "../SelectField";
 import TopicDetail from "./SubmitThesisFormComponents/TopicDetail";
 import AddingTeacherField from "../../pages/teacherPages/AddingTeacherField";
 import FormField from "./SubmitThesisFormComponents/FormField";
+import ConfirmationPopup from "../ConfirmationPopup";
+import SuccessPopup from "../SuccessPopup";
 
 const SubmitThesisForm = ({
   handleFormToggle = () => {},
   onSuccess = () => {},
+  initialData = null,
 }) => {
   const student = useSelector((state) => state.auth.user);
   const currentYear = new Date().getFullYear();
@@ -31,6 +34,9 @@ const SubmitThesisForm = ({
   const [formErrors, setFormErrors] = useState({});
   const [currentStep, setCurrentStep] = useState(1);
 
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false);
+  const [displaySuccessPopup, setDisplaySuccessPopup] = useState(false);
+
   // Handle form field changes
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,18 +47,47 @@ const SubmitThesisForm = ({
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = async () => {
-      try {
-        await api.post("/formRecords/create", formData);
-        onSuccess();
-      } catch (error) {
-        console.log("Error submitting " + error);
-      }
-    };
-    result();
+    setShowConfirmPopup(true);
   };
+
+  const onSuccessPopupClosed = () => {
+    setShowConfirmPopup(false);
+    setDisplaySuccessPopup(false);
+    onSuccess();
+  };
+
+  const submitData = async () => {
+    try {
+      if (initialData) {
+        await api.put("/formRecords/update", formData);
+      } else {
+        await api.post("/formRecords/create", formData);
+      }
+      setDisplaySuccessPopup(true);
+  
+    } catch (error) {
+      console.log("Error submitting " + error);
+    }
+  };
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        formRecordId: initialData.formRecordId,
+        // formId: initialData.topic.form.formId,
+        // topicId: initialData.topic.topicId,
+        // studentId: initialData.student.userId,
+        formRecordFields: initialData.formRecordFields.map((f) => ({
+          formRecordFieldId: f.formRecordFieldId,
+          formFieldId: f.formField.formFieldId,
+          value: f.value,
+        })),
+      });
+    }
+
+    console.log("initialData: ", initialData);
+  }, [initialData]);
 
   useEffect(() => {
     document.body.classList.add("overflow-hidden");
@@ -85,14 +120,40 @@ const SubmitThesisForm = ({
     const getForms = async () => {
       const forms = await fetchForms();
       setForms(forms);
+
+      if (initialData) {
+        const matchedForm = forms.find(
+          (f) => f.formId === initialData.topic.form.formId
+        );
+        if (matchedForm) {
+          setSelectedForm(matchedForm);
+          setFormData((prev) => ({
+            ...prev,
+            formId: matchedForm.formId,
+          }));
+        }
+      }
     };
     getForms();
   }, []);
 
   useEffect(() => {
     const getTopics = async () => {
-      const topics = await fetchTopics(formData.formId);
+      const topics = await fetchTopics(formData.formId || selectedForm.formId);
       setTopics(topics);
+      if (initialData) {
+        const matchedTopic = topics.find(
+          (t) => t.topicId === initialData.topic.topicId
+        );
+        // console.log("topic matched: ", matchedTopic);
+        if (matchedTopic) {
+          setSelectedTopic(matchedTopic);
+          setFormData((prev) => ({
+            ...prev,
+            topicId: matchedTopic.topicId,
+          }));
+        }
+      }
     };
     getTopics();
   }, [formData.formId]);
@@ -118,11 +179,9 @@ const SubmitThesisForm = ({
 
       let updatedFields;
       if (existingIndex !== -1) {
-        // Nếu đã có field này, cập nhật value
         updatedFields = [...prev.formRecordFields];
         updatedFields[existingIndex].value = value;
       } else {
-        // Nếu chưa có, thêm mới vào danh sách
         updatedFields = [...prev.formRecordFields, { formFieldId, value }];
       }
 
@@ -180,6 +239,7 @@ const SubmitThesisForm = ({
                     value: form.title,
                   }))}
                   showLabel={false}
+                  disabled={!!initialData}
                 ></SelectField>
               </div>
               {/* Topic */}
@@ -197,6 +257,7 @@ const SubmitThesisForm = ({
                     value: topic.title,
                   }))}
                   showLabel={false}
+                  disabled={!!initialData}
                 ></SelectField>
               </div>
               {/* Student Information */}
@@ -265,26 +326,27 @@ const SubmitThesisForm = ({
               <h1 className="text-4xl font-headerFont text-darkBlue font-bold text-center mb-6">
                 {selectedForm.title}
               </h1>
-              {selectedForm.formFields
-                ?.slice() // create a copy
-                .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
-                .map((field) => (
-                  <FormField
-                    key={field.formFieldId}
-                    type={field.filedType || ""}
-                    name={field.fieldName}
-                    title={field.fieldName}
-                    order={field.position + 1}
-                    value={
-                      formData.formRecordFields.find(
-                        (f) => f.formFieldId === field.formFieldId
-                      )?.value || ""
-                    }
-                    handleChange={(e) =>
-                      handleFormFieldChange(field.formFieldId, e.target.value)
-                    }
-                  />
-                ))}
+              {selectedForm?.formFields?.length > 0 &&
+                selectedForm.formFields
+                  ?.slice() // create a copy
+                  .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
+                  .map((field) => (
+                    <FormField
+                      key={field.formFieldId}
+                      type={field.filedType || ""}
+                      name={field.fieldName}
+                      title={field.fieldName}
+                      order={field.position + 1}
+                      value={
+                        formData.formRecordFields.find(
+                          (f) => f.formFieldId === field.formFieldId
+                        )?.value || ""
+                      }
+                      handleChange={(e) =>
+                        handleFormFieldChange(field.formFieldId, e.target.value)
+                      }
+                    />
+                  ))}
               <div className="mt-6 flex justify-between">
                 <button
                   type="button"
@@ -307,6 +369,30 @@ const SubmitThesisForm = ({
 
           {/* Submit Button */}
         </form>
+        {showConfirmPopup && (
+          <ConfirmationPopup
+            isOpen={true}
+            text={
+              initialData
+                ? "Bạn chắc chắn cập nhật bản ghi?"
+                : "Bạn chắc chắn muốn lưu bản ghi?"
+            }
+            onConfirm={() => {
+              setShowConfirmPopup(false);
+              submitData();
+            }}
+            onDecline={() => {
+              setShowConfirmPopup(false);
+            }}
+          ></ConfirmationPopup>
+        )}
+        {displaySuccessPopup && (
+          <SuccessPopup
+            isOpen={true}
+            successPopupText={initialData? "Cập nhật bản ghi thành công!":"Lưu bản ghi mới thành công!"}
+            onClose={onSuccessPopupClosed}
+          />
+        )}
       </div>
     </div>
   );
@@ -315,6 +401,7 @@ const SubmitThesisForm = ({
 SubmitThesisForm.propTypes = {
   handleFormToggle: PropTypes.func,
   onSuccess: PropTypes.func,
+  initialData: PropTypes.object,
 };
 
 export default SubmitThesisForm;

@@ -10,8 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AddFormRecordRequest {
-    String studentId;
-    String topicId;
-    List<AddFormRecordFieldRequest> formRecordFields;
+public class UpdateFormRecordRequest {
+    String formRecordId;
+    List<UpdateFormRecordFieldRequest> formRecordFields;
 }

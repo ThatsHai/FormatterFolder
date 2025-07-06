@@ -18,6 +18,7 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
 
   const [fieldPages, setFieldPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(0); // 0 = trang thông tin chung
+  const [refreshCounter, setRefreshCounter] = useState(0);
 
   useEffect(() => {
     const fetchRecord = async () => {
@@ -40,7 +41,7 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
       });
     };
     fetchRecord();
-  }, [formRecordId]);
+  }, [formRecordId, refreshCounter]);
   if (!formData) return <div>Đang tải...</div>;
 
   return (
@@ -192,7 +193,7 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
 
           {currentPage > 0 &&
             [...formRecord.formRecordFields]
-              .sort((a, b) => a.position - b.position)
+              .sort((a, b) => a.formField.position - b.formField.position)
               .map((field, index) => (
                 <div className="flex items-center font-textFont text-lg mb-8 px-10">
                   <h3 className="w-1/3 text-black font-semibold">
@@ -212,7 +213,10 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
         </div>
         <div>
           {/* Buttons */}
-          <ThesisInfoButtons formRecord={formRecord}></ThesisInfoButtons>
+          <ThesisInfoButtons
+            formRecord={formRecord}
+            onUpdated={() => setRefreshCounter((prev) => prev + 1)}
+          ></ThesisInfoButtons>
         </div>
       </div>
     </div>
