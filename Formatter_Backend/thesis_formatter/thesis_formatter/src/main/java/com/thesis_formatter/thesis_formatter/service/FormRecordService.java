@@ -51,6 +51,7 @@ public class FormRecordService {
     private final DesignRepo designRepo;
     private final FormRecordMapper formRecordMapper;
     private final FormRecordFieldRepo formRecordFieldRepo;
+    private final TeacherRepo teacherRepo;
 
     public APIResponse<FormRecordResponse> createFormRecord(AddFormRecordRequest request) {
         Student student = studentRepo.findByUserId(request.getStudentId());
@@ -162,6 +163,39 @@ public class FormRecordService {
                 .result(paginationResponse)
                 .build();
     }
+
+    public APIResponse<PaginationResponse<FormRecordResponse>> searchByTeacherId(String teacherId, String status, String page, String numberOfRecords) {
+        Teacher teacher = teacherRepo.findByAcId(teacherId);
+        if (teacher == null) {
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
+        }
+        Pageable pageable = PageRequest.of(Integer.parseInt(page), Integer.parseInt((numberOfRecords)));
+
+        FormStatus formStatus;
+        try {
+            formStatus = FormStatus.valueOf(status.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            System.out.println("Trạng thái không hợp lệ: " + status);
+            throw new AppException(ErrorCode.INVALID_ARGUMENT);
+
+        }
+
+        Page<FormRecord> formRecords = formRecordRepo.findByTeacherAndStatus(teacherId, formStatus, pageable);
+
+
+        List<FormRecordResponse> dtoList = formRecordMapper.toResponses(formRecords.getContent());
+
+        PaginationResponse<FormRecordResponse> paginationResponse = new PaginationResponse<>();
+        paginationResponse.setContent(dtoList);
+        paginationResponse.setTotalElements(formRecords.getTotalElements());
+        paginationResponse.setTotalPages(formRecords.getTotalPages());
+        paginationResponse.setCurrentPage(formRecords.getNumber());
+        return APIResponse.<PaginationResponse<FormRecordResponse>>builder()
+                .code("200")
+                .result(paginationResponse)
+                .build();
+    }
+
 
     public APIResponse<List<FormRecordResponse>> getAll() {
         List<FormRecord> formRecords = formRecordRepo.findAll();

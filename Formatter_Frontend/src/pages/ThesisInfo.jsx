@@ -126,7 +126,7 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
                 <div className="w-full grid grid-cols-3 items-center mb-3">
                   <p>Mục tiêu đề tài</p>
                   <div
-                    className="col-span-1 bg-[#e4e4e4] rounded-md min-h-[40px] text-lg col-span-2 rounded-md px-4 py-1 prose prose-sm 
+                    className="col-span-1 bg-[#e4e4e4] rounded-md min-h-[40px] text-lg rounded-md px-4 py-1 prose prose-sm 
                     prose-ul:list-disc prose-ol:list-decimal prose-li:ml-1 text-black  prose-li:marker:text-black"
                     dangerouslySetInnerHTML={{
                       __html: formData.topic.objective,

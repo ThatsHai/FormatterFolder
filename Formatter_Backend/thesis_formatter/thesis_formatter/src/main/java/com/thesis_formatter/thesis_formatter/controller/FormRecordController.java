@@ -12,9 +12,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -45,8 +47,13 @@ public class FormRecordController {
     }
 
     @GetMapping("/formRecords/student")
-    public APIResponse<PaginationResponse<FormRecordResponse>> searchFormRecord(@RequestParam String studentId, @RequestParam("p") String page, @RequestParam("n") String numberOfRecords) {
+    public APIResponse<PaginationResponse<FormRecordResponse>> searchFormRecordForStudent(@RequestParam String studentId, @RequestParam("p") String page, @RequestParam("n") String numberOfRecords) {
         return formRecordService.searchByStudentId(studentId, page, numberOfRecords);
+    }
+
+    @GetMapping("/formRecords/teacher")
+    public APIResponse<PaginationResponse<FormRecordResponse>> searchFormRecordForTeacher(@RequestParam String teacherId, @RequestParam String status, @RequestParam("p") String page, @RequestParam("n") String numberOfRecords) {
+        return formRecordService.searchByTeacherId(teacherId, status, page, numberOfRecords);
     }
 
     @GetMapping("/formRecords/{id}")

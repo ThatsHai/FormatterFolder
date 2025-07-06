@@ -17,6 +17,8 @@ import java.util.Optional;
 public interface TeacherRepo extends JpaRepository<Teacher, String>, JpaSpecificationExecutor<Teacher> {
     Teacher findByUserId(String userId);
 
+    Teacher findByAcId(String acId);
+
     @Query("SELECT t FROM Teacher t WHERE t.department.departmentName = :departmentName " +
             "AND t.department.faculty.facultyName = :faculty AND t.name = :teacherName " +
             "AND t.userId= :teacherId")

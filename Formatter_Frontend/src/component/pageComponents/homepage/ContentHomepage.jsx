@@ -26,17 +26,19 @@ const ContentHomepage = ({
         alert("Phiên đăng nhập hết hạn");
         navigate("/login");
       }
-      const result = await api.get(
-        `/formRecords/student?studentId=${user.userId}&p=${currentPage}&n=4`
-      );
-      setThesisList(result.data.result.content||[]);
-      setTotalPages(result.data.result.totalPages||1);
+      let url = "";
+      if (user.role.name === "STUDENT") {
+        url = `/formRecords/student?studentId=${user.userId}&p=${currentPage}&n=4`;
+      } else {
+        url = `/formRecords/teacher?teacherId=${user.acId}&status=WAITING&p=${currentPage}&n=4`;
+      }
+      const result = await api.get(url);
+      setThesisList(result.data.result.content || []);
+      setTotalPages(result.data.result.totalPages || 1);
       console.log(result);
     };
     result();
   }, [refreshTrigger, currentPage]);
-
-  
 
   if (!thesisList) {
     return (
@@ -58,12 +60,11 @@ const ContentHomepage = ({
         ))}
       </div>
       <PageNumberFooter
-      totalPages={totalPages}
-      currentPage={currentPage}
-      setCurrentPage={setCurrentPage}
-    />  
+        totalPages={totalPages}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+      />
     </div>
-    
   );
 };
 
