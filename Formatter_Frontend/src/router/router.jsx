@@ -120,6 +120,22 @@ const Router = createBrowserRouter([
     ),
   },
   {
+    path: "/admin/topics",
+    element: (
+      <AdminLayout>
+        <TopicManagementPage />
+      </AdminLayout>
+    ),
+  },
+  {
+    path: "/admin/repos",
+    element: (
+      <AdminLayout>
+        <RepoManagementPage />
+      </AdminLayout>
+    ),
+  },
+  {
     path: "/teacher/topics/suggest",
     element: (
       <DefaultLayout>
@@ -136,14 +152,6 @@ const Router = createBrowserRouter([
     ),
   },
   {
-    path: "/admin/topics",
-    element: (
-      <AdminLayout>
-        <TopicManagementPage />
-      </AdminLayout>
-    ),
-  },
-  {
     path: "/test",
     element: (
       <AdminLayout>
@@ -151,12 +159,11 @@ const Router = createBrowserRouter([
       </AdminLayout>
     ),
   },
-  { 
+  {
     path: "/pdfviewer",
     element: (
       <AdminLayout>
-        <PDFViewer>
-        </PDFViewer>
+        <PDFViewer></PDFViewer>
       </AdminLayout>
     ),
   },

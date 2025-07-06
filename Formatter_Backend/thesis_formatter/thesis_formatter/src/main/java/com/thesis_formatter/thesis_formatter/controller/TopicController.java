@@ -6,6 +6,7 @@ import com.thesis_formatter.thesis_formatter.dto.response.PaginationResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.TeacherTopicsResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.TopicResponse;
 import com.thesis_formatter.thesis_formatter.entity.Topic;
+import com.thesis_formatter.thesis_formatter.enums.Semester;
 import com.thesis_formatter.thesis_formatter.service.TopicService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +43,18 @@ public class TopicController {
     }
 
     @GetMapping("topics/groupByTeacher")
-    public APIResponse<PaginationResponse<TeacherTopicsResponse>> getTopicsGroupByTeacher() {
-        return topicService.getTopicsGroupByTeacher();
+    public APIResponse<PaginationResponse<TeacherTopicsResponse>> getTopicsGroupByTeacher(
+            @RequestParam(name = "semester", required = false) String semester,
+            @RequestParam String year,
+            @RequestParam(name = "name", required = false) String teacherQueryName,
+            @RequestParam String p,
+            @RequestParam String n) {
+
+        if (semester == null || semester.isBlank()) {
+            return topicService.getTopicsGroupByTeacher(year, teacherQueryName, p, n);
+        }
+
+        return topicService.getTopicsGroupByTeacher(semester, year, teacherQueryName, p, n);
     }
+
 }

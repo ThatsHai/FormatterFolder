@@ -1,5 +1,6 @@
 package com.thesis_formatter.thesis_formatter.dto.request;
 
+import com.thesis_formatter.thesis_formatter.enums.Semester;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -22,4 +23,6 @@ public class TopicRequest {
     String contactInfo;
     List<String> majorIds;
     String formId;
+    String year;
+    Semester semester;
 }

@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { useState } from "react";
 import { Link } from "react-router";
 
@@ -18,9 +19,11 @@ const DirectoryPanel = ({ onMouseEnter, onMouseLeave }) => {
             </Link>
           </li>
           <li className="">
-            <button className="hover:bg-gray border py-2 px-4 rounded-none border-gray w-full">
-              Quản lý đơn vị
-            </button>
+            <Link to={"/admin/repos"}>
+              <button className="hover:bg-gray border py-2 px-4 rounded-none border-gray w-full">
+                Quản lý đơn vị
+              </button>
+            </Link>
           </li>
         </ul>
       </div>
@@ -67,3 +70,8 @@ const AdminNavbar = () => {
 };
 
 export default AdminNavbar;
+
+DirectoryPanel.propTypes = {
+  onMouseEnter: PropTypes.func,
+  onMouseLeave: PropTypes.func,
+};

@@ -29,4 +29,5 @@ public class TopicResponse {
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     Semester semester;
+    String year;
 }
