@@ -4,6 +4,7 @@ import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.entity.Department;
 import com.thesis_formatter.thesis_formatter.entity.Faculty;
 import com.thesis_formatter.thesis_formatter.entity.Major;
+import com.thesis_formatter.thesis_formatter.entity.StudentClass;
 import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
 import com.thesis_formatter.thesis_formatter.exception.AppException;
 import com.thesis_formatter.thesis_formatter.repo.DepartmentRepo;
@@ -77,4 +78,15 @@ public class MajorService {
                 .build();
     }
 
+    public APIResponse<Department> getMajorParent(String majorId) {
+        Major major = majorRepo.findById(majorId)
+                .orElseThrow(() -> new AppException(ErrorCode.MAJOR_NOT_EXISTED));
+
+        Department department = major.getDepartment();
+
+        return APIResponse.<Department>builder()
+                .code("200")
+                .result(department)
+                .build();
+    }
 }

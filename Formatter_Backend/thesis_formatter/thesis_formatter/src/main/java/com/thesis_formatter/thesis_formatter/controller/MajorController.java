@@ -45,4 +45,9 @@ public class MajorController {
         return majorService.getMajorsByName(name);
     }
 
+    @GetMapping("/majors/getParents")
+    public APIResponse<Department> getMajorParent(@RequestParam String majorId) {
+        return majorService.getMajorParent(majorId);
+    }
+
 }

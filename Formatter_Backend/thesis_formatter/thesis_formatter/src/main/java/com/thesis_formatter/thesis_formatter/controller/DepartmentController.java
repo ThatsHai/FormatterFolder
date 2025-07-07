@@ -2,6 +2,7 @@ package com.thesis_formatter.thesis_formatter.controller;
 
 import com.thesis_formatter.thesis_formatter.entity.Department;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
+import com.thesis_formatter.thesis_formatter.entity.Faculty;
 import com.thesis_formatter.thesis_formatter.service.DepartmentService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -34,12 +35,19 @@ public class DepartmentController {
 //        return departmentService.getDepartmentsByFacultyId(facultyId);
 //    }
     @GetMapping("/departments")
-    public APIResponse<List<Department>> getDepartments(@RequestParam(required = false) String facultyId) {
-        if (facultyId == null) {
+    public APIResponse<List<Department>> getDepartments(@RequestParam(required = false) String facultyId, @RequestParam(required = false) String departmentId) {
+        if (facultyId == null && departmentId == null) {
             return departmentService.getAll();
+        } else if (departmentId != null) {
+            return departmentService.getDepartmentById(departmentId);
         } else {
             return departmentService.getDepartmentsByFacultyId(facultyId);
         }
+    }
+
+    @GetMapping("/departments/getParents")
+    public APIResponse<Faculty> getDepartmentParent(@RequestParam String departmentId) {
+        return departmentService.getDepartmentParent(departmentId);
     }
 
 }

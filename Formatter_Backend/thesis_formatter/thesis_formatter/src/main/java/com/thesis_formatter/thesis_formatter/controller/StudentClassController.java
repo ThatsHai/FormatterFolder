@@ -34,4 +34,9 @@ public class StudentClassController {
         }
         return studentClassService.getAll();
     }
+
+    @GetMapping("/classes/getParents")
+    public APIResponse<Major> getClassParent(@RequestParam String classId) {
+        return studentClassService.getClassParent(classId);
+    }
 }
