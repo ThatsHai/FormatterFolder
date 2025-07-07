@@ -8,7 +8,7 @@ import api from "../../services/api";
 const RepoManagementPage = () => {
   const [objectInfo, setObjectInfo] = useState({});
   const [openAddForm, setOpenAddForm] = useState(false);
-  const [addFormInfo, setAddFormInfo] = useState({}); 
+  const [addFormInfo, setAddFormInfo] = useState({});
   const [refreshKey, setRefreshKey] = useState(0);
   const [updatingObject, setUpdatingObject] = useState({});
 
@@ -82,17 +82,19 @@ const RepoManagementPage = () => {
             setUpdatingObject={setUpdatingObject}
           />
         </div>
-        <div className="col-span-2 border border-lightBlue rounded-md">
-          <DisplayObjectInfo
-            objectInfo={objectInfo}
-            handleSelectDepartment={handleSelectDepartment}
-            handleSelectFaculty={handleSelectFaculty}
-            handleSelectMajor={handleSelectMajor}
-            handleSelectStudentClass={handleSelectStudentClass}
-            setOpenAddForm={setOpenAddForm}
-            setUpdatingObject={setUpdatingObject}
-          ></DisplayObjectInfo>
-        </div>
+        {Object.keys(objectInfo).length > 0 && (
+          <div className="col-span-2 border border-lightBlue rounded-md">
+            <DisplayObjectInfo
+              objectInfo={objectInfo}
+              handleSelectDepartment={handleSelectDepartment}
+              handleSelectFaculty={handleSelectFaculty}
+              handleSelectMajor={handleSelectMajor}
+              handleSelectStudentClass={handleSelectStudentClass}
+              setOpenAddForm={setOpenAddForm}
+              setUpdatingObject={setUpdatingObject}
+            ></DisplayObjectInfo>
+          </div>
+        )}
       </div>
 
       <AddRepoForm

@@ -1,10 +1,7 @@
 package com.thesis_formatter.thesis_formatter.controller;
 
 import com.thesis_formatter.thesis_formatter.dto.request.TopicRequest;
-import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
-import com.thesis_formatter.thesis_formatter.dto.response.PaginationResponse;
-import com.thesis_formatter.thesis_formatter.dto.response.TeacherTopicsResponse;
-import com.thesis_formatter.thesis_formatter.dto.response.TopicResponse;
+import com.thesis_formatter.thesis_formatter.dto.response.*;
 import com.thesis_formatter.thesis_formatter.entity.Topic;
 import com.thesis_formatter.thesis_formatter.enums.Semester;
 import com.thesis_formatter.thesis_formatter.service.TopicService;
@@ -12,6 +9,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -53,8 +52,22 @@ public class TopicController {
         if (semester == null || semester.isBlank()) {
             return topicService.getTopicsGroupByTeacher(year, teacherQueryName, p, n);
         }
-
         return topicService.getTopicsGroupByTeacher(semester, year, teacherQueryName, p, n);
     }
+
+    @GetMapping("topics/groupByTeacherWithLimit")
+    public APIResponse<PaginationResponse<TeacherTopicWithLimitResponse>> getTopicsGroupByTeacherWithLimit(
+            @RequestParam(name = "semester", required = false) String semester,
+            @RequestParam String year,
+            @RequestParam(name = "name", required = false) String teacherQueryName,
+            @RequestParam String p,
+            @RequestParam String n) {
+
+        if (semester == null || semester.isBlank()) {
+            return topicService.getTopicsGroupByTeacherWithLimit(year, teacherQueryName, p, n);
+        }
+        return topicService.getTopicsGroupByTeacherWithLimit(semester, year, teacherQueryName, p, n);
+    }
+
 
 }

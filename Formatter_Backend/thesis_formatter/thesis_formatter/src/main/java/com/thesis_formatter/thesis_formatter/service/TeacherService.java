@@ -2,21 +2,14 @@ package com.thesis_formatter.thesis_formatter.service;
 
 import com.thesis_formatter.thesis_formatter.dto.request.TeacherFiltersDTO;
 import com.thesis_formatter.thesis_formatter.dto.request.TeacherSearchCriteria;
-import com.thesis_formatter.thesis_formatter.dto.response.PaginationResponse;
-import com.thesis_formatter.thesis_formatter.dto.response.TeacherDTO;
-import com.thesis_formatter.thesis_formatter.dto.response.TeacherFiltersReponseDTO;
-import com.thesis_formatter.thesis_formatter.entity.Department;
-import com.thesis_formatter.thesis_formatter.entity.Faculty;
-import com.thesis_formatter.thesis_formatter.entity.Teacher;
+import com.thesis_formatter.thesis_formatter.dto.response.*;
+import com.thesis_formatter.thesis_formatter.entity.*;
+import com.thesis_formatter.thesis_formatter.entity.id.TeacherTopicLimitId;
+import com.thesis_formatter.thesis_formatter.enums.Semester;
 import com.thesis_formatter.thesis_formatter.mapper.RoleMapper;
-import com.thesis_formatter.thesis_formatter.entity.TeacherSpecification;
 import com.thesis_formatter.thesis_formatter.mapper.TeacherMapper;
-import com.thesis_formatter.thesis_formatter.entity.Role;
-import com.thesis_formatter.thesis_formatter.repo.DepartmentRepo;
-import com.thesis_formatter.thesis_formatter.repo.RoleRepo;
-import com.thesis_formatter.thesis_formatter.repo.FacultyRepo;
-import com.thesis_formatter.thesis_formatter.repo.TeacherRepo;
-import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
+import com.thesis_formatter.thesis_formatter.mapper.TopicMapper;
+import com.thesis_formatter.thesis_formatter.repo.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -48,6 +41,9 @@ public class TeacherService {
     TeacherMapper teacherMapper;
     AuthenticationService authenticationService;
     RoleRepo roleRepo;
+    TopicRepo topicRepo;
+    TopicMapper topicMapper;
+    TeacherTopicLimitRepo teacherTopicLimitRepo;
 //    private final FacultyRepo facultyRepo;
 
     private final FacultyRepo facultyRepo;
@@ -189,5 +185,46 @@ public class TeacherService {
 //        return buildTeacherResponse(teachers);
     }
 
+    public APIResponse<PaginationResponse<TeacherTopicWithLimitResponse>> getTeachersWithTopicsAndLimits(
+            String semester, String year, String teacherQueryName, Pageable pageable) {
+
+        Semester semesterObj = Semester.valueOf(semester);
+
+        Page<Teacher> teacherPage = (teacherQueryName == null || teacherQueryName.isBlank())
+                ? teacherRepo.findAll(pageable)
+                : teacherRepo.findAllByNameContainingIgnoreCase(teacherQueryName, pageable);
+
+        List<TeacherTopicWithLimitResponse> responses = teacherPage.getContent().stream().map(teacher -> {
+            List<Topic> topics = topicRepo.findTopicsByTeacherAndSemesterAndYear(teacher, semesterObj, year);
+            List<TopicResponse> topicResponses = topics.stream()
+                    .map(topicMapper::toTopicResponse)
+                    .toList();
+
+            // ✅ FIX: Use teacherId instead of teacher entity
+            TeacherTopicLimitId teacherTopicLimitId = new TeacherTopicLimitId(teacher.getUserId(), semesterObj, year);
+            Optional<TeacherTopicLimit> topicLimitOpt = teacherTopicLimitRepo.findById(teacherTopicLimitId);
+
+            int maxTopics = topicLimitOpt.map(TeacherTopicLimit::getMaxTopics).orElse(0);
+
+            TeacherTopicWithLimitResponse response = new TeacherTopicWithLimitResponse();
+            response.setUserId(teacher.getUserId());
+            response.setName(teacher.getName());
+            response.setMaxTopics(maxTopics);
+            response.setTopicResponses(topicResponses);
+
+            return response;
+        }).toList();
+
+        PaginationResponse<TeacherTopicWithLimitResponse> paginationResponse = new PaginationResponse<>();
+        paginationResponse.setTotalPages(teacherPage.getTotalPages());
+        paginationResponse.setTotalElements(teacherPage.getTotalElements());
+        paginationResponse.setContent(responses);
+        paginationResponse.setCurrentPage(teacherPage.getNumber());
+
+        return APIResponse.<PaginationResponse<TeacherTopicWithLimitResponse>>builder()
+                .code("200")
+                .result(paginationResponse)
+                .build();
+    }
 
 }

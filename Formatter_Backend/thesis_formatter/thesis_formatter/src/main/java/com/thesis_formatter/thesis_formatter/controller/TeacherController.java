@@ -2,16 +2,15 @@ package com.thesis_formatter.thesis_formatter.controller;
 
 import com.thesis_formatter.thesis_formatter.dto.request.TeacherFiltersDTO;
 import com.thesis_formatter.thesis_formatter.dto.request.TeacherSearchCriteria;
-import com.thesis_formatter.thesis_formatter.dto.response.PaginationResponse;
-import com.thesis_formatter.thesis_formatter.dto.response.TeacherDTO;
-import com.thesis_formatter.thesis_formatter.dto.response.TeacherFiltersReponseDTO;
+import com.thesis_formatter.thesis_formatter.dto.response.*;
 import com.thesis_formatter.thesis_formatter.entity.Account;
 import com.thesis_formatter.thesis_formatter.entity.Teacher;
-import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.service.TeacherService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -59,4 +58,16 @@ public class TeacherController {
         return teacherService.findTeacherByFilters(teacherFiltersDTO);
     }
 
+    @GetMapping("/teachers/withTopicsAndLimits")
+    public APIResponse<PaginationResponse<TeacherTopicWithLimitResponse>> getTeachersWithTopicsAndLimits(
+            @RequestParam String semester,
+            @RequestParam String year,
+            @RequestParam(name = "name", required = false) String teacherQueryName,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return teacherService.getTeachersWithTopicsAndLimits(semester, year, teacherQueryName, pageable);
+    }
 }

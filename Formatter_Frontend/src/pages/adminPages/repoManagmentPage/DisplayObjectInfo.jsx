@@ -94,6 +94,8 @@ const DisplayObjectInfo = ({
         return "đơn vị";
     }
   };
+
+  
   
   return (
     <div className="grid grid-cols-1 w-full justify-center text-center items-center font-textFont mt-4">
@@ -119,16 +121,16 @@ const DisplayObjectInfo = ({
             <table className="w-5/6 border mx-auto text-left">
               <thead className="bg-lightBlue text-white">
                 <tr>
-                  <th className="border border-darkGray py-1 text-center">
+                  <th className="border border-darkBlue py-1 text-center">
                     STT
                   </th>
-                  <th className="border border-darkGray py-1 text-center">
+                  <th className="border border-darkBlue py-1 text-center">
                     Mã đơn vị con
                   </th>
-                  <th className="border border-darkGray py-1 text-center">
+                  <th className="border border-darkBlue py-1 text-center">
                     Tên đơn vị con
                   </th>
-                  <th className="border border-darkGray py-1 text-center">
+                  <th className="border border-darkBlue py-1 text-center">
                     Thao tác
                   </th>
                 </tr>
@@ -144,20 +146,20 @@ const DisplayObjectInfo = ({
                     }
                     className="hover:bg-gray-100"
                   >
-                    <td className="border py-1 text-center">{index + 1}</td>
-                    <td className="border py-1 text-center">
+                    <td className="border border-darkBlue py-1 text-center">{index + 1}</td>
+                    <td className="border border-darkBlue py-1 text-center">
                       {item.studentClassId ||
                         item.departmentId ||
                         item.majorId ||
                         item.id}
                     </td>
-                    <td className="border py-1 text-center">
+                    <td className="border border-darkBlue py-1 text-center">
                       {item.studentClassName ||
                         item.departmentName ||
                         item.majorName ||
                         item.name}
                     </td>
-                    <td className="border py-1 text-center">
+                    <td className="border border-darkBlue py-1 text-center">
                       <IconButton size="small" onClick={() => handleEdit(item)}>
                         <ArrowForwardIcon fontSize="small" />
                       </IconButton>

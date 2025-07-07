@@ -1,122 +1,30 @@
 import { useEffect, useState } from "react";
 import React from "react";
 import api from "../../services/api";
-import PropTypes from "prop-types";
 import PageNumberFooter from "../../component/PageNumberFooter";
-
-const TopicQuery = ({
-  semester,
-  schoolYear,
-  setSemester,
-  setSchoolYear,
-  teacherName,
-  setTeacherName,
-  // handleQueryCriteria,
-  handleSearch,
-}) => {
-  const semesters = ["HK1", "HK2", "HK3"];
-
-  const handleSemesterChange = (e) => {
-    setSemester(e.target.value);
-    // handleQueryCriteria(e);
-  };
-
-  const handleSchoolYearChange = (e) => {
-    setSchoolYear(e.target.value);
-    // handleQueryCriteria(e);
-  };
-
-  const handleTeacherNameChange = (e) => {
-    setTeacherName(e.target.value);
-  };
-
-  return (
-    <div>
-      <div className="flex justify-center w-full ">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 py-4 rounded-md mb-2">
-          {/* Teacher Name Input */}
-          <div className="flex flex-col px-8 md:col-span-2">
-            <label className="font-semibold mb-1">Tên CB</label>
-            <input
-              type="text"
-              className="border px-2 py-1 rounded-md"
-              placeholder="Tên CB"
-              name="name"
-              onChange={handleTeacherNameChange}
-            />
-          </div>
-
-          {/* School Year Input */}
-          <div className="flex flex-col px-8 md:col-span-1">
-            <label className="font-semibold mb-1">Năm học</label>
-            <input
-              type="number"
-              className="border px-2 py-1 rounded-md"
-              placeholder="2025"
-              name="schoolYear"
-              min={2000}
-              max={2300}
-              value={schoolYear}
-              onChange={handleSchoolYearChange}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleSearch();
-                }
-              }}
-            />
-          </div>
-
-          {/* Semester Select */}
-          <div className="flex flex-col px-8 md:col-span-2">
-            <label className="font-semibold mb-1">Học kỳ</label>
-            <select
-              name="semester"
-              className="border px-2 py-1 rounded-md"
-              value={semester}
-              onChange={handleSemesterChange}
-            >
-              <option value="">-- Chọn học kỳ --</option>
-              {semesters.map((s, index) => (
-                <option key={index} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-          </div>
-          {/* Search Button */}
-          <div className="md:col-span-5 flex justify-end mr-8 ">
-            <button
-              type="button"
-              className="bg-darkBlue text-white px-4 py-1 rounded-md shadow-md"
-              onClick={handleSearch}
-            >
-              Tìm kiếm
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-TopicQuery.propTypes = {
-  handleQueryCriteria: PropTypes.func,
-  handleSearch: PropTypes.func,
-};
+import TopicQuery from "./topicManagementPage/TopicQuery";
+import NumberInput from "../../component/NumberInput";
 
 const TopicManagementPage = () => {
-  const [topicsGroupByTeacher, setTopicsGroupByTeacher] = useState();
-  const [semester, setSemester] = useState();
-  const [schoolYear, setSchoolYear] = useState();
+  //This array state should include teacherTopicLimit too
+  const [topicsGroupByTeacher, setTopicsGroupByTeacher] = useState([]);
+  const [semester, setSemester] = useState("HK1");
+  const [schoolYear, setSchoolYear] = useState(2025);
   const [expandedTeachers, setExpandedTeachers] = useState({});
   const [teacherName, setTeacherName] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
+  // useEffect(() => {
+  //   getCurrentSemester();
+  //   setSchoolYear(new Date().getFullYear());
+  // }, []);
+
+  // useEffect(() => {console.log(typeof semester)}, [semester])
+
+  //Fetch on mount
   useEffect(() => {
-    getCurrentSemester();
-    setSchoolYear(new Date().getFullYear());
+    fetchTopicsByTeacher();
   }, []);
 
   useEffect(() => {
@@ -126,16 +34,19 @@ const TopicManagementPage = () => {
   const fetchTopicsByTeacher = async () => {
     if (schoolYear) {
       // Only require year
-      let url = `/topics/groupByTeacher?year=${schoolYear}&name=${teacherName}&n=5&p=${currentPage}`;
+      let url = `/topics/groupByTeacherWithLimit?year=${schoolYear}&name=${teacherName}&n=5&p=${currentPage}`;
 
       if (semester && semester !== "") {
-        url = `/topics/groupByTeacher?semester=${semester}&year=${schoolYear}&name=${teacherName}&n=5&p=${currentPage}`;
+        url = `/topics/groupByTeacherWithLimit?semester=${semester}&year=${schoolYear}&name=${teacherName}&n=5&p=${currentPage}`;
       }
 
       const result = await api.get(url);
+      const topicsGroupByTeacherFetched = result.data.result.content;
+      // const topic = api.get("/")
+      console.log(topicsGroupByTeacherFetched);
       setTopicsGroupByTeacher(result.data.result.content);
+
       setTotalPages(result.data.result.totalPages);
-      console.log(result.data.result.content);
     }
   };
 
@@ -208,9 +119,9 @@ const TopicManagementPage = () => {
     <div className="flex justify-center">
       {/* department, faculty, class, major */}
       <div className="w-3/4 border-lightBlue rounded-md border mx-1 p-2 font-textFont px-6">
-        <span className="border-b border-b-darkBlue text-xl font-medium flex gap-2">
-          <h2>Phân chia số lượng đề tài -</h2>
-          <h2>{semester}</h2>
+        <span className="border-b border-b-darkBlue text-xl font-medium flex">
+          <h2 className="pr-2">Phân chia số lượng đề tài -</h2>
+          {semester && <h2 className="pr-2">{semester}</h2>}
           <h2>{schoolYear}</h2>
         </span>
         <TopicQuery
@@ -222,6 +133,7 @@ const TopicManagementPage = () => {
           setTeacherName={setTeacherName}
           handleSearch={fetchTopicsByTeacher}
         ></TopicQuery>
+        {/* Table for display */}
         <table className="w-full table-fixed mt-3">
           <colgroup>
             <col className="w-[20%]" />
@@ -246,11 +158,26 @@ const TopicManagementPage = () => {
                     <td className="p-1 border px-2">{teacher.name}</td>
                     <td className="p-1 border">
                       <div className="flex justify-center rounded-md">
-                        <input
+                        {/* <input
                           className="border rounded w-1/4 px-1"
                           type="number"
                           max={20}
                           min={0}
+                        /> */}
+                        <NumberInput
+                          min={2000}
+                          max={2300}
+                          name="schoolYear"
+                          placeholder={new Date().getFullYear()}
+                          className="border rounded w-1/3 text-center px-1 bg-lightGray"
+                          value={teacher.maxTopics}
+                          // onChange={handleSchoolYearChange}
+                          // onKeyDown={(e) => {
+                          //   if (e.key === "Enter") {
+                          //     e.preventDefault();
+                          //     handleSearch();
+                          //   }
+                          // }}
                         />
                       </div>
                     </td>

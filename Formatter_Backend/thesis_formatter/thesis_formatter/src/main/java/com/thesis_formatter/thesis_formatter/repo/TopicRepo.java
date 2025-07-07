@@ -1,5 +1,6 @@
 package com.thesis_formatter.thesis_formatter.repo;
 
+import com.thesis_formatter.thesis_formatter.entity.Teacher;
 import com.thesis_formatter.thesis_formatter.entity.Topic;
 import com.thesis_formatter.thesis_formatter.enums.Semester;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -34,5 +35,10 @@ public interface TopicRepo extends JpaRepository<Topic, String> {
             "ORDER BY t2.userId")
     List<Object[]> findTopicsGroupedByUserIdAndName(@Param("year") String year,
                                                     @Param("name") String name);
+
+    @Query("SELECT t FROM Topic t JOIN t.teachers teacher WHERE teacher = :teacher AND t.semester = :semester AND t.year = :year")
+    List<Topic> findTopicsByTeacherAndSemesterAndYear(@Param("teacher") Teacher teacher,
+                                                      @Param("semester") Semester semester,
+                                                      @Param("year") String year);
 
 }
