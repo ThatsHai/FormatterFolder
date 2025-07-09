@@ -5,6 +5,7 @@ import com.thesis_formatter.thesis_formatter.enums.FormStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -18,4 +19,8 @@ public class FormRecordResponse {
     TopicResponse topic;
     StudentDTO student;
     FormStatus status;
+    int version;
+    String createdAt;
+    String lastModifiedAt;
+
 }

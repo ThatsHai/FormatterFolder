@@ -6,7 +6,9 @@ import com.thesis_formatter.thesis_formatter.enums.FormStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.DynamicUpdate;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -15,6 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
+@DynamicUpdate
 public class FormRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -38,5 +41,11 @@ public class FormRecord {
 
     @Enumerated(EnumType.STRING)
     FormStatus status = FormStatus.PENDING;
+
+    LocalDateTime createdAt = LocalDateTime.now();
+    LocalDateTime lastModifiedAt = LocalDateTime.now();
+
+    int version=0;
+
 }
 

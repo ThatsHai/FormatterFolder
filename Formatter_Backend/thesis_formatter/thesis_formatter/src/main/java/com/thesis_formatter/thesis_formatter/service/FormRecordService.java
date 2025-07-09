@@ -33,9 +33,8 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -73,6 +72,7 @@ public class FormRecordService {
                         .value(fieldRequest.getValue())
                         .formField(formField)
                         .formRecord(formRecord)
+                        .createdAt(LocalDateTime.now())
                         .build();
 
                 recordFields.add(recordField);
@@ -80,7 +80,7 @@ public class FormRecordService {
 
             formRecord.setFormRecordFields(recordFields);
         }
-
+        formRecord.setCreatedAt(LocalDateTime.now());
         FormRecord savedFormRecord = formRecordRepo.save(formRecord);
         FormRecordResponse formRecordResponse = formRecordMapper.toResponse(savedFormRecord);
         return APIResponse.<FormRecordResponse>builder()
@@ -93,28 +93,40 @@ public class FormRecordService {
     public APIResponse<FormRecordResponse> updateFormRecord(UpdateFormRecordRequest request) {
         FormRecord formRecord = formRecordRepo.findById(request.getFormRecordId()).orElseThrow(
                 () -> new AppException(ErrorCode.FormRecord_NOT_FOUND));
-        System.out.println("request: " + request);
-        List<FormRecordField> updatedFields = new ArrayList<>();
 
-        for (UpdateFormRecordFieldRequest fieldRequest : request.getFormRecordFields()) {
-            if (fieldRequest.getFormRecordFieldId() != null) {
-                FormRecordField existingRecordField = formRecordFieldRepo.findByFormRecordFieldId(fieldRequest.getFormRecordFieldId());
+        int currentVersion = formRecord.getVersion() + 1;
 
-                existingRecordField.setValue(fieldRequest.getValue());
-                updatedFields.add(existingRecordField);
-            } else {
-                FormField formField = formFieldRepo.findById(fieldRequest.getFormFieldId())
-                        .orElseThrow(() -> new RuntimeException("khong có form field"));
-                FormRecordField newRecordField = FormRecordField.builder()
-                        .value(fieldRequest.getValue())
-                        .formField(formField)
-                        .formRecord(formRecord)
-                        .build();
-                updatedFields.add(newRecordField);
-            }
+        Set<String> updatedFieldIds = request.getFormRecordFields().stream()
+                .map(UpdateFormRecordFieldRequest::getFormRecordFieldId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+
+        List<FormRecordField> currentFields = formRecord.getFormRecordFields();
+        List<FormRecordField> allFields = new ArrayList<>();
+
+        for (FormRecordField existingField : currentFields) {
+            if (!updatedFieldIds.contains(existingField.getFormRecordFieldId()) && !existingField.isChanged()) {
+                existingField.setVersion(currentVersion);
+            } else existingField.setChanged(true);
+            allFields.add(existingField);
         }
-        formRecord.getFormRecordFields().clear();
-        formRecord.getFormRecordFields().addAll(updatedFields);
+
+        List<FormRecordField> changedFields = request.getFormRecordFields().stream()
+                .map(req -> {
+                    FormField formField = formFieldRepo.findById(req.getFormFieldId()).orElseThrow(() -> new RuntimeException("ko co formField"));
+                    return FormRecordField.builder()
+                            .formRecord(formRecord)
+                            .formField(formField)
+                            .value(req.getValue())
+                            .version(currentVersion)
+                            .createdAt(LocalDateTime.now())
+                            .build();
+                }).collect(Collectors.toList());
+        allFields.addAll(changedFields);
+        formRecord.setFormRecordFields(allFields);
+        formRecord.setLastModifiedAt(LocalDateTime.now());
+        formRecord.setVersion(currentVersion);
         FormRecord savedRecord = formRecordRepo.save(formRecord);
 
         FormRecordResponse formRecordResponse = formRecordMapper.toResponse(savedRecord);
@@ -123,6 +135,14 @@ public class FormRecordService {
                 .result(formRecordResponse)
                 .build();
     }
+
+//    public APIResponse<void> deleteFormRecord(String formRecordId) {
+//        FormRecord formRecord = formRecordRepo.findById(formRecordId).orElseThrow(() -> new AppException(ErrorCode.FormRecord_NOT_FOUND);
+//
+//        return APIResponse.<void>builder()
+//                .code("200")
+//                .build();
+//    }
 
     public APIResponse<FormRecordResponse> updateStatus(String formRecordId, String status) {
 
@@ -206,9 +226,81 @@ public class FormRecordService {
                 .build();
     }
 
-    public APIResponse<FormRecordResponse> getFormRecordById(String formRecordId) {
+    public APIResponse<FormRecordResponse> getFormRecordById(String formRecordId, String version) {
         FormRecord formRecord = formRecordRepo.findById(formRecordId).orElseThrow(() -> new RuntimeException("không tìm thấy record"));
-        FormRecordResponse formRecordResponse = formRecordMapper.toResponse(formRecord);
+
+        int currentVersion = formRecord.getVersion();
+        List<FormRecordField> allFields = formRecord.getFormRecordFields();
+        //current version
+        if (version == null || Integer.parseInt(version) == formRecord.getVersion()) {
+            List<FormRecordField> currentFields = allFields.stream()
+                    .filter(f -> f.getVersion() == currentVersion)
+                    .collect(Collectors.toList());
+            formRecord.setFormRecordFields(currentFields);
+            FormRecordResponse formRecordResponse = formRecordMapper.toResponse(formRecord);
+            return APIResponse.<FormRecordResponse>builder()
+                    .result(formRecordResponse)
+                    .code("200")
+                    .build();
+        }
+
+        //old version
+        //group record field by formfiledId
+        Map<String, List<FormRecordField>> fieldsByFormFieldId = allFields.stream()
+                .collect(Collectors.groupingBy(field -> field.getFormField().getFormFieldId()));
+
+        List<FormRecordField> selectedFields = new ArrayList<>();
+        for (Map.Entry<String, List<FormRecordField>> entry : fieldsByFormFieldId.entrySet()) {
+            String formFieldId = entry.getKey();
+            List<FormRecordField> formRecordFields = entry.getValue();
+            System.out.println("formFieldId: " + formFieldId);
+            formRecordFields.forEach(formRecordField -> {
+                System.out.println("formRecordFieldId: " + formRecordField.getFormRecordFieldId());
+                System.out.println("version: " + formRecordField.getVersion());
+                System.out.println("value: " + formRecordField.getValue());
+            });
+            Optional<FormRecordField> exactDataField = formRecordFields.stream()
+                    .filter(f -> f.getVersion() == Integer.parseInt(version))
+                    .findFirst();
+            if (exactDataField.isPresent()) {
+                selectedFields.add(exactDataField.get());
+                System.out.println(formFieldId + "có");
+            } else {
+                //Find the nearest version greater than the requested version where isChanged equals true.
+
+                Optional<FormRecordField> closestChangedField = formRecordFields.stream()
+                        .filter(f -> f.getVersion() > Integer.parseInt(version) && f.isChanged())
+                        .min(Comparator.comparing(FormRecordField::getVersion));
+                if (closestChangedField.isPresent()) {
+                    System.out.println(formFieldId + " gần nhất đã thay đổi");
+                    selectedFields.add(closestChangedField.get());
+                } else {
+                    Optional<FormRecordField> latestField = formRecordFields.stream()
+                            .max(Comparator.comparing(FormRecordField::getVersion)); //get lastest version
+
+                    latestField.ifPresent(selectedFields::add);
+                }
+            }
+        }
+
+        LocalDateTime versionModifiedAt = selectedFields.stream()
+                .map(FormRecordField::getCreatedAt)
+                .filter(Objects::nonNull)
+                .max(LocalDateTime::compareTo)
+                .orElse(formRecord.getLastModifiedAt());
+
+        FormRecord copied = FormRecord.builder()
+                .formRecordId(formRecordId)
+                .formRecordFields(selectedFields)
+                .topic(formRecord.getTopic())
+                .student(formRecord.getStudent())
+                .status(formRecord.getStatus())
+                .version(formRecord.getVersion())
+                .createdAt(formRecord.getCreatedAt())
+                .lastModifiedAt(versionModifiedAt)
+                .build();
+
+        FormRecordResponse formRecordResponse = formRecordMapper.toResponse(copied);
         return APIResponse.<FormRecordResponse>builder()
                 .result(formRecordResponse)
                 .code("200")

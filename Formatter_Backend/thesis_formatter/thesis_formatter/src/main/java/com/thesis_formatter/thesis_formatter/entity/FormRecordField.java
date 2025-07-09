@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -25,4 +27,9 @@ public class FormRecordField {
     @JoinColumn(name = "formRecordId")
     @JsonBackReference
     FormRecord formRecord;
+
+    LocalDateTime createdAt = LocalDateTime.now();
+
+    int version = 0;
+    boolean changed = false;
 }

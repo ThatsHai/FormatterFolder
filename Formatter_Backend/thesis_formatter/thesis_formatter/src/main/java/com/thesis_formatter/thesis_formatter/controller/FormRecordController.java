@@ -57,8 +57,8 @@ public class FormRecordController {
     }
 
     @GetMapping("/formRecords/{id}")
-    public APIResponse<FormRecordResponse> getFormRecord(@PathVariable String id) {
-        return formRecordService.getFormRecordById(id);
+    public APIResponse<FormRecordResponse> getFormRecord(@PathVariable String id, @RequestParam(required = false) String version) {
+        return formRecordService.getFormRecordById(id, version);
     }
 
     @GetMapping("/formRecords/{formRecordId}/downloadPdf/{designId}")
