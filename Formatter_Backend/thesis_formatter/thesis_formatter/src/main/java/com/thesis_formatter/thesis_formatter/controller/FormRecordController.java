@@ -2,9 +2,7 @@ package com.thesis_formatter.thesis_formatter.controller;
 
 import com.thesis_formatter.thesis_formatter.dto.request.AddFormRecordRequest;
 import com.thesis_formatter.thesis_formatter.dto.request.UpdateFormRecordRequest;
-import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
-import com.thesis_formatter.thesis_formatter.dto.response.FormRecordResponse;
-import com.thesis_formatter.thesis_formatter.dto.response.PaginationResponse;
+import com.thesis_formatter.thesis_formatter.dto.response.*;
 import com.thesis_formatter.thesis_formatter.entity.FormRecord;
 import com.thesis_formatter.thesis_formatter.service.FormRecordService;
 import lombok.AccessLevel;
@@ -61,9 +59,22 @@ public class FormRecordController {
         return formRecordService.getFormRecordById(id, version);
     }
 
+    @GetMapping("/formRecords/{formRecordId}/diff/{version}")
+    public APIResponse<List<FormRecordFieldDiff>> getChangedFields(
+            @PathVariable String formRecordId,
+            @PathVariable String version) {
+        return formRecordService.getChangedFieldsFromVersion(formRecordId, version);
+    }
+
+
+    @GetMapping("formRecords/{id}/versions")
+    public APIResponse<List<FormRecordVersionInfo>> getAllVersions(@PathVariable String id) {
+        return formRecordService.getAllVersions(id);
+    }
+
     @GetMapping("/formRecords/{formRecordId}/downloadPdf/{designId}")
-    public ResponseEntity<Resource> downloadFormRecordPdf(@PathVariable String formRecordId, @PathVariable String designId) throws IOException {
-        return formRecordService.downloadFormRecordPdf(formRecordId, designId);
+    public ResponseEntity<Resource> downloadFormRecordPdf(@PathVariable String formRecordId, @PathVariable String designId, @RequestParam(required = false) String version) throws IOException {
+        return formRecordService.downloadFormRecordPdf(formRecordId, designId, version);
     }
 }
 

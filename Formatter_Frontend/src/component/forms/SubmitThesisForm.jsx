@@ -36,6 +36,7 @@ const SubmitThesisForm = ({
 
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [displaySuccessPopup, setDisplaySuccessPopup] = useState(false);
+  const [successPopupText, setSuccessPopupText] = useState("");
 
   // Handle form field changes
   const handleChange = (e) => {
@@ -60,13 +61,37 @@ const SubmitThesisForm = ({
 
   const submitData = async () => {
     try {
+      let fieldsToSend = formData.formRecordFields;
       if (initialData) {
-        await api.put("/formRecords/update", formData);
+        fieldsToSend = formData.formRecordFields.filter((field) => {
+          const initialField = initialData.formRecordFields.find(
+            (f) => f.formRecordFieldId === field.formRecordFieldId
+          );
+
+          return !initialField || initialField.value !== field.value;
+        });
+      }
+      console.log("fields to send: ",fieldsToSend);
+      if (initialData && fieldsToSend.length === 0) {
+        setSuccessPopupText(
+          "Không có trường nào thay đổi, không cần cập nhật!");
+        setDisplaySuccessPopup(true);
+        return;
+      }
+      
+      const dataToSend = {
+        ...formData,
+        formRecordFields: fieldsToSend,
+      }
+      console.log("Data to send: ", dataToSend);
+      if (initialData) {
+        await api.put("/formRecords/update", dataToSend);
+        setSuccessPopupText("Cập nhật bản ghi thành công!");
       } else {
-        await api.post("/formRecords/create", formData);
+        await api.post("/formRecords/create", dataToSend);
+        setSuccessPopupText("Lưu bản ghi mới thành công!");
       }
       setDisplaySuccessPopup(true);
-  
     } catch (error) {
       console.log("Error submitting " + error);
     }
@@ -389,7 +414,9 @@ const SubmitThesisForm = ({
         {displaySuccessPopup && (
           <SuccessPopup
             isOpen={true}
-            successPopupText={initialData? "Cập nhật bản ghi thành công!":"Lưu bản ghi mới thành công!"}
+            successPopupText={
+              successPopupText
+            }
             onClose={onSuccessPopupClosed}
           />
         )}
