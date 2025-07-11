@@ -6,7 +6,8 @@ import SelectField from "../../component/SelectField";
 import { useSelector } from "react-redux";
 import AddingTeacherField from "./AddingTeacherField";
 import AddingMajorField from "./major/AddingMajorField";
-import { major } from "@mui/material";
+import DesignsListWindow from "../../component/DesignListWindow";
+
 const TopicSuggestionPage = ({
   handleFormToggle = () => {},
   onSuccess = () => {},
@@ -22,6 +23,13 @@ const TopicSuggestionPage = ({
     teacherIds: [],
     contactInfo: "",
     majorIds: [],
+    year: new Date().getFullYear(),
+    semester:
+      new Date().getMonth() < 5
+        ? "HK2"
+        : new Date().getMonth() < 9
+        ? "HK3"
+        : "HK1",
   });
   const user = useSelector((state) => state.auth.user);
   const [currentTeacher, setCurrentTeacher] = useState(user);
@@ -34,6 +42,7 @@ const TopicSuggestionPage = ({
 
   const [forms, setForms] = useState([]);
   const [openAddMajorModal, setOpenAddMajorModal] = useState(false);
+  const [showDesignWindow, setShowDesignWindow] = useState(false);
 
   const onUpdateFormData = (fieldName, value) => {
     setFormData((prev) => ({ ...prev, [fieldName]: value }));
@@ -232,19 +241,32 @@ const TopicSuggestionPage = ({
             <h2 className="text-black font-semibold">
               LOẠI BIỂU MẪU TƯƠNG ỨNG
             </h2>
-            <SelectField
-              className="mt-2 mb-4"
-              key={"formId"}
-              label={"formId"}
-              value={formData.formId}
-              onChange={handleSelectChange}
-              error={formErrors.formId || ""}
-              options={forms.map((form) => ({
-                key: form.formId,
-                value: form.title,
-              }))}
-              showLabel={false}
-            ></SelectField>
+            <div className="flex items-center gap-2 mt-2 mb-4">
+              <SelectField
+                className="mt-2 mb-4 w-full"
+                key={"formId"}
+                label={"formId"}
+                value={formData.formId}
+                onChange={handleSelectChange}
+                error={formErrors.formId || ""}
+                options={forms.map((form) => ({
+                  key: form.formId,
+                  value: form.title,
+                }))}
+                showLabel={false}
+              ></SelectField>
+              <button
+                type="button"
+                tooltip="Xem pdf tương ứng"
+                className="ml-2 bg-lightBlue text-white rounded-full w-8 h-8 flex items-center justify-center text-xl shadow hover:bg-blue-600"
+                title="Xem danh sách thiết kế"
+                onClick={() => {setShowDesignWindow(true);
+                  console.log("formData.formId", formData.formId);
+                }}
+              >
+                +
+              </button>
+            </div>
           </div>
           <div className="relative text-start font-textFont text-lg m-8 px-10">
             <h2 className="text-lightBlue font-semibold">THÔNG TIN ĐỀ TÀI</h2>
@@ -430,7 +452,15 @@ const TopicSuggestionPage = ({
             openAddMajorModal={openAddMajorModal}
             setOpenAddMajorModal={setOpenAddMajorModal}
           ></AddingMajorField>
-
+          <div className="relative text-start font-textFont text-lg m-8 px-10">
+            <h3 className="text-black font-semibold">
+              10. THỜI ĐIỂM TẠO ĐỀ TÀI
+            </h3>
+            <div className="flex justify-between gap-3 items-start mt-2">
+              <p className="w-1/2">Năm: {formData.year}</p>
+              <p className="w-1/2">Học kỳ: {formData.semester}</p>
+            </div>
+          </div>
           <div className="m-6 text-center">
             <button
               type="submit"
@@ -441,7 +471,14 @@ const TopicSuggestionPage = ({
             </button>
           </div>
         </form>
+        {showDesignWindow && (
+        <DesignsListWindow
+          formId={formData.formId}
+          onDecline={() => setShowDesignWindow(false)}
+        ></DesignsListWindow>
+      )}
       </div>
+      
     </div>
   );
 };

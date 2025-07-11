@@ -61,6 +61,10 @@ const TopicDetail = ({ topic, onChange, formErrors }) => {
             title="Thông tin liên hệ"
             value={topic.contactInfo}
           ></DisabledField>
+          <DisabledField
+            title="Thời điểm tạo đề tài"
+            value={topic.semester + " - năm " + topic.year}
+          ></DisabledField>
           <div>
             <p className="mb-3">Cán bộ hướng dẫn</p>
             <TeachersTable

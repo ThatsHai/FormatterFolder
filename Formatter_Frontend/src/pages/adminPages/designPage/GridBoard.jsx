@@ -424,7 +424,7 @@ const GridBoard = ({
       </div>
 
       {/* Print Data Button */}
-      <button
+      <button className="hidden"
         onClick={handlePrintData}
         style={{
           marginTop: 10,
@@ -438,7 +438,7 @@ const GridBoard = ({
       >
         Print Grid Data
       </button>
-      <button onClick={() => setColSize((prev) => prev + 1)}>Add col</button>
+      <button className="hidden" onClick={() => setColSize((prev) => prev + 1)}>Add col</button>
     </>
   );
 };

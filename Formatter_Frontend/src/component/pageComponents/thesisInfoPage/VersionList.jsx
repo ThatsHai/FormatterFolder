@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import React from "react";
 
 const VersionList = ({ versions, selectedVersion, onSelect }) => (
-  <div className="w-1/4 border-r">
+  <div className="w-1/6 border-r">
     {versions.map((v) => (
       <div
         key={v.version}
@@ -14,6 +14,7 @@ const VersionList = ({ versions, selectedVersion, onSelect }) => (
         onClick={() => onSelect(v.version)}
       >
         <div className="font-bold">Version {v.version}</div>
+        {v.version == versions[0].version && <div>Phiên bản hiện tại</div>}
         <div>{v.modifiedAt.trim()}</div>
       </div>
     ))}

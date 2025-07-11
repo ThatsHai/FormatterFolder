@@ -99,10 +99,10 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
                   </p>
                 </div>
                 {/* Year */}
-                <div className="w-full grid grid-cols-3 items-center mb-3">
+                {/* <div className="w-full grid grid-cols-3 items-center mb-3">
                   <p>Năm</p>
                   <p className="col-span-2 px-4 py-1 w-1/4">{2025}</p>
-                </div>
+                </div> */}
               </div>
 
               {/* Topic Information */}
@@ -149,6 +149,12 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
                   <p>Thời gian thực hiện</p>
                   <p className="col-span-2 rounded-md px-4 py-1 ">
                     {formData.topic.implementationTime}
+                  </p>
+                </div>
+                <div className="w-full grid grid-cols-3 items-center mb-3">
+                  <p>Thời điểm tạo đề tài</p>
+                  <p className="col-span-2 rounded-md px-4 py-1 ">
+                    {formData.topic.semester} - Năm {formData.topic.year}
                   </p>
                 </div>
                 <div className="w-full grid grid-cols-3 items-center mb-3">

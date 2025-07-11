@@ -352,6 +352,7 @@ public class FormRecordService {
                                 .fieldName(curentField.getFormField().getFieldName())
                                 .oldValue(null)
                                 .newValue(curentField.getValue())
+                                .position(curentField.getFormField().getPosition())
                                 .modifiedAt(curentField.getCreatedAt())
                                 .build()
                 );
@@ -383,6 +384,7 @@ public class FormRecordService {
                                 .fieldName(curentField.getFormField().getFieldName())
                                 .oldValue(oldValue)
                                 .newValue(newValue)
+                                .position(curentField.getFormField().getPosition())
                                 .modifiedAt(curentField.getCreatedAt())
                                 .build()
                 );
