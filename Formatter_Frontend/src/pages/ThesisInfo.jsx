@@ -49,7 +49,7 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
       <Link to="/student" onClick={onDecline}>
         <p>{"< Quay lại"}</p>
       </Link>
-      <div className="m-6 bg-lightGray p-6">
+      <div className="m-6 mx-2 bg-lightGray p-6">
         <div className="bg-white rounded-md p-6">
           {currentPage === 0 && (
             <div className="relative text-start w-full font-textFont text-lg mb-8 px-10">

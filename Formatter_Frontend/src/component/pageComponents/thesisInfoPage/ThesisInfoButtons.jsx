@@ -6,6 +6,7 @@ import SubmitThesisForm from "../../forms/SubmitThesisForm";
 import ConfirmationPopup from "../../ConfirmationPopup";
 import api from "../../../services/api";
 import SuccessPopup from "../../SuccessPopup";
+import { useNavigate } from "react-router-dom";
 const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
   const user = useSelector((state) => state.auth.user);
 
@@ -15,6 +16,7 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [text, setText] = useState("");
   const [successPopupText, setSuccessPopupText] = useState("");
+  const navigate = useNavigate(); 
 
   const handleCardClick = () => {
     setShowDesignWindow(true);
@@ -64,7 +66,7 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
         </button>
         {user.role.name === "STUDENT" ? (
           <>
-            <button className="border p-2 rounded-md px-5 bg-white">
+            <button className="border p-2 rounded-md px-5 bg-white" onClick={()=> navigate(`/diff-viewer/${formRecord.formRecordId}`)}>
               Xem lịch sử sửa
             </button>
             <button

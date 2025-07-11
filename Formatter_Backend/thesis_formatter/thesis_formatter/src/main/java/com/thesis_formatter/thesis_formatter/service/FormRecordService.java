@@ -339,13 +339,28 @@ public class FormRecordService {
     public APIResponse<List<FormRecordFieldDiff>> getChangedFieldsFromVersion(String formRecordId, String version) {
 
         int currentVersion = Integer.parseInt(version.trim());
+
+        FormRecord current = getFormRecordByIdAndVersion(formRecordId, version);
         if (currentVersion == 0) {
+            List<FormRecordField> currentFields = current.getFormRecordFields();
+            List<FormRecordFieldDiff> changedFields = new ArrayList<>();
+            for (FormRecordField curentField : current.getFormRecordFields()) {
+
+                changedFields.add(
+                        FormRecordFieldDiff.builder()
+                                .formFieldId(curentField.getFormField().getFormFieldId())
+                                .fieldName(curentField.getFormField().getFieldName())
+                                .oldValue(null)
+                                .newValue(curentField.getValue())
+                                .modifiedAt(curentField.getCreatedAt())
+                                .build()
+                );
+            }
             return APIResponse.<List<FormRecordFieldDiff>>builder()
                     .code("200")
-                    .result(null)
+                    .result(changedFields)
                     .build();
         }
-        FormRecord current = getFormRecordByIdAndVersion(formRecordId, version);
         String prevVersion = String.valueOf(currentVersion - 1);
         FormRecord previous = getFormRecordByIdAndVersion(formRecordId, prevVersion);
 
@@ -357,15 +372,9 @@ public class FormRecordService {
         for (FormRecordField curentField : current.getFormRecordFields()) {
             String fieldId = curentField.getFormField().getFormFieldId();
 
-
             FormRecordField prevField = prevFieldMap.get(fieldId);
             String oldValue = prevField != null ? prevField.getValue() : null;
             String newValue = curentField.getValue();
-            System.out.println("current field: " + fieldId);
-            System.out.println("previous field: " + prevField.getFormRecordFieldId());
-            System.out.println("previous value: " + oldValue);
-            System.out.println("current field:" + curentField.getFormRecordFieldId());
-            System.out.println("new value: " + newValue);
 
             if (!Objects.equals(oldValue, newValue)) {
                 changedFields.add(

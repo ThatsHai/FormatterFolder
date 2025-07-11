@@ -21,6 +21,7 @@ import TopicManagementPage from "../pages/adminPages/TopicManagementPage";
 import Test from "../pages/Test";
 import PDFViewer from "../component/forms/SubmitThesisFormComponents/PDFViewer";
 import TopicContent from "../pages/teacherPages/topic/TopicContent";
+import DiffViewerPage from "../component/pageComponents/thesisInfoPage/DiffViewerPage";
 
 const Router = createBrowserRouter([
   {
@@ -68,6 +69,14 @@ const Router = createBrowserRouter([
     element: (
       <ThesisInfoLayout>
         <ThesisInfo />
+      </ThesisInfoLayout>
+    ),
+  },
+   {
+    path: "/diff-viewer/:formRecordId",
+    element: (
+      <ThesisInfoLayout>
+        <DiffViewerPage />
       </ThesisInfoLayout>
     ),
   },
