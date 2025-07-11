@@ -40,6 +40,17 @@ public class FacultyService {
                 .build();
     }
 
+    public APIResponse<List<Faculty>> getFacultyById(String facultyId) {
+        Faculty faculty = facultyRepo.findByFacultyId(facultyId);
+        if (faculty == null) {
+            throw new AppException(ErrorCode.FACULTY_NOT_FOUND);
+        }
+        return APIResponse.<List<Faculty>>builder()
+                .result(List.of(faculty))
+                .code("200")
+                .build();
+    }
+
 //    public APIResponse<List<FacultyResponse>> getAll() {
 //        List<Faculty> faculties = facultyRepo.findAll();
 //        return APIResponse.<List<FacultyResponse>>builder()

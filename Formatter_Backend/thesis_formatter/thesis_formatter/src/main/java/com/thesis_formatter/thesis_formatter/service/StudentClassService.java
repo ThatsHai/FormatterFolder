@@ -53,4 +53,16 @@ public class StudentClassService {
                 .build();
     }
 
+    public APIResponse<Major> getClassParent(String studentClassId) {
+        StudentClass studentClass = studentClassRepo.findById(studentClassId)
+                .orElseThrow(() -> new AppException(ErrorCode.STUDENTCLASS_NOT_FOUND));
+
+        Major major = studentClass.getMajor();
+
+        return APIResponse.<Major>builder()
+                .code("200")
+                .result(major)
+                .build();
+    }
+
 }
