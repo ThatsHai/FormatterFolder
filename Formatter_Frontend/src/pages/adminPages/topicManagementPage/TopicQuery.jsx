@@ -84,6 +84,7 @@ const TopicQuery = ({
                   {s}
                 </option>
               ))}
+              <option value="Cả năm">Cả năm</option>
             </select>
           </div>
           {/* Search Button */}

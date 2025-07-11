@@ -15,10 +15,11 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class TeacherTopicLimitId implements Serializable {
 
-    @Column(name = "teacher_id") // This maps to teacher.acId
+    @Column(name = "ac_id") // This maps to teacher.acId
     private String teacherId;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
+    @Column(name = "semester")
     private Semester semester;
 
     private String schoolYear;

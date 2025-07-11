@@ -60,14 +60,13 @@ public class TeacherController {
 
     @GetMapping("/teachers/withTopicsAndLimits")
     public APIResponse<PaginationResponse<TeacherTopicWithLimitResponse>> getTeachersWithTopicsAndLimits(
-            @RequestParam String semester,
+            @RequestParam(required = false) String semester,
             @RequestParam String year,
             @RequestParam(name = "name", required = false) String teacherQueryName,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-
-        Pageable pageable = PageRequest.of(page, size);
-
-        return teacherService.getTeachersWithTopicsAndLimits(semester, year, teacherQueryName, pageable);
+            @RequestParam String p,
+            @RequestParam String n) {
+        if (semester != null && !semester.isBlank()) {
+            return teacherService.getTeachersWithTopicsAndLimits(semester, year, teacherQueryName, p, n);
+        } else return teacherService.getTeachersWithTopicsAndLimits(year, teacherQueryName, p, n);
     }
 }

@@ -11,4 +11,5 @@ import java.util.List;
 @Repository
 public interface TeacherTopicLimitRepo extends JpaRepository<TeacherTopicLimit, TeacherTopicLimitId> {
     List<TeacherTopicLimit> findAllById_TeacherIdAndId_SchoolYear(String teacherId, String schoolYear);
+
 }

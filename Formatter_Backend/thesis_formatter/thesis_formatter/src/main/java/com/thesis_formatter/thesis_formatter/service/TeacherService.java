@@ -186,9 +186,10 @@ public class TeacherService {
     }
 
     public APIResponse<PaginationResponse<TeacherTopicWithLimitResponse>> getTeachersWithTopicsAndLimits(
-            String semester, String year, String teacherQueryName, Pageable pageable) {
+            String semester, String year, String teacherQueryName, String page, String numberOfRecords) {
 
         Semester semesterObj = Semester.valueOf(semester);
+        Pageable pageable = PageRequest.of(Integer.parseInt(page), Integer.parseInt(numberOfRecords));
 
         Page<Teacher> teacherPage = (teacherQueryName == null || teacherQueryName.isBlank())
                 ? teacherRepo.findAll(pageable)
@@ -199,9 +200,7 @@ public class TeacherService {
             List<TopicResponse> topicResponses = topics.stream()
                     .map(topicMapper::toTopicResponse)
                     .toList();
-
-            // ✅ FIX: Use teacherId instead of teacher entity
-            TeacherTopicLimitId teacherTopicLimitId = new TeacherTopicLimitId(teacher.getUserId(), semesterObj, year);
+            TeacherTopicLimitId teacherTopicLimitId = new TeacherTopicLimitId(teacher.getAcId(), semesterObj, year);
             Optional<TeacherTopicLimit> topicLimitOpt = teacherTopicLimitRepo.findById(teacherTopicLimitId);
 
             int maxTopics = topicLimitOpt.map(TeacherTopicLimit::getMaxTopics).orElse(0);
@@ -212,6 +211,46 @@ public class TeacherService {
             response.setMaxTopics(maxTopics);
             response.setTopicResponses(topicResponses);
 
+            return response;
+        }).toList();
+
+        PaginationResponse<TeacherTopicWithLimitResponse> paginationResponse = new PaginationResponse<>();
+        paginationResponse.setTotalPages(teacherPage.getTotalPages());
+        paginationResponse.setTotalElements(teacherPage.getTotalElements());
+        paginationResponse.setContent(responses);
+        paginationResponse.setCurrentPage(teacherPage.getNumber());
+
+        return APIResponse.<PaginationResponse<TeacherTopicWithLimitResponse>>builder()
+                .code("200")
+                .result(paginationResponse)
+                .build();
+    }
+
+    public APIResponse<PaginationResponse<TeacherTopicWithLimitResponse>> getTeachersWithTopicsAndLimits(
+            String year, String teacherQueryName, String page, String numberOfRecords) {
+
+        Pageable pageable = PageRequest.of(Integer.parseInt(page), Integer.parseInt(numberOfRecords));
+
+        Page<Teacher> teacherPage = (teacherQueryName == null || teacherQueryName.isBlank())
+                ? teacherRepo.findAll(pageable)
+                : teacherRepo.findAllByNameContainingIgnoreCase(teacherQueryName, pageable);
+
+        List<TeacherTopicWithLimitResponse> responses = teacherPage.getContent().stream().map(teacher -> {
+            List<Topic> topics = topicRepo.findTopicsByTeacherAndYear(teacher, year);
+            List<TopicResponse> topicResponses = topics.stream()
+                    .map(topicMapper::toTopicResponse)
+                    .toList();
+
+            List<TeacherTopicLimit> topicLimits = teacherTopicLimitRepo.findAllById_TeacherIdAndId_SchoolYear(teacher.getAcId(), year);
+            int maxTopics = topicLimits.stream()
+                    .mapToInt(TeacherTopicLimit::getMaxTopics)
+                    .sum();
+
+            TeacherTopicWithLimitResponse response = new TeacherTopicWithLimitResponse();
+            response.setUserId(teacher.getUserId());
+            response.setName(teacher.getName());
+            response.setMaxTopics(maxTopics);
+            response.setTopicResponses(topicResponses);
             return response;
         }).toList();
 

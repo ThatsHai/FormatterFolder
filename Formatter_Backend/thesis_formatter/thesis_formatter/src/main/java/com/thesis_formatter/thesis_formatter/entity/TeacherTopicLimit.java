@@ -18,7 +18,7 @@ public class TeacherTopicLimit {
     private TeacherTopicLimitId id;
 
     @ManyToOne
-    @JoinColumn(name = "teacher_id", referencedColumnName = "acId", insertable = false, updatable = false)
+    @JoinColumn(name = "ac_Id", referencedColumnName = "acId", insertable = false, updatable = false)
     private Teacher teacher;
 
 
