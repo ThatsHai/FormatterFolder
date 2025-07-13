@@ -136,15 +136,15 @@ const GridBoard = ({
   // Main function to generate print data with filling gaps
   const generateOptimizedCellData = () => {
     if (mergeRegions.length === 0) return [];
-  
+
     const visited = Array.from({ length: rowSize }, () =>
       Array(colSize).fill(false)
     );
-  
+
     const gridMap = Array.from({ length: rowSize }, () =>
       Array(colSize).fill(null)
     );
-  
+
     // Fill gridMap with region indices
     mergeRegions.forEach((region, index) => {
       for (let r = region.topPos; r < region.topPos + region.height; r++) {
@@ -153,7 +153,7 @@ const GridBoard = ({
         }
       }
     });
-  
+
     // ⬇️ Determine which rows are partially merged
     const partiallyMergedRows = new Set();
     for (let r = 0; r < rowSize; r++) {
@@ -167,19 +167,19 @@ const GridBoard = ({
         partiallyMergedRows.add(r);
       }
     }
-  
+
     const result = [];
-  
+
     for (let r = rowSize - 1; r >= 0; r--) {
       for (let c = colSize - 1; c >= 0; c--) {
         if (visited[r][c]) continue;
-  
+
         const regionIndex = gridMap[r][c];
-  
+
         if (regionIndex !== null) {
           const region = mergeRegions[regionIndex];
           const isTopLeft = region.topPos === r && region.leftPos === c;
-  
+
           if (isTopLeft) {
             result.push({
               text: region.text || "",
@@ -190,7 +190,7 @@ const GridBoard = ({
               fromDataSource: region.fromDataSource || false,
               fromDrag: region.fromDrag || false,
             });
-  
+
             for (
               let rr = region.topPos;
               rr < region.topPos + region.height;
@@ -210,7 +210,7 @@ const GridBoard = ({
         } else {
           // ⚠️ Only allow filling empty cells in partially merged rows
           if (!partiallyMergedRows.has(r)) continue;
-  
+
           // Empty cell — try to expand
           let minCol = c;
           while (
@@ -220,9 +220,9 @@ const GridBoard = ({
           ) {
             minCol--;
           }
-  
+
           const spanWidth = c - minCol + 1;
-  
+
           let minRow = r;
           let canExpand = true;
           while (canExpand && minRow - 1 >= 0) {
@@ -234,16 +234,16 @@ const GridBoard = ({
             }
             if (canExpand) minRow--;
           }
-  
+
           const spanHeight = r - minRow + 1;
-  
+
           // Mark all visited
           for (let rr = minRow; rr <= r; rr++) {
             for (let cc = minCol; cc <= c; cc++) {
               visited[rr][cc] = true;
             }
           }
-  
+
           result.push({
             text: "",
             colSpan: spanWidth,
@@ -253,15 +253,14 @@ const GridBoard = ({
             fromDataSource: false,
             fromDrag: false,
           });
-  
+
           c = minCol;
         }
       }
     }
-  
+
     return result;
   };
-  
 
   const handlePrintData = () => {
     const data = generateOptimizedCellData();
@@ -347,6 +346,50 @@ const GridBoard = ({
     }
   };
 
+  const handleInsertRow = (insertAtRow) => {
+    setRowSize((prev) => prev + 1);
+
+    setMergeRegions((prevRegions) =>
+      prevRegions.map((region) => {
+        if (region.topPos >= insertAtRow + 1) {
+          return { ...region, topPos: region.topPos + 1 };
+        }
+        return region;
+      })
+    );
+  };
+
+  const handleDeleteRow = (rowIdx) => {
+    setRowSize((prev) => Math.max(1, prev - 1));
+    setMergeRegions(
+      (prevRegions) =>
+        prevRegions
+          .map((region) => {
+            const { topPos, height } = region;
+
+            // Case 1: Region ends before deleted row → keep unchanged
+            if (topPos + height - 1 < rowIdx) return region;
+
+            // Case 2: Region starts after deleted row → shift upward
+            if (topPos > rowIdx) {
+              return { ...region, topPos: topPos - 1 };
+            }
+
+            // Case 3: Region spans the deleted row
+            if (topPos <= rowIdx && topPos + height - 1 >= rowIdx) {
+              // Remove region if it's 1 row tall and that row is deleted
+              if (height === 1) return null;
+
+              // Shrink height by 1 if it spans the deleted row
+              return { ...region, height: height - 1 };
+            }
+
+            return region;
+          })
+          .filter(Boolean) // remove nulls (deleted regions)
+    );
+  };
+
   return (
     <>
       <div
@@ -404,6 +447,64 @@ const GridBoard = ({
             }}
           />
         ))}
+
+        {/* Row-side insert buttons */}
+        <div
+          className="absolute top-0 left-0"
+          style={{
+            width: `${colSize * cellSize}px`,
+            height: `${rowSize * cellSize}px`,
+            pointerEvents: "none",
+            zIndex: 50,
+          }}
+        >
+          {[...Array(rowSize)].map((_, rowIdx) => (
+            <div
+              key={`row-hover-${rowIdx}`}
+              className="absolute group"
+              style={{
+                top: `${rowIdx * cellSize}px`,
+                left: "0px",
+                height: `${cellSize}px`,
+                width: `${colSize * cellSize}px`,
+                pointerEvents: "none",
+              }}
+            >
+              <div
+                className="absolute flex flex-col items-start gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                style={{
+                  top: `0px`,
+                  left: `${colSize * cellSize}px`, // Position just outside right edge
+                  height: `${cellSize}px`,
+                  minWidth: "150px",
+                  marginLeft: "10px",
+                  pointerEvents: "auto",
+                  textAlign: "left", // align text inside buttons to the left
+                }}
+              >
+                <div
+                  onClick={() => handleInsertRow(rowIdx - 1)}
+                  className="text-xs px-2 bg-darkBlue text-white rounded cursor-pointer"
+                >
+                  + Thêm hàng trên
+                </div>
+                <div
+                  onClick={() => handleInsertRow(rowIdx)}
+                  className="text-xs px-2 bg-lightBlue text-white rounded cursor-pointer"
+                >
+                  + Thêm hàng dưới
+                </div>
+                <div
+                  onClick={() => handleDeleteRow(rowIdx)}
+                  className="text-xs px-2 bg-red-500 text-white rounded cursor-pointer"
+                >
+                  Xóa hàng này
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
         {focusedIndex !== null && (
           <div style={getToolbarPosition()}>
             <CustomToolbar
@@ -442,7 +543,7 @@ const GridBoard = ({
       </div>
 
       {/* Print Data Button */}
-      <button
+      {/* <button
         onClick={handlePrintData}
         style={{
           marginTop: 10,
@@ -456,7 +557,7 @@ const GridBoard = ({
       >
         Print Grid Data
       </button>
-      <button onClick={() => setRowSize((prev) => prev + 1)}>Add row</button>
+      <button onClick={() => setRowSize((prev) => prev + 1)}>Add row</button> */}
     </>
   );
 };

@@ -247,7 +247,7 @@ const DesignMainContent = ({ formData, fetchFormInfo }) => {
         ></GridBoard>
         <div className="w-full flex justify-end font-textFont">
           <button
-            className="bg-darkGray text-white font-semibold shadow-md py-2 px-4  rounded-md"
+            className="bg-darkGray text-white font-semibold shadow-md py-2 px-4 z-50 mt-5 rounded-md"
             onClick={() => handleSaveForm()}
           >
             Lưu
