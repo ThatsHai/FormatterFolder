@@ -39,4 +39,9 @@ public class StudentClassController {
     public APIResponse<Major> getClassParent(@RequestParam String classId) {
         return studentClassService.getClassParent(classId);
     }
+
+    @PutMapping("/classes")
+    public APIResponse<StudentClass> updateClass(@RequestBody StudentClass studentClass) {
+        return studentClassService.updateClass(studentClass);
+    }
 }

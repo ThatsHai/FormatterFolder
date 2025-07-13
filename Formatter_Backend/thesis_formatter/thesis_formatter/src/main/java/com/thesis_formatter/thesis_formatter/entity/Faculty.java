@@ -18,6 +18,4 @@ public class Faculty {
 //    @GeneratedValue(strategy = GenerationType.UUID)
     String facultyId;
     String facultyName;
-
-
 }

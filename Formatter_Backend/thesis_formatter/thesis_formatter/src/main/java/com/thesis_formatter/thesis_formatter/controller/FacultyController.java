@@ -33,6 +33,11 @@ public class FacultyController {
         }
     }
 
+    @PutMapping("/faculties")
+    public APIResponse<Faculty> updateFaculty(@RequestBody Faculty faculty) {
+        return facultyService.updateFaculty(faculty);
+    }
+
 
 //    @GetMapping("/faculties")
 //    public APIResponse<List<FacultyResponse>> getFaculty() {

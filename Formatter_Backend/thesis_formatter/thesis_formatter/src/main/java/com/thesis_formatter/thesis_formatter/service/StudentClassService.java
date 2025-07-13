@@ -65,4 +65,21 @@ public class StudentClassService {
                 .build();
     }
 
+    public APIResponse<StudentClass> updateClass(StudentClass studentClass) {
+        StudentClass existedStudentClass = studentClassRepo.findByStudentClassId(studentClass.getStudentClassId());
+        if (existedStudentClass == null) {
+            throw new AppException(ErrorCode.STUDENTCLASS_NOT_FOUND);
+        }
+        Major major = majorRepo.findByMajorId(studentClass.getMajor().getMajorId());
+        if (major == null) {
+            throw new AppException(ErrorCode.MAJOR_NOT_EXISTED);
+        }
+        existedStudentClass.setMajor(major);
+        existedStudentClass.setStudentClassName(studentClass.getStudentClassName());
+        studentClassRepo.save(existedStudentClass);
+        return APIResponse.<StudentClass>builder()
+                .code("200")
+                .result(existedStudentClass)
+                .build();
+    }
 }

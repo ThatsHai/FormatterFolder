@@ -7,6 +7,10 @@ const AddRepoForm = ({
   objectInfo = {},
   onClose,
   setRefreshKey = () => {},
+  handleSelectDepartment = () => {},
+  handleSelectFaculty = () => {},
+  handleSelectMajor = () => {},
+  handleSelectStudentClass = () => {},
   initialData = {}, // Expected format: { id, name, level }
 }) => {
   const [formData, setFormData] = useState({ id: "", name: "", parentId: "" });
@@ -143,25 +147,27 @@ const AddRepoForm = ({
     try {
       let payload = {};
       let endpoint = "";
+      const level = objectInfo.level || initialData.level;
+      const isUpdating = !!initialData.id;
 
-      if (objectInfo.level === "faculty") {
+      if (level === "faculty") {
         payload = { facultyId: formData.id, facultyName: formData.name };
         endpoint = "/faculties";
-      } else if (objectInfo.level === "department") {
+      } else if (level === "department") {
         payload = {
           departmentId: formData.id,
           departmentName: formData.name,
           faculty: { facultyId: formData.parentId },
         };
         endpoint = "/departments";
-      } else if (objectInfo.level === "major") {
+      } else if (level === "major") {
         payload = {
           majorId: formData.id,
           majorName: formData.name,
           department: { departmentId: formData.parentId },
         };
         endpoint = "/majors";
-      } else if (objectInfo.level === "studentClass") {
+      } else if (level === "studentClass") {
         payload = {
           studentClassId: formData.id,
           studentClassName: formData.name,
@@ -170,11 +176,29 @@ const AddRepoForm = ({
         endpoint = "/classes";
       }
 
+      const url = isUpdating ? `${endpoint}` : endpoint;
+
       try {
-        await api.post(endpoint, payload);
-        alert("Thêm thành công.");
+        const result = await api[isUpdating ? "put" : "post"](url, payload);
+        alert(`${isUpdating ? "Cập nhật" : "Thêm"} thành công.`);
         setFormData({ id: "", name: "", parentId: "" });
         setRefreshKey((prev) => prev + 1);
+
+        // Pass updated data to appropriate handler
+        if (isUpdating && result.data?.result) {
+          const updated = result.data.result;
+
+          if (level === "faculty") {
+            handleSelectFaculty(updated);
+          } else if (level === "department") {
+            handleSelectDepartment(updated);
+          } else if (level === "major") {
+            handleSelectMajor(updated);
+          } else if (level === "studentClass") {
+            handleSelectStudentClass(updated);
+          }
+        }
+
         onClose();
       } catch (e) {
         if (
@@ -187,8 +211,8 @@ const AddRepoForm = ({
         }
       }
     } catch (error) {
-      console.error("Error adding item:", error);
-      alert("Thêm thất bại.");
+      console.error("Error submitting form:", error);
+      alert(`${initialData.id ? "Cập nhật" : "Thêm"} thất bại.`);
     }
   };
 
@@ -250,10 +274,11 @@ const AddRepoForm = ({
 
         <input
           type="text"
-          className="border rounded-md px-3 py-1 w-full mb-4"
+          className={`border rounded-md px-3 py-1 w-full mb-4 ${!!initialData.id ? "bg-lightGray" : ""}`}
           name="id"
           value={formData.id}
           onChange={handleChange}
+          disabled={!!initialData.id}
           placeholder={`Nhập mã ${getLabel(currentLevel)}`}
         />
 

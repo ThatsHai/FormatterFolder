@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FacultyTree from "./repoManagmentPage/FacultyTree";
 import DisplayObjectInfo from "./repoManagmentPage/DisplayObjectInfo";
 import AddRepoForm from "./repoManagmentPage/AddRepoForm";
@@ -53,7 +53,6 @@ const RepoManagementPage = () => {
       content: content || [],
       level: "major",
     };
-    console.log(object);
     setObjectInfo(object);
   };
 
@@ -69,7 +68,7 @@ const RepoManagementPage = () => {
   };
 
   return (
-    <div>
+    <div className="mb-4">
       <div className="grid gap-4 grid-cols-3 px-4">
         <div className="col-span-1">
           <FacultyTree
@@ -77,6 +76,7 @@ const RepoManagementPage = () => {
             handleSelectDepartment={handleSelectDepartment}
             handleSelectFaculty={handleSelectFaculty}
             handleSelectMajor={handleSelectMajor}
+            handleSelectClass={handleSelectStudentClass}
             handleOpenAddForm={handleOpenAddForm}
             refreshKey={refreshKey}
             setUpdatingObject={setUpdatingObject}
@@ -102,6 +102,10 @@ const RepoManagementPage = () => {
         objectInfo={addFormInfo} // ✅ Correct object now
         onClose={() => setOpenAddForm(false)}
         setRefreshKey={setRefreshKey}
+        handleSelectDepartment={handleSelectDepartment}
+        handleSelectFaculty={handleSelectFaculty}
+        handleSelectMajor={handleSelectMajor}
+        handleSelectStudentClass={handleSelectStudentClass}
         initialData={updatingObject}
       />
     </div>

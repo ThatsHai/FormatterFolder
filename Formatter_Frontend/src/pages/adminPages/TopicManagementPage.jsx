@@ -72,9 +72,7 @@ const TopicManagementPageContent = ({
       const changed = tempMaxTopics.filter(
         (temp) => temp.maxTopics !== temp.original
       );
-
-      // console.log(changed);
-      const result = await api.post("/teacherTopicLimit/userId", changed);
+      await api.post("/teacherTopicLimit/userId", changed);
       alert("Lưu thành công.");
     } catch (e) {
       alert("Lưu không thành công, vui lòng thử lại sau");

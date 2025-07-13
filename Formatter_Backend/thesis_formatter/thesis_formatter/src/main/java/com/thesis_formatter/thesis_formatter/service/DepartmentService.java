@@ -71,4 +71,22 @@ public class DepartmentService {
                 .build();
 
     }
+
+    public APIResponse<Department> updateDepartment(Department department) {
+        Department existedDepartment = departmentRepo.findByDepartmentId(department.getDepartmentId());
+        if (existedDepartment == null) {
+            throw new AppException(ErrorCode.DEPARTMENT_NOT_FOUND);
+        }
+        Faculty faculty = facultyRepo.findByFacultyId(department.getFaculty().getFacultyId());
+        if (faculty == null) {
+            throw new AppException(ErrorCode.FACULTY_NOT_FOUND);
+        }
+        existedDepartment.setFaculty(faculty);
+        existedDepartment.setDepartmentName(department.getDepartmentName());
+        departmentRepo.save(existedDepartment);
+        return APIResponse.<Department>builder()
+                .code("200")
+                .result(existedDepartment)
+                .build();
+    }
 }

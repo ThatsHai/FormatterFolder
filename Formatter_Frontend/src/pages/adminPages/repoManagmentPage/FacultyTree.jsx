@@ -11,6 +11,7 @@ const FacultyTree = ({
   handleSelectFaculty,
   handleSelectDepartment,
   handleSelectMajor,
+  handleSelectClass,
   handleOpenAddForm,
   setUpdatingObject,
   refreshKey,
@@ -19,6 +20,7 @@ const FacultyTree = ({
   const [faculties, setFaculties] = useState([]);
   const [departmentsByFaculty, setDepartmentsByFaculty] = useState({});
   const [majorsByDepartment, setMajorsByDepartment] = useState({});
+  const [classesByMajor, setClassesByMajor] = useState({});
   const [hoveredId, setHoveredId] = useState(null); // New: Track which item is hovered
 
   useEffect(() => {
@@ -60,6 +62,23 @@ const FacultyTree = ({
         }));
       } catch (error) {
         console.error("Failed to fetch majors", error);
+      }
+    }
+  };
+
+  const toggleMajor = async (majorId) => {
+    setExpanded((prev) => ({ ...prev, [majorId]: !prev[majorId] }));
+
+    if (!classesByMajor[majorId]) {
+      try {
+        const response = await api.get(`/classes?majorId=${majorId}`);
+        setClassesByMajor((prev) => ({
+          ...prev,
+          [majorId]: response.data.result,
+        }));
+        // console.log(response.data.result)
+      } catch (error) {
+        console.error("Failed to fetch classes", error);
       }
     }
   };
@@ -111,7 +130,9 @@ const FacultyTree = ({
           Thêm
         </Button>
       </div>
-
+      <span className="font-bold text-black hover:cursor-pointer text-lg p-1">
+        Khoa/Trường
+      </span>
       {faculties.map((faculty) => (
         <div key={faculty.facultyId} className="">
           <div
@@ -149,6 +170,12 @@ const FacultyTree = ({
           </div>
 
           {/* Departments */}
+          {expanded[faculty.facultyId] &&
+            departmentsByFaculty[faculty.facultyId] && (
+              <span className="font-semibold text-black hover:cursor-pointer text-lg p-1 ml-8">
+                Bộ môn
+              </span>
+            )}
           {expanded[faculty.facultyId] &&
             departmentsByFaculty[faculty.facultyId]?.map((dept) => (
               <div key={dept.departmentId} className="ml-8">
@@ -191,18 +218,75 @@ const FacultyTree = ({
 
                 {/* Majors */}
                 {expanded[dept.departmentId] &&
+                  majorsByDepartment[dept.departmentId] && (
+                    <span className="font-medium text-black hover:cursor-pointer text-md p-1 ml-10">
+                      Ngành
+                    </span>
+                  )}
+                {expanded[dept.departmentId] &&
                   majorsByDepartment[dept.departmentId]?.map((major) => (
-                    <div
-                      key={major.majorId}
-                      className="flex items-center gap-2 ml-10 my-1"
-                    >
-                      <span
-                        className="text-darkGray px-2 rounded-md hover:cursor-pointer hover:bg-lightGray"
-                        onClick={() => handleSelectMajor(major)}
+                    <div key={major.majorId} className="ml-10 my-1">
+                      {/* Major Header Row */}
+                      <div
+                        className="flex items-center gap-2"
+                        onMouseEnter={() => setHoveredId(major.majorId)}
+                        onMouseLeave={() => setHoveredId(null)}
                       >
-                        {major.majorName}
-                      </span>
-                      {/* No add button for class level */}
+                        <IconButton
+                          disableRipple
+                          disableFocusRipple
+                          onClick={() => toggleMajor(major.majorId)}
+                          size="small"
+                          sx={{
+                            padding: 0,
+                            "&:hover": { backgroundColor: "transparent" },
+                          }}
+                        >
+                          {expanded[major.majorId] ? (
+                            <ExpandMoreIcon />
+                          ) : (
+                            <ChevronRightIcon />
+                          )}
+                        </IconButton>
+
+                        <span
+                          className="text-darkGray px-2 p-1 rounded-md hover:cursor-pointer hover:bg-lightGray"
+                          onClick={() => handleSelectMajor(major)}
+                        >
+                          {major.majorName}
+                        </span>
+
+                        {hoveredId === major.majorId && (
+                          <IconButton
+                            size="small"
+                            onClick={() => handleAddClick("class", major)}
+                          >
+                            <AddIcon fontSize="small" />
+                          </IconButton>
+                        )}
+                      </div>
+
+                      {/* Class List */}
+                      {expanded[major.majorId] &&
+                        classesByMajor[major.majorId] && (
+                          <span className="font-medium text-black hover:cursor-pointer text-md p-1 ml-12">
+                            Lớp
+                          </span>
+                        )}
+                      {expanded[major.majorId] &&
+                        classesByMajor[major.majorId]?.map((clazz) => (
+                          <div
+                            key={clazz.classId}
+                            className="ml-12 flex items-center gap-2 my-1"
+                          >
+                            <span
+                              className="text-darkGray px-2 p-1 rounded-md hover:cursor-pointer hover:bg-lightGray"
+                              onClick={() => handleSelectClass?.(clazz)}
+                            >
+                              {clazz.studentClassName}
+                            </span>
+                          </div>
+                        ))}
                     </div>
                   ))}
               </div>
@@ -219,6 +303,7 @@ FacultyTree.propTypes = {
   handleSelectFaculty: PropTypes.func,
   handleSelectDepartment: PropTypes.func,
   handleSelectMajor: PropTypes.func,
+  handleSelectClass: PropTypes.func,
   handleOpenAddForm: PropTypes.func,
   setUpdatingObject: PropTypes.func,
   refreshKey: PropTypes.number,

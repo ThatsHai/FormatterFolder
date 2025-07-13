@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { IconButton } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -7,17 +7,18 @@ import PropTypes from "prop-types";
 import api from "../../../services/api";
 
 const DisplayObjectInfo = ({
-  objectInfo,
-  handleSelectFaculty,
-  handleSelectDepartment,
-  handleSelectMajor,
-  handleSelectStudentClass,
-  setUpdatingObject,
-  setOpenAddForm,
+  objectInfo = {},
+  handleSelectFaculty = () => {},
+  handleSelectDepartment = () => {},
+  handleSelectMajor = () => {},
+  handleSelectStudentClass = () => {},
+  setUpdatingObject = () => {},
+  setOpenAddForm = () => {},
 }) => {
   const [showTable, setShowTable] = useState(true);
 
   if (!objectInfo || Object.keys(objectInfo).length === 0) return null;
+  
 
   const handleEdit = (item) => {
     if (item.majorId) {
@@ -94,8 +95,6 @@ const DisplayObjectInfo = ({
         return "đơn vị";
     }
   };
-
-  
   
   return (
     <div className="grid grid-cols-1 w-full justify-center text-center items-center font-textFont mt-4">
