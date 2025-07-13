@@ -19,6 +19,7 @@ const FieldDiffView = ({ diffs }) => (
             Sửa lúc: {new Date(diff.modifiedAt).toLocaleString()}
           </div>
         )}
+        
       </div>
     ))}
   </div>

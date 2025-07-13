@@ -39,6 +39,13 @@ public class FormRecordController {
         return formRecordService.updateFormRecord(request);
     }
 
+    @PostMapping("/formRecords/{formRecordId}/restore/{fromVersion}")
+    public APIResponse<FormRecordResponse> restoreFormRecordFromVersion(
+            @PathVariable String formRecordId,
+            @PathVariable String fromVersion) {
+        return formRecordService.restoreFormRecord(formRecordId, fromVersion);
+    }
+
     @PutMapping("/formRecords/status")
     public APIResponse<FormRecordResponse> updateStatus(@RequestParam String formRecordId, @RequestParam String status) {
         return formRecordService.updateStatus(formRecordId, status);

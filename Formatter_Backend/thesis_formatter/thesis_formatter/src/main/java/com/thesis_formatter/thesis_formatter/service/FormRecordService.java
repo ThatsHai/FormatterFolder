@@ -50,6 +50,7 @@ public class FormRecordService {
     private final FormRecordMapper formRecordMapper;
     private final FormRecordFieldRepo formRecordFieldRepo;
     private final TeacherRepo teacherRepo;
+    private final RestoredVersionRepo restoredVersionRepo;
 
     public APIResponse<FormRecordResponse> createFormRecord(AddFormRecordRequest request) {
         Student student = studentRepo.findByUserId(request.getStudentId());
@@ -233,6 +234,9 @@ public class FormRecordService {
         Set<Integer> versions = allFields.stream()
                 .map(formRecordField -> formRecordField.getVersion())
                 .collect(Collectors.toCollection(TreeSet::new)); //increasing versions list
+        List<RestoredVersion> restoredVersions = restoredVersionRepo.findByFormRecord_FormRecordId(formRecordId);
+        Map<Integer, Integer> versionMap = restoredVersions.stream()
+                .collect(Collectors.toMap(RestoredVersion::getRestoredVersion, RestoredVersion::getFromVersion));
 
         List<FormRecordVersionInfo> formRecordVersionInfos = versions.stream()
                 .map(ver -> {
@@ -246,6 +250,7 @@ public class FormRecordService {
                     return FormRecordVersionInfo.builder()
                             .version(ver)
                             .modifiedAt(time)
+                            .restoredFromVersion(versionMap.get(ver))
                             .build();
                 })
                 .sorted(Comparator.comparing(FormRecordVersionInfo::getVersion).reversed()) //decreasing by version
@@ -405,6 +410,58 @@ public class FormRecordService {
                 .result(formRecordResponse)
                 .code("200")
                 .build();
+    }
+
+    @Transactional
+    public APIResponse<FormRecordResponse> restoreFormRecord(String formRecordId, String targetVersion) {
+
+        FormRecord formRecord = formRecordRepo.findById(formRecordId).orElseThrow(() -> new AppException(ErrorCode.FormRecord_NOT_FOUND));
+
+        FormRecord targetRecord = getFormRecordByIdAndVersion(formRecordId, targetVersion);
+        FormRecord currentRecord = getFormRecordByIdAndVersion(formRecordId, null);
+        Map<String,String> recorFieldFromField = currentRecord.getFormRecordFields().stream()
+                .collect(Collectors.toMap(f->f.getFormField().getFormFieldId(), f -> f.getFormRecordFieldId()));
+        Map<String,String> valueFromField = currentRecord.getFormRecordFields().stream()
+                .collect(Collectors.toMap(f->f.getFormField().getFormFieldId(), f -> f.getValue()));
+        List<FormRecordField> targetRecordFields = targetRecord.getFormRecordFields();
+        List<UpdateFormRecordFieldRequest> newRecordFields = new ArrayList<>();
+        for (FormRecordField targetRecordField : targetRecordFields) {
+            String thisFormFieldId = targetRecordField.getFormField().getFormFieldId();
+            if (!targetRecordField.getValue().equals(valueFromField.get(thisFormFieldId))) {
+                newRecordFields.add(
+                        UpdateFormRecordFieldRequest.builder()
+                                .formRecordFieldId(recorFieldFromField.get(thisFormFieldId))
+                                .formFieldId(thisFormFieldId)
+                                .value(targetRecordField.getValue())
+                                .build()
+                );
+            }
+        }
+//        System.out.println("=== Target Fields ===");
+//        for (FormRecordField targetRecordField : targetRecordFields) {
+//            System.out.println(targetRecordField.getFormField().getFormFieldId() + " ::: " + targetRecordField.getValue());
+//        }
+
+////        System.out.println("=== new Fields ===");
+//        for (UpdateFormRecordFieldRequest targetRecordField : newRecordFields) {
+//            System.out.println(targetRecordField.getFormFieldId());
+//            System.out.println(targetRecordField.getFormRecordFieldId());
+//            System.out.println(targetRecordField.getValue());
+//            System.out.println("---------------------------------");
+//        }
+        RestoredVersion restoredVersion = RestoredVersion.builder()
+                .formRecord(formRecord)
+                .restoredVersion(formRecord.getVersion()+1)
+                .fromVersion(Integer.parseInt(targetVersion.trim()))
+                .restoredAt(LocalDateTime.now())
+                .build();
+        restoredVersionRepo.save(restoredVersion);
+
+        return updateFormRecord(UpdateFormRecordRequest.builder()
+                .formRecordId(formRecordId)
+                .formRecordFields(newRecordFields)
+                .build());
+
     }
 
     private String replacePlaceholders(String text, Map<String, String> placeholderValueMap) {

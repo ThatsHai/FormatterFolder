@@ -16,6 +16,10 @@ const VersionList = ({ versions, selectedVersion, onSelect }) => (
         <div className="font-bold">Version {v.version}</div>
         {v.version == versions[0].version && <div>Phiên bản hiện tại</div>}
         <div>{v.modifiedAt.trim()}</div>
+        {v.restoredFromVersion !== null && (
+          <div className="text-sm text-gray-500">
+            Khôi phục từ phiên bản {v.restoredFromVersion}
+            </div>)}
       </div>
     ))}
   </div>

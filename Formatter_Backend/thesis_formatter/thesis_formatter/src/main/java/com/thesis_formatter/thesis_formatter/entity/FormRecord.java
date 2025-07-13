@@ -45,7 +45,7 @@ public class FormRecord {
     LocalDateTime createdAt = LocalDateTime.now();
     LocalDateTime lastModifiedAt = LocalDateTime.now();
 
-    int version=0;
+    int version = 0;
 
 }
 
