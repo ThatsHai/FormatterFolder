@@ -145,8 +145,6 @@ const AddTeacherForm = () => {
     e.preventDefault();
     if (validateForm()) {
       const dataToSend = mapFormInfoToPayload();
-      // console.log(dataToSend);
-      // return;
       try {
         await api.post("/teachers", dataToSend);
 

@@ -13,14 +13,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TeacherTopicLimit {
-
     @EmbeddedId
     private TeacherTopicLimitId id;
-
     @ManyToOne
     @JoinColumn(name = "ac_Id", referencedColumnName = "acId", insertable = false, updatable = false)
     private Teacher teacher;
-
-
     private int maxTopics;
 }

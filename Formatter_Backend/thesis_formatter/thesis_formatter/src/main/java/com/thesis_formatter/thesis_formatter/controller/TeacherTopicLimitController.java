@@ -1,5 +1,6 @@
 package com.thesis_formatter.thesis_formatter.controller;
 
+import com.thesis_formatter.thesis_formatter.dto.request.AddTeacherTopicLimitRequest;
 import com.thesis_formatter.thesis_formatter.dto.request.TeacherTopicLimitRequest;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.TeacherTopicsResponse;
@@ -35,4 +36,8 @@ public class TeacherTopicLimitController {
         return teacherTopicLimitService.createTeacherTopicLimit(teacherTopicLimitRequest);
     }
 
+    @PostMapping("/teacherTopicLimit/userId")
+    public APIResponse<List<AddTeacherTopicLimitRequest>> addWithUserId(@RequestBody List<AddTeacherTopicLimitRequest> addTeacherTopicLimitRequestList) {
+        return teacherTopicLimitService.addTeacherTopicLimitWithId(addTeacherTopicLimitRequestList);
+    }
 }
