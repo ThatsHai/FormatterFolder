@@ -90,13 +90,25 @@ const Login = () => {
       setFormInfo(Object.fromEntries(fields.map((f) => [f.label, ""])));
       setResetSignal((prev) => prev + 1);
       alert(JSON.stringify(user));
-      if (user.role.name === "STUDENT") {
+      const roleName = user.role?.name?.toUpperCase();
+
+      if (roleName === "STUDENT") {
         navigate("/student");
-      } else if (user.role.name === "TEACHER") {
+      } else if (roleName === "TEACHER") {
         navigate("/teacher");
-      } else navigate("/admin");
+      } else {
+        // If role is missing or not recognized, assume admin
+        navigate("/admin");
+      }
     } catch (error) {
-      setError(error.response?.data?.message || "Đăng nhập thất bại");
+      const errorMessage =
+        error.response?.data?.message || "Đăng nhập thất bại";
+
+      if (errorMessage === "Incorrect password") {
+        setError("Mã số hoặc mật khẩu không chính xác");
+      } else {
+        setError(errorMessage);
+      }
     }
   };
 

@@ -249,7 +249,7 @@ const GridBoard = ({
     const data = generateOptimizedCellData();
     data.reverse();
     // console.log("Grid Print Data:", data);
-    data.pop();
+    // data.pop();
     onUpdateDesignInfo("cells", data);
     data.reverse();
     console.log("Grid Print Data:", data);

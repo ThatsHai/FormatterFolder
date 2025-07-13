@@ -10,7 +10,7 @@ const FieldInfo = ({
 }) => {
   return (
     <div className="my-12">
-      <p className="text-gray text-lg opacity-80 py-2">{label}</p>
+      <p className="text-darkGray text-lg opacity-80 py-2">{label}</p>
       <div className="relative w-full flex items-center">
         <input
           className="text-xl w-full outline-none bg-transparent"
