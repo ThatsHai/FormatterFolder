@@ -498,7 +498,7 @@ const GridBoard = ({
                   onClick={() => handleDeleteRow(rowIdx)}
                   className="text-xs px-2 bg-red-500 text-white rounded cursor-pointer"
                 >
-                  Xóa hàng này
+                  - Xóa hàng này
                 </div>
               </div>
             </div>
