@@ -180,8 +180,8 @@ const AddTeacherForm = () => {
   };
 
   return (
-    <div className="p-6  flex justify-center">
-      <div className="px-16 py-5 w-full">
+    <div className="px-6 pt-6 flex justify-center">
+      <div className="px-16 pb-5 w-full">
         {error && (
           <p className="text-lg text-redError text-center mb-4">{error}</p>
         )}

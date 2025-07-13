@@ -42,7 +42,7 @@ const FormContent = () => {
   // }
 
   return (
-    <div className="pt-6">
+    <div className="">
       <div className="bg-lightGray m-5 p-6 rounded-md">
         {/* <p className="mb-3 text-2xl">Năm {year}</p> */}
         <div className="min-h-[400px]  rounded-md grid grid-cols-2 md:grid-cols-4 gap-3">

@@ -171,7 +171,8 @@ const FacultyTree = ({
 
           {/* Departments */}
           {expanded[faculty.facultyId] &&
-            departmentsByFaculty[faculty.facultyId] && (
+            departmentsByFaculty[faculty.facultyId] &&
+            departmentsByFaculty[faculty.facultyId].length > 0 && (
               <span className="font-semibold text-black hover:cursor-pointer text-lg p-1 ml-8">
                 Bộ môn
               </span>
@@ -218,7 +219,8 @@ const FacultyTree = ({
 
                 {/* Majors */}
                 {expanded[dept.departmentId] &&
-                  majorsByDepartment[dept.departmentId] && (
+                  majorsByDepartment[dept.departmentId] &&
+                  majorsByDepartment[dept.departmentId].length > 0 && (
                     <span className="font-medium text-black hover:cursor-pointer text-md p-1 ml-10">
                       Ngành
                     </span>
@@ -268,7 +270,8 @@ const FacultyTree = ({
 
                       {/* Class List */}
                       {expanded[major.majorId] &&
-                        classesByMajor[major.majorId] && (
+                        classesByMajor[major.majorId] &&
+                        classesByMajor[major.majorId].length > 0 && (
                           <span className="font-medium text-black hover:cursor-pointer text-md p-1 ml-12">
                             Lớp
                           </span>

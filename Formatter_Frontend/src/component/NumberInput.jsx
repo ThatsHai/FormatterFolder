@@ -6,6 +6,7 @@ const NumberInput = ({
   name,
   placeholder,
   className = "",
+  disabled = false,
   value,
   onChange,
   onKeyDown,
@@ -75,6 +76,7 @@ const NumberInput = ({
       placeholder={placeholder}
       name={name}
       value={value}
+      disabled={disabled}
       onChange={handleChange}
       onBlur={handleBlur}
       onKeyDown={handleKeyDown}
@@ -93,4 +95,5 @@ NumberInput.propTypes = {
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   onChange: PropTypes.func.isRequired,
   onKeyDown: PropTypes.func,
+  disable: PropTypes.bool,
 };

@@ -37,6 +37,11 @@ const TopicManagementPageContent = ({
     fetchTopicsByTeacher();
   }, [currentPage]);
 
+  useEffect(() => {
+    setTempMaxTopics([]);
+    fetchTopicsByTeacher();
+  }, [semester]);
+
   const fetchTopicsByTeacher = async () => {
     if (schoolYear) {
       let url =
@@ -159,7 +164,7 @@ const TopicManagementPageContent = ({
   }
 
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-center mb-6">
       {/* department, faculty, class, major */}
       <div className="w-3/4 border-lightBlue rounded-md border mx-1 p-2 font-textFont px-6">
         <span className="border-b border-b-darkBlue text-xl font-medium flex">
@@ -221,6 +226,7 @@ const TopicManagementPageContent = ({
                               min={0}
                               max={20}
                               name="schoolYear"
+                              disabled={semester === "Cả năm"}
                               placeholder={new Date().getFullYear().toString()}
                               className="border rounded w-1/3 text-center px-1 bg-lightGray"
                               value={temp?.maxTopics ?? teacher.maxTopics} // show temp if exists
@@ -248,7 +254,7 @@ const TopicManagementPageContent = ({
                                   <p className=""> Đề tài đã nhập </p>
                                   {teacher.topicResponses &&
                                     teacher.topicResponses.length > 0 && (
-                                      <p className="text-center bg-lightBlue text-white p-2 py-1 rounded-full">
+                                      <p className="text-center bg-lightBlue text-white px-1 rounded-full">
                                         {teacher.topicResponses.length}
                                       </p>
                                     )}

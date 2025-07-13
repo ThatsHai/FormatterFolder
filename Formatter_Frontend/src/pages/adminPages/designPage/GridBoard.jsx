@@ -135,14 +135,17 @@ const GridBoard = ({
 
   // Main function to generate print data with filling gaps
   const generateOptimizedCellData = () => {
+    if (mergeRegions.length === 0) return [];
+  
     const visited = Array.from({ length: rowSize }, () =>
       Array(colSize).fill(false)
     );
-
+  
     const gridMap = Array.from({ length: rowSize }, () =>
       Array(colSize).fill(null)
     );
-
+  
+    // Fill gridMap with region indices
     mergeRegions.forEach((region, index) => {
       for (let r = region.topPos; r < region.topPos + region.height; r++) {
         for (let c = region.leftPos; c < region.leftPos + region.width; c++) {
@@ -150,21 +153,34 @@ const GridBoard = ({
         }
       }
     });
-
+  
+    // ⬇️ Determine which rows are partially merged
+    const partiallyMergedRows = new Set();
+    for (let r = 0; r < rowSize; r++) {
+      let hasRegion = false;
+      let hasEmpty = false;
+      for (let c = 0; c < colSize; c++) {
+        if (gridMap[r][c] !== null) hasRegion = true;
+        else hasEmpty = true;
+      }
+      if (hasRegion && hasEmpty) {
+        partiallyMergedRows.add(r);
+      }
+    }
+  
     const result = [];
-
+  
     for (let r = rowSize - 1; r >= 0; r--) {
       for (let c = colSize - 1; c >= 0; c--) {
         if (visited[r][c]) continue;
-
+  
         const regionIndex = gridMap[r][c];
-
-        // If it's part of a merged region
+  
         if (regionIndex !== null) {
           const region = mergeRegions[regionIndex];
-          const isTopPosLeft = region.topPos === r && region.leftPos === c;
-
-          if (isTopPosLeft) {
+          const isTopLeft = region.topPos === r && region.leftPos === c;
+  
+          if (isTopLeft) {
             result.push({
               text: region.text || "",
               colSpan: region.width,
@@ -174,8 +190,7 @@ const GridBoard = ({
               fromDataSource: region.fromDataSource || false,
               fromDrag: region.fromDrag || false,
             });
-
-            // Mark visited
+  
             for (
               let rr = region.topPos;
               rr < region.topPos + region.height;
@@ -193,7 +208,10 @@ const GridBoard = ({
             visited[r][c] = true;
           }
         } else {
-          // Empty, unmerged cell — try to span it
+          // ⚠️ Only allow filling empty cells in partially merged rows
+          if (!partiallyMergedRows.has(r)) continue;
+  
+          // Empty cell — try to expand
           let minCol = c;
           while (
             minCol - 1 >= 0 &&
@@ -202,9 +220,9 @@ const GridBoard = ({
           ) {
             minCol--;
           }
-
+  
           const spanWidth = c - minCol + 1;
-
+  
           let minRow = r;
           let canExpand = true;
           while (canExpand && minRow - 1 >= 0) {
@@ -216,16 +234,16 @@ const GridBoard = ({
             }
             if (canExpand) minRow--;
           }
-
+  
           const spanHeight = r - minRow + 1;
-
-          // Mark all as visited
+  
+          // Mark all visited
           for (let rr = minRow; rr <= r; rr++) {
             for (let cc = minCol; cc <= c; cc++) {
               visited[rr][cc] = true;
             }
           }
-
+  
           result.push({
             text: "",
             colSpan: spanWidth,
@@ -235,15 +253,15 @@ const GridBoard = ({
             fromDataSource: false,
             fromDrag: false,
           });
-
-          // Skip over already processed leftPos-side cells
+  
           c = minCol;
         }
       }
     }
-
+  
     return result;
   };
+  
 
   const handlePrintData = () => {
     const data = generateOptimizedCellData();
@@ -334,8 +352,8 @@ const GridBoard = ({
       <div
         className="grid gap-[1px] relative select-none justify-center"
         style={{
-          width: rowSize * cellSize + "px",
-          height: colSize * cellSize + "px",
+          width: colSize * cellSize + "px",
+          height: rowSize * cellSize + "px",
           gridTemplateColumns: `repeat(${colSize}, ${cellSize}px)`,
           gridTemplateRows: `repeat(${rowSize}, ${cellSize}px)`,
         }}
@@ -438,7 +456,7 @@ const GridBoard = ({
       >
         Print Grid Data
       </button>
-      <button onClick={() => setColSize((prev) => prev + 1)}>Add col</button>
+      <button onClick={() => setRowSize((prev) => prev + 1)}>Add row</button>
     </>
   );
 };
