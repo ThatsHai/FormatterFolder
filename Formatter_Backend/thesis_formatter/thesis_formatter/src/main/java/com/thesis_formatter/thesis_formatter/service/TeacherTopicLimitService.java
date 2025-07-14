@@ -1,7 +1,10 @@
 package com.thesis_formatter.thesis_formatter.service;
 
+import com.thesis_formatter.thesis_formatter.dto.request.AddStudentRequest;
+import com.thesis_formatter.thesis_formatter.dto.request.AddTeacherTopicLimitRequest;
 import com.thesis_formatter.thesis_formatter.dto.request.TeacherTopicLimitRequest;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
+import com.thesis_formatter.thesis_formatter.dto.response.TeacherDTO;
 import com.thesis_formatter.thesis_formatter.entity.Teacher;
 import com.thesis_formatter.thesis_formatter.entity.TeacherTopicLimit;
 import com.thesis_formatter.thesis_formatter.entity.id.TeacherTopicLimitId;
@@ -16,6 +19,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -67,6 +71,7 @@ public class TeacherTopicLimitService {
 
         teacherTopicLimitRepo.save(teacherTopicLimit);
 
+        //TeacherTopicLimit saved teacher, but Request save DTO
         return APIResponse.<TeacherTopicLimitRequest>builder()
                 .code("200")
                 .result(teacherTopicLimitRequest)
@@ -74,4 +79,27 @@ public class TeacherTopicLimitService {
     }
 
 
+    public APIResponse<List<AddTeacherTopicLimitRequest>> addTeacherTopicLimitWithId(List<AddTeacherTopicLimitRequest> addTeacherTopicLimitRequestList) {
+        List<AddTeacherTopicLimitRequest> addTeacherTopicLimitRequests = new ArrayList<>();
+        for (AddTeacherTopicLimitRequest addTeacherTopicLimitRequest : addTeacherTopicLimitRequestList) {
+            Teacher teacher = teacherRepo.findByUserId(addTeacherTopicLimitRequest.getUserId());
+            if (teacher == null) {
+                continue;
+            }
+
+            String teacherId = teacher.getAcId();
+            TeacherTopicLimitId id = new TeacherTopicLimitId();
+            id.setTeacherId(teacherId);
+            id.setSemester(addTeacherTopicLimitRequest.getSemester());
+            id.setSchoolYear(addTeacherTopicLimitRequest.getSchoolYear());
+
+            TeacherTopicLimit teacherTopicLimit = new TeacherTopicLimit();
+            teacherTopicLimit.setId(id);
+            teacherTopicLimit.setMaxTopics(addTeacherTopicLimitRequest.getMaxTopics());
+            teacherTopicLimit.setTeacher(teacher);
+            teacherTopicLimitRepo.save(teacherTopicLimit);
+            addTeacherTopicLimitRequests.add(addTeacherTopicLimitRequest);
+        }
+        return APIResponse.<List<AddTeacherTopicLimitRequest>>builder().result(addTeacherTopicLimitRequests).code("200").build();
+    }
 }

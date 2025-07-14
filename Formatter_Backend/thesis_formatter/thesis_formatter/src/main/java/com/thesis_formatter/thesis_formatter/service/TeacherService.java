@@ -5,7 +5,9 @@ import com.thesis_formatter.thesis_formatter.dto.request.TeacherSearchCriteria;
 import com.thesis_formatter.thesis_formatter.dto.response.*;
 import com.thesis_formatter.thesis_formatter.entity.*;
 import com.thesis_formatter.thesis_formatter.entity.id.TeacherTopicLimitId;
+import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
 import com.thesis_formatter.thesis_formatter.enums.Semester;
+import com.thesis_formatter.thesis_formatter.exception.AppException;
 import com.thesis_formatter.thesis_formatter.mapper.RoleMapper;
 import com.thesis_formatter.thesis_formatter.mapper.TeacherMapper;
 import com.thesis_formatter.thesis_formatter.mapper.TopicMapper;
@@ -52,12 +54,17 @@ public class TeacherService {
 //    @PreAuthorize("hasAuthority('CREATE_TEACHER')")
 
     public APIResponse<TeacherDTO> addTeacher(Teacher teacher) {
+        Teacher checkDuplicate = teacherRepo.findByUserId(teacher.getUserId());
+        if (checkDuplicate != null) {
+            throw new AppException(ErrorCode.DUPLICATE_KEY);
+        }
 
         Department department = departmentRepo.findByDepartmentId(teacher.getDepartment().getDepartmentId());
         teacher.setDepartment(department);
         authenticationService.encodePassword(teacher);
         Role role = roleRepo.findByName("TEACHER");
         teacher.setRole(role);
+        teacher.setStatus("active");
         teacherRepo.save(teacher);
 
         TeacherDTO teacherDTO = teacherMapper.toDTO(teacher);

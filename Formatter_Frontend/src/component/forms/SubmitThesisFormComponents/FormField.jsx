@@ -4,6 +4,7 @@ import PasswordField from "../../PasswordField.jsx";
 import SelectField from "../../SelectField.jsx";
 import ShortAnswer from "./ShortAnswer.jsx";
 import FieldInfo from "./../../FieldInfo.jsx";
+import DateField from "./../../DateField.jsx";
 
 const FormField = ({ type = "text", ...rest }) => {
   const renderFieldByType = () => {
@@ -16,6 +17,8 @@ const FormField = ({ type = "text", ...rest }) => {
         return <DisableField {...rest} />;
       case "fieldInfo":
         return <FieldInfo {...rest} />;
+      case "date":
+        return <DateField type="date" {...rest} />;
       default:
         return <ShortAnswer {...rest} />;
     }

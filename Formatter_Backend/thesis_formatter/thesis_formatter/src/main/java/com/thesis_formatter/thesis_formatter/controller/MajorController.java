@@ -50,4 +50,9 @@ public class MajorController {
         return majorService.getMajorParent(majorId);
     }
 
+    @PutMapping("majors")
+    public APIResponse<Major> updateMajor(@RequestBody Major major) {
+        return majorService.updateMajor(major);
+    }
+
 }

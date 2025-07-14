@@ -3,10 +3,10 @@ import TeachersTable from "./accountManagementPage/TeachersTable";
 import TeacherQuery from "./accountManagementPage/TeacherQuery";
 import StudentQuery from "./accountManagementPage/StudentQuery";
 import StudentsTable from "./accountManagementPage/StudentsTable";
+import AddTeacherForm from "./accountManagementPage/AddTeacherForm";
 import PropTypes from "prop-types";
 import api from "../../services/api";
 import PageNumberFooter from "../../component/PageNumberFooter";
-
 
 const QueryContent = ({ selectedTab }) => {
   const [teacherQueryCriteria, setTeacherQueryCriteria] = useState({});
@@ -126,6 +126,14 @@ const QueryContent = ({ selectedTab }) => {
           ></PageNumberFooter>
         </div>
       )}
+      {selectedTab === "addTeacher" && (
+        <div className="w-full border-lightBlue rounded-md border mx-1 p-2 font-textFont">
+          <h2 className="border-b border-b-darkBlue text-xl font-medium">
+            Thêm tài khoản giáo viên
+          </h2>
+          <AddTeacherForm></AddTeacherForm>
+        </div>
+      )}
     </>
   );
 };
@@ -158,13 +166,26 @@ const ManagementTabs = ({ selectedTab, setSelectedTab }) => {
             Tài khoản sinh viên
           </button>
         </li>
+        <li className="w-full ">
+          <button
+            className={`${
+              selectedTab === "addTeacher"
+                ? "bg-lightBlue text-white"
+                : "bg-lightGray text-black"
+            } p-5 rounded-b-md w-full`}
+            onClick={() => setSelectedTab("addTeacher")}
+          >
+            Thêm tài khoản giáo viên
+          </button>
+        </li>
       </ul>
     </div>
   );
 };
 
 const AccountManagementPage = () => {
-  const [selectedTab, setSelectedTab] = useState("teacher");
+  // const [selectedTab, setSelectedTab] = useState("teacher");
+  const [selectedTab, setSelectedTab] = useState("addTeacher");
 
   return (
     <div className="flex">

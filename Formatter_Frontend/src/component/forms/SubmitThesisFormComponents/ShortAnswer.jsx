@@ -10,18 +10,18 @@ const Title = ({
   // formData = {},
   handleChange = () => {},
   error = "",
-  className="",
+  className = "",
 }) => {
   return (
-    <div className={` relative text-start font-textFont text-lg m-8 px-10 ${className}`}>
+    <div
+      className={` relative text-start font-textFont text-lg m-8 px-10 ${className}`}
+    >
       {order ? (
         <h3 className="text-black font-semibold mb-2">
           {order}. {title}
         </h3>
       ) : (
-        <h3 className="text-black font-semibold mb-0">
-          {title}
-        </h3>
+        <h3 className="text-black font-semibold mb-0">{title}</h3>
       )}
       <input
         type="text"

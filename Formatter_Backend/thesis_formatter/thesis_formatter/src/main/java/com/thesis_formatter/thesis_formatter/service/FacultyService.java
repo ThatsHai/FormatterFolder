@@ -51,6 +51,19 @@ public class FacultyService {
                 .build();
     }
 
+    public APIResponse<Faculty> updateFaculty(Faculty faculty) {
+        Faculty existedFaculty = facultyRepo.findByFacultyId(faculty.getFacultyId());
+        if (existedFaculty == null) {
+            throw new AppException(ErrorCode.FACULTY_NOT_FOUND);
+        }
+        existedFaculty.setFacultyName(faculty.getFacultyName());
+        facultyRepo.save(existedFaculty);
+        return APIResponse.<Faculty>builder()
+                .code("200")
+                .result(existedFaculty)
+                .build();
+    }
+
 //    public APIResponse<List<FacultyResponse>> getAll() {
 //        List<Faculty> faculties = facultyRepo.findAll();
 //        return APIResponse.<List<FacultyResponse>>builder()

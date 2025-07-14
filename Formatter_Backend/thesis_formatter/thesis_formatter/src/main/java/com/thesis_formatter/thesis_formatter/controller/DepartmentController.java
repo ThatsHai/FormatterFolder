@@ -50,4 +50,8 @@ public class DepartmentController {
         return departmentService.getDepartmentParent(departmentId);
     }
 
+    @PutMapping("/departments")
+    public APIResponse<Department> updateDepartment(@RequestBody Department department) {
+        return departmentService.updateDepartment(department);
+    }
 }

@@ -89,4 +89,22 @@ public class MajorService {
                 .result(department)
                 .build();
     }
+
+    public APIResponse<Major> updateMajor(Major major) {
+        Major existedMajor = majorRepo.findByMajorId(major.getMajorId());
+        if (existedMajor == null) {
+            throw new AppException(ErrorCode.MAJOR_NOT_EXISTED);
+        }
+        Department department = departmentRepo.findByDepartmentId(major.getDepartment().getDepartmentId());
+        if (department == null) {
+            throw new AppException(ErrorCode.DEPARTMENT_NOT_FOUND);
+        }
+        existedMajor.setDepartment(department);
+        existedMajor.setMajorName(major.getMajorName());
+        majorRepo.save(existedMajor);
+        return APIResponse.<Major>builder()
+                .code("200")
+                .result(existedMajor)
+                .build();
+    }
 }
