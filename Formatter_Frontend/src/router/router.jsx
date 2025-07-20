@@ -24,168 +24,173 @@ import TopicInfo from "../pages/teacherPages/topic/TopicInfo";
 import DiffViewerPage from "../component/pageComponents/thesisInfoPage/DiffViewerPage";
 import TopicContent from "../pages/teacherPages/topic/TopicContent";
 
-const Router = createBrowserRouter([
+const Router = createBrowserRouter(
+  [
+    {
+      path: "/login",
+      element: (
+        <AuthLayout>
+          <Login />
+        </AuthLayout>
+      ),
+    },
+    {
+      path: "/",
+      element: (
+        <AuthLayout>
+          <Login />
+        </AuthLayout>
+      ),
+    },
+    {
+      path: "/signup",
+      element: (
+        <AuthLayout>
+          <SignUp />
+        </AuthLayout>
+      ),
+    },
+    {
+      path: "/student",
+      element: (
+        <DefaultLayout>
+          <StudentHomePage />
+        </DefaultLayout>
+      ),
+    },
+    {
+      path: "/teacher",
+      element: (
+        <DefaultLayout>
+          <TeacherHomePage />
+        </DefaultLayout>
+      ),
+    },
+    {
+      path: "/thesis/:formRecordId",
+      element: (
+        <ThesisInfoLayout>
+          <ThesisInfo />
+        </ThesisInfoLayout>
+      ),
+    },
+
+    {
+      path: "/diff-viewer/:formRecordId",
+      element: (
+        <ThesisInfoLayout>
+          <DiffViewerPage />
+        </ThesisInfoLayout>
+      ),
+    },
+    {
+      path: "/admin",
+      element: (
+        <AdminLayout>
+          <AdminHomePage />
+        </AdminLayout>
+      ),
+    },
+    {
+      path: "/admin/accounts",
+      element: (
+        <AdminLayout>
+          <AccountManagementPage />
+        </AdminLayout>
+      ),
+    },
+    {
+      path: "/admin/forms/create",
+      element: (
+        <AdminLayout>
+          <FormCreationPage />
+        </AdminLayout>
+      ),
+    },
+    {
+      path: "/admin/forms",
+      element: (
+        <AdminLayout>
+          <FormManagementPage />
+        </AdminLayout>
+      ),
+    },
+    {
+      path: "/admin/forms/:formId",
+      element: (
+        <AdminLayout>
+          <FormInfoPage />
+        </AdminLayout>
+      ),
+    },
+    {
+      path: "/admin/designs/:formId",
+      element: (
+        <AdminLayout>
+          <FormDesignCreationPage />
+        </AdminLayout>
+      ),
+    },
+    {
+      path: "/admin/topics",
+      element: (
+        <AdminLayout>
+          <TopicManagementPage />
+        </AdminLayout>
+      ),
+    },
+    {
+      path: "/admin/repos",
+      element: (
+        <AdminLayout>
+          <RepoManagementPage />
+        </AdminLayout>
+      ),
+    },
+    {
+      path: "/teacher/topics/suggest",
+      element: (
+        <DefaultLayout>
+          <TopicSuggestionPage />
+        </DefaultLayout>
+      ),
+    },
+    {
+      path: "/teacher/topics",
+      element: (
+        <DefaultLayout>
+          <TopicContent />
+        </DefaultLayout>
+      ),
+    },
+    {
+      path: "/teacher/topic/:topicId",
+      element: (
+        <ThesisInfoLayout>
+          <TopicInfo />
+        </ThesisInfoLayout>
+      ),
+    },
+    {
+      path: "/test",
+      element: (
+        <AdminLayout>
+          <Test />
+        </AdminLayout>
+      ),
+    },
+    {
+      path: "/pdfviewer",
+      element: (
+        <AdminLayout>
+          <PDFViewer></PDFViewer>
+        </AdminLayout>
+      ),
+    },
+  ],
   {
-    path: "/login",
-    element: (
-      <AuthLayout>
-        <Login />
-      </AuthLayout>
-    ),
-  },
-  {
-    path: "/",
-    element: (
-      <AuthLayout>
-        <Login />
-      </AuthLayout>
-    ),
-  },
-  {
-    path: "/signup",
-    element: (
-      <AuthLayout>
-        <SignUp />
-      </AuthLayout>
-    ),
-  },
-  {
-    path: "/student",
-    element: (
-      <DefaultLayout>
-        <StudentHomePage />
-      </DefaultLayout>
-    ),
-  },
-  {
-    path: "/teacher",
-    element: (
-      <DefaultLayout>
-        <TeacherHomePage />
-      </DefaultLayout>
-    ),
-  },
-  {
-    path: "/thesis/:formRecordId",
-    element: (
-      <ThesisInfoLayout>
-        <ThesisInfo />
-      </ThesisInfoLayout>
-    ),
-  },
-  
-   {
-    path: "/diff-viewer/:formRecordId",
-    element: (
-      <ThesisInfoLayout>
-        <DiffViewerPage />
-      </ThesisInfoLayout>
-    ),
-  },
-  {
-    path: "/admin",
-    element: (
-      <AdminLayout>
-        <AdminHomePage />
-      </AdminLayout>
-    ),
-  },
-  {
-    path: "/admin/accounts",
-    element: (
-      <AdminLayout>
-        <AccountManagementPage />
-      </AdminLayout>
-    ),
-  },
-  {
-    path: "/admin/forms/create",
-    element: (
-      <AdminLayout>
-        <FormCreationPage />
-      </AdminLayout>
-    ),
-  },
-  {
-    path: "/admin/forms",
-    element: (
-      <AdminLayout>
-        <FormManagementPage />
-      </AdminLayout>
-    ),
-  },
-  {
-    path: "/admin/forms/:formId",
-    element: (
-      <AdminLayout>
-        <FormInfoPage />
-      </AdminLayout>
-    ),
-  },
-  {
-    path: "/admin/designs/:formId",
-    element: (
-      <AdminLayout>
-        <FormDesignCreationPage />
-      </AdminLayout>
-    ),
-  },
-  {
-    path: "/admin/topics",
-    element: (
-      <AdminLayout>
-        <TopicManagementPage />
-      </AdminLayout>
-    ),
-  },
-  {
-    path: "/admin/repos",
-    element: (
-      <AdminLayout>
-        <RepoManagementPage />
-      </AdminLayout>
-    ),
-  },
-  {
-    path: "/teacher/topics/suggest",
-    element: (
-      <DefaultLayout>
-        <TopicSuggestionPage />
-      </DefaultLayout>
-    ),
-  },
-  {
-    path: "/teacher/topics",
-    element: (
-      <DefaultLayout>
-        <TopicContent />
-      </DefaultLayout>
-    ),
-  },
-  {
-    path: "/teacher/topic/:topicId",
-    element: (
-      <ThesisInfoLayout>
-        <TopicInfo />
-      </ThesisInfoLayout>
-    ),
-  },
-  {
-    path: "/test",
-    element: (
-      <AdminLayout>
-        <Test />
-      </AdminLayout>
-    ),
-  },
-  {
-    path: "/pdfviewer",
-    element: (
-      <AdminLayout>
-        <PDFViewer></PDFViewer>
-      </AdminLayout>
-    ),
-  },
-]);
+    basename: "/FormatterFolder", // 👈 IMPORTANT for GitHub Pages!
+  }
+);
 
 export default Router;
