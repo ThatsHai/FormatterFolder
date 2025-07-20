@@ -15,13 +15,16 @@ import java.util.List;
 public class TopicRequest {
     String title;
     String description;
+    String researchContent;
     String objective;
+    String objectiveDetails;
     String funding;
-    String fundingSource;
+    String time;
     String implementationTime;
     List<String> teacherIds;
     String contactInfo;
     List<String> majorIds;
+    List<String> studentIds;
     String formId;
     String year;
     Semester semester;

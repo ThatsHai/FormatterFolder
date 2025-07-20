@@ -52,7 +52,16 @@ public class FormRecordService {
     private final TeacherRepo teacherRepo;
     private final RestoredVersionRepo restoredVersionRepo;
 
-    public APIResponse<FormRecordResponse> createFormRecord(AddFormRecordRequest request) {
+    public APIResponse<FormRecordResponse> create(AddFormRecordRequest request) {
+        FormRecord savedFormRecord = createFormRecord(request);
+        FormRecordResponse formRecordResponse = formRecordMapper.toResponse(savedFormRecord);
+        return APIResponse.<FormRecordResponse>builder()
+                .code("200")
+                .result(formRecordResponse)
+                .build();
+    }
+
+    public FormRecord createFormRecord(AddFormRecordRequest request) {
         Student student = studentRepo.findByUserId(request.getStudentId());
         Topic topic = topicRepo.findById(request.getTopicId())
                 .orElseThrow(() -> new RuntimeException("ko co topic trong formrecord"));
@@ -82,11 +91,7 @@ public class FormRecordService {
         }
         formRecord.setCreatedAt(LocalDateTime.now());
         FormRecord savedFormRecord = formRecordRepo.save(formRecord);
-        FormRecordResponse formRecordResponse = formRecordMapper.toResponse(savedFormRecord);
-        return APIResponse.<FormRecordResponse>builder()
-                .code("200")
-                .result(formRecordResponse)
-                .build();
+        return savedFormRecord;
     }
 
     @Transactional
@@ -127,6 +132,7 @@ public class FormRecordService {
         formRecord.setFormRecordFields(allFields);
         formRecord.setLastModifiedAt(LocalDateTime.now());
         formRecord.setVersion(currentVersion);
+        formRecord.setStatus(FormStatus.PENDING);
         FormRecord savedRecord = formRecordRepo.save(formRecord);
 
         FormRecordResponse formRecordResponse = formRecordMapper.toResponse(savedRecord);
@@ -169,7 +175,7 @@ public class FormRecordService {
             throw new AppException(ErrorCode.USER_NOT_EXISTED);
         }
         Pageable pageable = PageRequest.of(Integer.parseInt(page), Integer.parseInt((numberOfRecords)));
-        Page<FormRecord> formRecords = formRecordRepo.findAllByStudent_UserId(studentId, pageable);
+        Page<FormRecord> formRecords = formRecordRepo.findAllByStudent_UserIdAndStatusIsNot(studentId, pageable, FormStatus.DELETED);
 
         List<FormRecordResponse> dtoList = formRecordMapper.toResponses(formRecords.getContent());
 
@@ -219,6 +225,9 @@ public class FormRecordService {
 
     public APIResponse<List<FormRecordResponse>> getAll() {
         List<FormRecord> formRecords = formRecordRepo.findAll();
+//        List<FormRecord> returnList = formRecords.stream()
+//                .filter(f -> !f.getStatus().equals(FormStatus.DELETED))
+//                .collect(Collectors.toList());
         List<FormRecordResponse> formRecordResponses = formRecordMapper.toResponses(formRecords);
         return APIResponse.<List<FormRecordResponse>>builder()
                 .code("200")
@@ -419,10 +428,10 @@ public class FormRecordService {
 
         FormRecord targetRecord = getFormRecordByIdAndVersion(formRecordId, targetVersion);
         FormRecord currentRecord = getFormRecordByIdAndVersion(formRecordId, null);
-        Map<String,String> recorFieldFromField = currentRecord.getFormRecordFields().stream()
-                .collect(Collectors.toMap(f->f.getFormField().getFormFieldId(), f -> f.getFormRecordFieldId()));
-        Map<String,String> valueFromField = currentRecord.getFormRecordFields().stream()
-                .collect(Collectors.toMap(f->f.getFormField().getFormFieldId(), f -> f.getValue()));
+        Map<String, String> recorFieldFromField = currentRecord.getFormRecordFields().stream()
+                .collect(Collectors.toMap(f -> f.getFormField().getFormFieldId(), f -> f.getFormRecordFieldId()));
+        Map<String, String> valueFromField = currentRecord.getFormRecordFields().stream()
+                .collect(Collectors.toMap(f -> f.getFormField().getFormFieldId(), f -> f.getValue()));
         List<FormRecordField> targetRecordFields = targetRecord.getFormRecordFields();
         List<UpdateFormRecordFieldRequest> newRecordFields = new ArrayList<>();
         for (FormRecordField targetRecordField : targetRecordFields) {
@@ -451,7 +460,7 @@ public class FormRecordService {
 //        }
         RestoredVersion restoredVersion = RestoredVersion.builder()
                 .formRecord(formRecord)
-                .restoredVersion(formRecord.getVersion()+1)
+                .restoredVersion(formRecord.getVersion() + 1)
                 .fromVersion(Integer.parseInt(targetVersion.trim()))
                 .restoredAt(LocalDateTime.now())
                 .build();
@@ -462,6 +471,20 @@ public class FormRecordService {
                 .formRecordFields(newRecordFields)
                 .build());
 
+    }
+
+    @Transactional
+    public APIResponse<FormRecord> deleteFormRecord(String formRecordId) {
+//        restoredVersionRepo.deleteByFormRecord_FormRecordId(formRecordId);
+//        formRecordFieldRepo.deleteByFormRecord_FormRecordId(formRecordId);
+//        formRecordRepo.deleteById(formRecordId);
+        FormRecord formRecord = formRecordRepo.findById(formRecordId).orElseThrow(() -> new AppException(ErrorCode.FormRecord_NOT_FOUND));
+        formRecord.setStatus(FormStatus.DELETED);
+        formRecordRepo.save(formRecord);
+        return APIResponse.<FormRecord>builder()
+                .code("200")
+                .message("Delete Form Record successfully")
+                .build();
     }
 
     private String replacePlaceholders(String text, Map<String, String> placeholderValueMap) {
@@ -554,4 +577,6 @@ public class FormRecordService {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
     }
+
+
 }

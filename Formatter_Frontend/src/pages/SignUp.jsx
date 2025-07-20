@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import FieldInfo from "../component/FieldInfo.jsx";
 import PasswordField from "../component/PasswordField.jsx";
 import SelectField from "../component/SelectField.jsx";
-import api, { refreshTokenApi } from "../services/api.js";
+import api, { refreshTokenApi, noTokenApi } from "../services/api.js";
 import dayjs from "dayjs";
-import { loginSuccess } from "../redux/authSlice";
+import { loginSuccess } from "../redux/authSlice.js";
 import { useDispatch } from "react-redux";
 import FormField from "../component/forms/SubmitThesisFormComponents/FormField.jsx";
 
@@ -15,7 +15,7 @@ const SignUp = () => {
   const fields = [
     { label: "Họ và tên sinh viên", minLength: 5 },
     { label: "Mã số sinh viên", minLength: 8 },
-    { label: "Ngày sinh", minLength: 10, type: "date" },
+    { label: "Ngày sinh", type: "date" },
     { label: "Số điện thoại", minLength: 10, type: "number" },
     { label: "Giới tính", options: ["Nam", "Nữ"], type: "select" },
     { label: "Khoa/Trường/Viện", type: "select" },
@@ -101,14 +101,23 @@ const SignUp = () => {
     }
   };
 
+  const isValidDate = (value) => {
+      return dayjs(value, "DD/MM/YYYY", true).isValid();
+    };
+  
+
   const validateForm = () => {
     const errors = {};
 
     fields.forEach(({ label, minLength, type }) => {
       const value = formInfo[label] || "";
-      if (type === "select" || type === "date") {
-        if (value === "") {
+      if (type === "select" && !value) {
+        errors[label] = `Vui lòng chọn ${label.toLowerCase()}`;
+      } else if (type === "date") {
+        if (!value) {
           errors[label] = `Vui lòng chọn ${label.toLowerCase()}`;
+        } else if (!isValidDate(value)) {
+          errors[label] = `${label} không hợp lệ (định dạng đúng: dd/mm/yyyy)`;
         }
       } else {
         if (value.trim().length < minLength) {
@@ -172,98 +181,122 @@ const SignUp = () => {
 
         setFormInfo(Object.fromEntries(fields.map((f) => [f.label, ""])));
         setResetSignal((prev) => prev + 1);
-        navigate("/");
+        navigate("/student");
       } catch (error) {
-        setError(
-          error.response.data.message || "Đăng ký thất bại. Vui lòng thử lại!"
-        );
+        const errorData = error.response?.data;
+        console.log("Error during registration:", error);
+        if (
+          errorData?.code === "1009" &&
+          errorData.message === "Duplicate key"
+        ) {
+          setError("MSSV đã tồn tại");
+        } else if (error.request) {
+          // request được gửi đi nhưng không nhận được phản hồi
+          console.error("Không nhận được phản hồi từ server:", error.request);
+          setError("Không kết nối được đến server. Vui lòng thử lại sau.");
+        } else {
+          // lỗi khi tạo request (cú pháp axios hoặc code logic)
+          console.error("Lỗi không xác định:", error.message);
+          setError("Lỗi không xác định. Vui lòng thử lại.");
+        }
       }
       setFormErrors({});
     }
   };
 
   const specialSelectFields = {
-  "Khoa/Trường/Viện": {
-    options: facultiesList.map((f) => ({
-      key: f.facultyId,
-      value: f.facultyName,
-    })),
-    onChange: handleSelectChange(setSelectedFacultyId),
-  },
-  "Đơn vị (Khoa/Bộ môn)": {
-    options: departmentsList.map((d) => ({
-      key: d.departmentId,
-      value: d.departmentName,
-    })),
-    onChange: handleSelectChange(setSelectedDepartmentId),
-  },
-  "Ngành": {
-    options: majorsList.map((m) => ({
-      key: m.majorId,
-      value: m.majorName,
-    })),
-    onChange: handleSelectChange(setSelectedMajorId),
-  },
-  "Lớp": {
-    options: studentClassesList.map((c) => ({
-      key: c.studentClassId,
-      value: c.studentClassName,
-    })),
-    onChange: handleSelectChange(setSelectedClassId),
-  },
-};
+    "Khoa/Trường/Viện": {
+      options: facultiesList.map((f) => ({
+        key: f.facultyId,
+        value: f.facultyName,
+      })),
+      onChange: handleSelectChange(setSelectedFacultyId),
+    },
+    "Đơn vị (Khoa/Bộ môn)": {
+      options: departmentsList.map((d) => ({
+        key: d.departmentId,
+        value: d.departmentName,
+      })),
+      onChange: handleSelectChange(setSelectedDepartmentId),
+    },
+    Ngành: {
+      options: majorsList.map((m) => ({
+        key: m.majorId,
+        value: m.majorName,
+      })),
+      onChange: handleSelectChange(setSelectedMajorId),
+    },
+    Lớp: {
+      options: studentClassesList.map((c) => ({
+        key: c.studentClassId,
+        value: c.studentClassName,
+      })),
+      onChange: handleSelectChange(setSelectedClassId),
+    },
+  };
 
-return (
-  <>
-    <div className="px-16 py-5">
-      <p className="text-5xl text-darkBlue font-headerFont text-center font-bold">
-        Đăng ký
-      </p>
-      <p className="text-[1.8rem] text-gray mt-2 opacity-80">
-        Hệ thống Đề cương luận văn luận án
-      </p>
-      {error && (
-        <p className="text-lg text-redError text-center mb-4">{error}</p>
-      )}
-    </div>
-    <form onSubmit={handleSubmit}>
-      {fields.map((field) => {
-        const { label, type, minLength } = field;
+  return (
+    <>
+      <div className="px-16 py-5">
+        <p className="text-5xl text-darkBlue font-headerFont text-center font-bold">
+          Đăng ký
+        </p>
+        <p className="text-[1.8rem] text-gray mt-2 opacity-80">
+          Hệ thống Đề cương luận văn luận án
+        </p>
+        {error && (
+          <p className="text-lg text-redError text-center mb-4">{error}</p>
+        )}
+      </div>
+      <form onSubmit={handleSubmit}>
+        {fields.map((field) => {
+          const { label, type, minLength } = field;
 
-        const isSpecialSelect = specialSelectFields[label];
+          const isSpecialSelect = specialSelectFields[label];
 
-        return (
-          <FormField
-            type={type === "password" ? "password" : field.type === "select" || isSpecialSelect ? "select" : "fieldInfo"}
-            label={label}
-            value={formInfo[label]}
-            onChange={isSpecialSelect ? isSpecialSelect.onChange : handleChange}
-            error={formErrors[label]}
-            options={isSpecialSelect ? isSpecialSelect.options : field.options}
-            minLength={minLength}
-            resetSignal={resetSignal}
-          />
-        );
-      })}
-      <button
-        type="submit"
-        className="text-white text-xl py-2 px-4 rounded-md bg-gradient-to-r from-[#23A9E1] to-[#0249AE] w-full mb-10"
-      >
-        <p className="text-headerFont text-xl text-center">ĐĂNG KÝ</p>
-      </button>
-      <p className="text-gray text-center">
-        Đã có tài khoản?{" "}
-        <span
-          className="text-darkBlue cursor-pointer"
-          onClick={() => navigate("/login")}
+          return (
+            <FormField
+              type={
+                type === "password"
+                  ? "password"
+                  : field.type === "select" || isSpecialSelect
+                  ? "select"
+                  : field.type === "date"
+                  ? "date"
+                  : "fieldInfo"
+              }
+              label={label}
+              value={formInfo[label]}
+              onChange={
+                isSpecialSelect ? isSpecialSelect.onChange : handleChange
+              }
+              error={formErrors[label]}
+              options={
+                isSpecialSelect ? isSpecialSelect.options : field.options
+              }
+              minLength={minLength}
+              resetSignal={resetSignal}
+            />
+          );
+        })}
+        <button
+          type="submit"
+          className="text-white text-xl py-2 px-4 rounded-md bg-gradient-to-r from-[#23A9E1] to-[#0249AE] w-full mb-10"
         >
-          Đăng nhập ngay
-        </span>
-      </p>
-    </form>
-  </>
-);
-
+          <p className="text-headerFont text-xl text-center">ĐĂNG KÝ</p>
+        </button>
+        <p className="text-gray text-center">
+          Đã có tài khoản?{" "}
+          <span
+            className="text-darkBlue cursor-pointer"
+            onClick={() => navigate("/login")}
+          >
+            Đăng nhập ngay
+          </span>
+        </p>
+      </form>
+    </>
+  );
 };
 
 export default SignUp;

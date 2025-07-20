@@ -4,6 +4,7 @@ import ConfirmationPopup from "../../component/ConfirmationPopup";
 import { v4 as uuidv4 } from "uuid";
 import api from "../../services/api";
 import { useNavigate } from "react-router";
+import SuccessPopup from "../../component/SuccessPopup";
 
 const FormCreationPage = () => {
   const [form, setForm] = useState({
@@ -73,12 +74,15 @@ const FormCreationPage = () => {
 
   //Display confirmation popup
   const handleSaveForm = () => {
-    const emptyFields = form.formFields.filter((form) => form.fieldName === "");
     if (form.title.trim() === "") {
       setEmptyTitleError(true);
     } else {
       setEmptyTitleError(false);
     }
+    const emptyFields = form.formFields.filter(
+      (form) => form.fieldName.trim() === ""
+    );
+    
     setEmptyFields(emptyFields);
     if (emptyFields.length === 0 && form.title !== "") {
       setDisplayConfirmationPopup(true);
@@ -87,7 +91,19 @@ const FormCreationPage = () => {
 
   const handleSendFormData = async () => {
     try {
-      const result = await api.post("/forms/create", form);
+      const cleanedFields = form.formFields.map((field) => ({
+        ...field,
+        fieldName: field.fieldName.trim(),
+        fieldType: field.fieldType.trim(),
+        description: field.description.trim(),
+      }));
+
+      const dataToSend = {
+        title: form.title.trim(),
+        description: form.description.trim(),
+        formFields: cleanedFields,
+      };
+      const result = await api.post("/forms/create", dataToSend);
       console.log(result);
       setDisplaySuccessPopup(true);
     } catch (e) {
@@ -163,12 +179,15 @@ const FormCreationPage = () => {
             </button>
             <ConfirmationPopup
               isOpen={displayConfirmationPopup}
-              text="Xác nhận gửi đơn"
+              text="Xác nhận tạo form này?"
               onDecline={() => setDisplayConfirmationPopup(false)}
               onConfirm={() => handleSendFormData()}
-              displaySuccessPopup={displaySuccessPopup}
-              onSuccessPopupClosed={() => onSuccessPopupClosed()}
             ></ConfirmationPopup>
+            <SuccessPopup
+              isOpen={displaySuccessPopup}
+              successPopupText="Đã tạo form thành công!"
+              onClose={() => onSuccessPopupClosed()}
+            ></SuccessPopup>
           </div>
         </div>
       </div>

@@ -1,134 +1,153 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { use } from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import ThesisInfoButtons from "../component/pageComponents/thesisInfoPage/ThesisInfoButtons";
-
+import { useParams } from "react-router-dom";
+import api from "../../../services/api";
+import TopicInfoButtons from "./TopicInfoButtons";
 const TopicInfo = () => {
-  const currentYear = new Date().getFullYear();
+  const [refreshCounter, setRefreshCounter] = useState(0);
 
-  const [formData, setFormData] = useState({
-    title: "Tên đề tài",
-    studentName: "Nguyễn Văn A",
-    studentId: "B2111111",
-    department: "Tên ngành",
-    unit: "Tên đơn vị",
-    school: "Tên Khoa/Trường",
-    year: currentYear,
-    teachersList: [
-      {
-        Khoa: "Trường CNTT",
-        MaBM: "Khoa CNTT",
-        TenCB: "Nguyen V",
-        MaCB: "0111",
-      },
-      {
-        Khoa: "Trường CNTT",
-        MaBM: "Khoa CNTT",
-        TenCB: "Nguyen Y",
-        MaCB: "0122",
-      },
-    ],
-    introduction: "Giới thiệu chi tiết về nội dung đề tài đã nộp",
-  });
+  const { topicId } = useParams();
+  console.log("Topic ID:", topicId);
+  const [formData, setFormData] = useState(null);
+  useEffect(() => {
+    const fetchTopicData = async () => {
+      try {
+        const response = await api.get(`topics/${topicId}`);
+        if (response.status === 200) {
+          setFormData(response.data.result);
+        } else {
+          console.error("Failed to fetch topic data");
+        }
+      } catch (error) {
+        console.error("Error fetching topic data:", error);
+      }
+    };
+    fetchTopicData();
+    console.log("Topic data:", formData);
+  }, [topicId, refreshCounter]); // Re-fetch data when topicId or refreshCounter changes
+  if (!formData) {
+    return <div>Loading...</div>;
+  }
   return (
     <div className="p-6">
-      <Link to="/">
+      <Link to="/teacher/topics">
         <p>{"< Quay lại"}</p>
       </Link>
       <div className="m-6 bg-lightGray p-6">
         <div className="bg-white rounded-md p-6">
           <div className="relative text-start w-full font-textFont text-lg mb-8 px-10">
             <h1 className="text-4xl font-headerFont text-darkBlue font-bold text-center mb-6">
-              Đề cương
+              ĐỀ TÀI: {formData.title}
             </h1>
-            {/* Title */}
-            <div className="relative text-start w-full font-textFont text-lg mb-8 px-10">
-              <h3 className="text-black font-semibold mb-2">1. TÊN ĐỀ TÀI</h3>
-              <p className="w-full">{formData.title}</p>
-            </div>
 
-            {/* Student Information */}
-            <div className="relative text-start w-full font-textFont text-lg mb-8 px-10">
-              <h3 className="text-black font-semibold mb-3">
-                2. NGƯỜI THỰC HIỆN
-              </h3>
-              {/* Student info */}
-              <div className="w-full grid grid-cols-3 items-center mb-3">
-                <p>Tên sinh viên</p>
-                <p className="col-span-2 rounded-md px-4 py-1 ">
-                  {formData.studentName}
-                </p>
-              </div>
-              <div className="w-full grid grid-cols-3 items-center mb-3">
-                <p>Khóa (MSSV)</p>
-                <p className="col-span-2 rounded-md px-4 py-1 ">
-                  {formData.studentId}
-                </p>
-              </div>
-              <div className="w-full grid grid-cols-3 items-center mb-3">
-                <p>Ngành</p>
-                <p className="col-span-2 rounded-md px-4 py-1 ">
-                  {formData.department}
-                </p>
-              </div>
-              <div className="w-full grid grid-cols-3 items-center mb-3">
-                <p>Đơn vị (Khoa/Bộ môn)</p>
-                <p className="col-span-2 rounded-md px-4 py-1 ">
-                  {formData.unit}
-                </p>
-              </div>
-              <div className="w-full grid grid-cols-3 items-center mb-3">
-                <p>Khoa/Trường</p>
-                <p className="col-span-2 rounded-md px-4 py-1 ">
-                  {formData.school}
-                </p>
-              </div>
-              {/* Year */}
-              <div className="w-full grid grid-cols-3 items-center mb-3">
-                <p>Năm</p>
-                <p className="col-span-2 px-4 py-1 w-1/4">{formData.year}</p>
-              </div>
-            </div>
-
-            {/* Teacher */}
-            <div className="relative text-start w-full font-textFont text-lg mb-6 px-10">
-              <div className="items-center mb-2">
-                <h3 className="text-black font-semibold mb-3">
-                  3. CÁN BỘ HƯỚNG DẪN
-                </h3>
-
-                <ul className="list-disc ml-5 space-y-1">
-                  {formData.teachersList?.map((teacher, index) => (
-                    <li key={index}>
-                      <div className="flex justify-between items-center">
-                        <span>
-                          {teacher.TenCB} ({teacher.MaCB}) - {teacher.Khoa},{" "}
-                          {teacher.MaBM}
-                        </span>
-                      </div>
-                    </li>
+            <div className="relative text-start w-full font-textFont text-lg px-10 w-full grid grid-cols-3 items-center mb-3">
+              <p className="text-black font-semibold">1. CÁN BỘ HƯỚNG DẪN</p>
+              {formData.teachers > 1 ? (
+                <div className="rounded-md col-span-2 bg-[#e4e4e4] px-4 py-1">
+                  {formData.teachers?.map((teacher, index) => (
+                    <div key={index}>
+                      {index + 1}. {teacher.name} - {teacher.email}
+                    </div>
                   ))}
-                </ul>
-              </div>
+                </div>
+              ) : (
+                <p className="col-span-2 rounded-md px-4 py-1 ">
+                  {formData.teachers[0].name} - {formData.teachers[0].email}
+                </p>
+              )}
             </div>
 
-            {/* Introduction */}
             <div className="relative text-start w-full font-textFont text-lg mb-8 px-10">
-              <h3 className="text-black font-semibold mb-2">4. GIỚI THIỆU</h3>
-              <p
-                name="introduction"
-                id=""
-                className="w-full px-3 rounded-md resize-none"
-              >
-                {formData.introduction}
-              </p>
+              <h3 className="text-black font-semibold">
+                2. THÔNG TIN GỢI Ý ĐỀ TÀI
+              </h3>
+              <div className="w-full grid grid-cols-3 items-center mb-3">
+                <p>Giới thiệu</p>
+                <p className="col-span-2 rounded-md px-4 py-1 ">
+                  {formData.description}
+                </p>
+              </div>
+              <div className="w-full grid grid-cols-3 items-center mb-3">
+                <p>Nội dung nghiên cứu</p>
+                <p className="col-span-2 rounded-md px-4 py-1 bg-[#e4e4e4]">
+                  {formData.researchContent}
+                </p>
+              </div>
+              <div className="w-full grid grid-cols-3 items-center mb-3">
+                <p>Mục tiêu tổng quát</p>
+                <p className="col-span-2 rounded-md px-4 py-1 ">
+                  {formData.objective}
+                </p>
+              </div>
+              <div className="w-full grid grid-cols-3 items-center mb-3">
+                <p>Mục tiêu cụ thể</p>
+                <div
+                  className="col-span-2 bg-[#e4e4e4] rounded-md min-h-[40px] text-lg rounded-md px-4 py-1 prose prose-sm max-w-none
+                    prose-ul:list-disc prose-ol:list-decimal prose-li:ml-1 text-black  prose-li:marker:text-black"
+                  dangerouslySetInnerHTML={{
+                    __html: formData.objectiveDetails,
+                  }}
+                ></div>
+              </div>
+              <div className="w-full grid grid-cols-3 items-center mb-3">
+                <p>Kinh phí</p>
+                <p className="col-span-2 rounded-md px-4 py-1 ">
+                  {formData.funding}
+                </p>
+              </div>
+              <div className="w-full grid grid-cols-3 items-center mb-3">
+                <p>Thời gian thực hiện</p>
+                <p className="col-span-2 rounded-md px-4 py-1 ">
+                  {formData.time} - Bắt đầu từ {formData.implementationTime}
+                </p>
+              </div>
+
+              <div className="w-full grid grid-cols-3 items-center mb-3">
+                <p>Thông tin liên hệ về đề tài</p>
+                <p className="col-span-2 rounded-md px-4 py-1 ">
+                  {formData.contactInfo}
+                </p>
+              </div>
+              <div className="w-full grid grid-cols-3 items-center mb-3">
+                <p className="self-start">Dành cho sinh viên ngành</p>
+                {formData.majors > 1 ? (
+                  <div className="rounded-md bg-[#e4e4e4] px-4 py-1">
+                    {formData.majors.map((major, index) => (
+                      <div key={index}>
+                        {index + 1}. {major.majorName}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="col-span-2 rounded-md px-4 py-1 ">
+                    {formData.majors[0].majorName}
+                  </p>
+                )}
+              </div>
             </div>
+            {formData.students.length > 0 && (
+              <div className="relative text-start w-full font-textFont text-lg mb-8 px-10 ">
+                {/* Student info */}
+                <h3 className="text-black font-semibold">3. NGƯỜI THỰC HIỆN</h3>
+                {formData.students.map((student, index) => (
+                  <div key={index} className="w-full items-center mb-3">
+                    <p className="rounded-md px-4 py-1 ">
+                      {index + 1}. {student.name} - {student.userId} - Ngành{" "}
+                      {student.studentClass.major.majorName}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
-        <div>
-          {/* Buttons */}
-          <ThesisInfoButtons></ThesisInfoButtons>
-        </div>
+
+        <TopicInfoButtons
+          topic={formData}
+          onUpdated={() => setRefreshCounter(refreshCounter + 1)}
+        ></TopicInfoButtons>
       </div>
     </div>
   );

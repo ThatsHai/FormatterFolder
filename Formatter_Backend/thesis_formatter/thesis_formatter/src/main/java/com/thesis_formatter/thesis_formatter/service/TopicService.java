@@ -1,24 +1,33 @@
 package com.thesis_formatter.thesis_formatter.service;
 
+import com.thesis_formatter.thesis_formatter.dto.request.AddFormRecordFieldRequest;
+import com.thesis_formatter.thesis_formatter.dto.request.AddFormRecordRequest;
 import com.thesis_formatter.thesis_formatter.dto.request.TopicRequest;
+import com.thesis_formatter.thesis_formatter.dto.request.UpdateTopicRequest;
 import com.thesis_formatter.thesis_formatter.dto.response.*;
 import com.thesis_formatter.thesis_formatter.entity.*;
 import com.thesis_formatter.thesis_formatter.entity.id.TeacherTopicLimitId;
 import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
+import com.thesis_formatter.thesis_formatter.enums.FormStatus;
 import com.thesis_formatter.thesis_formatter.enums.Semester;
 import com.thesis_formatter.thesis_formatter.exception.AppException;
 import com.thesis_formatter.thesis_formatter.mapper.TeacherMapper;
 import com.thesis_formatter.thesis_formatter.mapper.TopicMapper;
 import com.thesis_formatter.thesis_formatter.repo.*;
+import jakarta.persistence.criteria.From;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,11 +35,14 @@ import java.util.*;
 public class TopicService {
     TopicRepo topicRepo;
     TeacherRepo teacherRepo;
-    private final MajorRepo majorRepo;
-    private final TopicMapper topicMapper;
-    private final FormRepo formRepo;
-    private final TeacherMapper teacherMapper;
+    MajorRepo majorRepo;
+    TopicMapper topicMapper;
+    FormRepo formRepo;
+    TeacherMapper teacherMapper;
     TeacherTopicLimitRepo teacherTopicLimitRepo;
+    StudentRepo studentRepo;
+    FormRecordService formRecordService;
+    FormRecordRepo formRecordRepo;
 
     public APIResponse<List<TopicResponse>> getAll() {
         List<Topic> topics = topicRepo.findAll();
@@ -46,22 +58,13 @@ public class TopicService {
         if (teacherIds.isEmpty()) {
             throw new AppException(ErrorCode.TEACHER_NOT_EXISTED);
         }
-        List<Teacher> teachers = new ArrayList<>();
-        for (String teacherId : teacherIds) {
-            Teacher teacher = teacherRepo.findByUserId(teacherId);
-            teachers.add(teacher);
-        }
+        List<Teacher> teachers = teacherRepo.findByUserIdIn(teacherIds);
 
         List<String> majorIds = topicRequest.getMajorIds();
         if (majorIds.isEmpty()) {
             throw new AppException(ErrorCode.MAJOR_NOT_EXISTED);
         }
-
-        List<Major> majors = new ArrayList<>();
-        for (String majorId : majorIds) {
-            Major major = majorRepo.findByMajorId(majorId);
-            majors.add(major);
-        }
+        List<Major> majors = majorRepo.findByMajorIdIn(majorIds);
 
         Form form = formRepo.findByFormId(topicRequest.getFormId());
         if (form == null) {
@@ -74,8 +77,162 @@ public class TopicService {
         topic.setForm(form);
         topic.setSemester(topicRequest.getSemester());
         topic.setYear(topicRequest.getYear());
-        topicRepo.save(topic);
 
+        List<String> studentIds = topicRequest.getStudentIds();
+        if (studentIds != null && !studentIds.isEmpty()) {
+            List<Student> students = studentRepo.findByUserIdIn(studentIds);
+            topic.setStudents(students);
+        }
+
+        Topic savedTopic = topicRepo.save(topic);
+        if (studentIds != null && !studentIds.isEmpty()) {
+            createFormRecordsForNewStudents(savedTopic, studentIds);
+        }
+
+        TopicResponse topicResponse = topicMapper.toTopicResponse(savedTopic);
+        return APIResponse.<TopicResponse>builder()
+                .code("200")
+                .result(topicResponse)
+                .build();
+    }
+
+
+    @Transactional
+    public APIResponse<TopicResponse> update(UpdateTopicRequest request) {
+        Topic topic = topicRepo.findById(request.getTopicId())
+                .orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOT_FOUND));
+
+
+        topic.setTitle(request.getTitle());
+        topic.setDescription(request.getDescription());
+        topic.setResearchContent(request.getResearchContent());
+        topic.setObjective(request.getObjective());
+        topic.setObjectiveDetails(request.getObjectiveDetails());
+        topic.setFunding(request.getFunding());
+        topic.setContactInfo(request.getContactInfo());
+        topic.setTime(request.getTime());
+        topic.setImplementationTime(request.getImplementationTime());
+        topic.setSemester(request.getSemester());
+        topic.setYear(request.getYear());
+        topic.setUpdatedAt(LocalDateTime.now());
+
+        // Cập nhật giảng viên nếu khác
+        updateTeachersInTopic(topic, request.getTeacherIds());
+
+        // Cập nhật sinh viên và FormRecord tương ứng
+        updateStudentsAndFormRecords(topic, request.getStudentIds());
+
+        // Cập nhật ngành nếu khác
+        updateMajorsInTopic(topic, request.getMajorIds());
+
+        Topic savedTopic = topicRepo.save(topic);
+        return APIResponse.<TopicResponse>builder()
+                .code("200")
+                .result(topicMapper.toTopicResponse(savedTopic))
+                .build();
+    }
+
+    private void updateMajorsInTopic(Topic topic, List<String> newMajorIds) {
+        Set<String> oldIds = topic.getMajors().stream()
+                .map(Major::getMajorId)
+                .collect(Collectors.toSet());
+
+        Set<String> newIds = new HashSet<>(newMajorIds);
+
+        if (!oldIds.equals(newIds)) {
+            List<Major> newMajors = majorRepo.findAllById(newMajorIds);
+            topic.setMajors(newMajors);
+        }
+    }
+
+    private void updateTeachersInTopic(Topic topic, List<String> newTeacherIds) {
+        Set<String> oldIds = topic.getTeachers().stream()
+                .map(Teacher::getUserId)
+                .collect(Collectors.toSet());
+
+        Set<String> newIds = new HashSet<>(newTeacherIds);
+
+        if (!oldIds.equals(newIds)) {
+            List<Teacher> newTeachers = teacherRepo.findByUserIdIn(newTeacherIds);
+            topic.setTeachers(newTeachers);
+        }
+    }
+
+
+    private void updateStudentsAndFormRecords(Topic topic, List<String> newStudentIds) {
+
+        Set<String> oldIds = topic.getStudents().stream()
+                .map(student -> student.getUserId())
+                .collect(Collectors.toSet());
+
+        Set<String> newIds = new HashSet<>(newStudentIds);
+        Set<String> toAdd = new HashSet<>(newIds);
+        toAdd.removeAll(oldIds);
+
+        Set<String> toRemove = new HashSet<>(oldIds);
+        toRemove.removeAll(newIds);
+
+        System.out.println("Them sinh vien: " + toAdd);
+        System.out.println("Xoa sinh vien: " + toRemove);
+
+        List<Student> updatedStudents = newStudentIds.stream()
+                .map(studentRepo::findByUserId)
+                .collect(Collectors.toList());
+        topic.setStudents(updatedStudents);
+
+        // Tạo FormRecord cho sinh viên mới
+        createFormRecordsForNewStudents(topic, new ArrayList<>(toAdd));
+
+        // Xoá FormRecord của sinh viên bị loại
+        deleteFormRecordsByStudentsAndTopic(topic, new ArrayList<>(toRemove));
+    }
+
+    public void deleteFormRecordsByStudentsAndTopic(Topic topic, List<String> studentIds) {
+
+        for (String studentId : studentIds) {
+            Student student = studentRepo.findByUserId(studentId);
+            if (student == null) continue;
+
+            List<FormRecord> formRecords = formRecordRepo.findByStudentAndTopic(student, topic);
+            for (FormRecord formRecord : formRecords) {
+                formRecord.setStatus(FormStatus.DELETED);
+            }
+            formRecordRepo.saveAll(formRecords);
+        }
+    }
+
+
+    public void createFormRecordsForNewStudents(Topic topic, List<String> studentIds) {
+        Form form = topic.getForm();
+        if (form == null) return;
+
+        List<AddFormRecordFieldRequest> fieldRequests = form.getFormFields().stream()
+                .map(field -> AddFormRecordFieldRequest.builder()
+                        .formFieldId(field.getFormFieldId())
+                        .build())
+                .collect(Collectors.toList());
+
+        for (String studentId : studentIds) {
+            Optional<FormRecord> deletedRecordOpt = formRecordRepo
+                    .findDeletedByStudentAndTopic(studentId, topic.getTopicId());
+
+            if (deletedRecordOpt.isPresent()) {
+                FormRecord deletedRecord = deletedRecordOpt.get();
+                deletedRecord.setStatus(FormStatus.PENDING);
+                formRecordRepo.save(deletedRecord);
+            } else {
+                formRecordService.createFormRecord(AddFormRecordRequest.builder()
+                        .studentId(studentId)
+                        .topicId(topic.getTopicId())
+                        .formRecordFields(fieldRequests)
+                        .build());
+            }
+        }
+    }
+
+
+    public APIResponse<TopicResponse> getByTopicId(String topicId) {
+        Topic topic = topicRepo.findById(topicId).orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOT_FOUND));
         TopicResponse topicResponse = topicMapper.toTopicResponse(topic);
         return APIResponse.<TopicResponse>builder()
                 .code("200")

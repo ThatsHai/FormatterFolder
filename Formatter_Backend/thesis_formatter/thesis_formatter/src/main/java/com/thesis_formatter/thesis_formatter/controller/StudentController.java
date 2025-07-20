@@ -32,6 +32,11 @@ public class StudentController {
         return studentService.getAll();
     }
 
+    @GetMapping("/students/get")
+    public APIResponse<?> getStudent(@RequestParam String id) {
+        return studentService.getById(id);
+    }
+
     @PostMapping("/students/search")
     public APIResponse<PaginationResponse<StudentDTO>> getStudentsByCriteria(@RequestBody StudentSearchCriteria studentSearchCriteria, @RequestParam("p") String page, @RequestParam("n") String numberOfRecords) {
         return studentService.searchStudents(studentSearchCriteria, page, numberOfRecords);

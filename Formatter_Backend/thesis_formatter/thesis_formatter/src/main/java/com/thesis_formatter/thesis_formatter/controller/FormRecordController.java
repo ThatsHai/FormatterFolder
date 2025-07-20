@@ -31,7 +31,7 @@ public class FormRecordController {
 
     @PostMapping("/formRecords/create")
     public APIResponse<FormRecordResponse> createFormRecord(@RequestBody AddFormRecordRequest request) {
-        return formRecordService.createFormRecord(request);
+        return formRecordService.create(request);
     }
 
     @PutMapping("/formRecords/update")
@@ -49,6 +49,11 @@ public class FormRecordController {
     @PutMapping("/formRecords/status")
     public APIResponse<FormRecordResponse> updateStatus(@RequestParam String formRecordId, @RequestParam String status) {
         return formRecordService.updateStatus(formRecordId, status);
+    }
+
+    @PutMapping("/formRecords/{formRecordId}/send")
+    public APIResponse<FormRecordResponse> sendRecord(@PathVariable String formRecordId) {
+        return formRecordService.updateStatus(formRecordId, "WAITING");
     }
 
     @GetMapping("/formRecords/student")
@@ -82,6 +87,11 @@ public class FormRecordController {
     @GetMapping("/formRecords/{formRecordId}/downloadPdf/{designId}")
     public ResponseEntity<Resource> downloadFormRecordPdf(@PathVariable String formRecordId, @PathVariable String designId, @RequestParam(required = false) String version) throws IOException {
         return formRecordService.downloadFormRecordPdf(formRecordId, designId, version);
+    }
+
+    @DeleteMapping("/formRecords/delete/{id}")
+    public APIResponse<FormRecord> deleteFormRecord(@PathVariable String id) {
+        return formRecordService.deleteFormRecord(id);
     }
 }
 

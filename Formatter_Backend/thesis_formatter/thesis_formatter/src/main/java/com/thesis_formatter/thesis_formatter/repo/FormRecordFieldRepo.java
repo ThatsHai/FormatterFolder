@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FormRecordFieldRepo extends JpaRepository<FormRecordField, String> {
     FormRecordField findByFormRecordFieldId(String id);
+    void deleteByFormRecord_FormRecordId(String id);
 }

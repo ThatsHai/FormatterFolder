@@ -1,6 +1,8 @@
 package com.thesis_formatter.thesis_formatter.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.thesis_formatter.thesis_formatter.enums.Semester;
+import com.thesis_formatter.thesis_formatter.enums.TopicStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -26,10 +28,14 @@ public class Topic {
     String title;
     String description;
     @Column(columnDefinition = "TEXT")
+    String researchContent;
+    @Column(columnDefinition = "TEXT")
     String objective;
+    @Column(columnDefinition = "TEXT")
+    String objectiveDetails;
     String funding;
-    String fundingSource;
     String contactInfo;
+    String time;
     String implementationTime;
 
     @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
@@ -50,6 +56,9 @@ public class Topic {
     @JoinColumn(name = "formId", referencedColumnName = "formId")
     Form form;
 
+    @OneToMany(cascade = CascadeType.ALL)
+    @JsonManagedReference
+    List<Student> students;
     @CreationTimestamp
     LocalDateTime createdAt;
     @UpdateTimestamp
@@ -57,4 +66,7 @@ public class Topic {
     @Enumerated
     Semester semester;
     String year;
+
+    @Enumerated
+    TopicStatus status = TopicStatus.UNPUBLISHED;
 }

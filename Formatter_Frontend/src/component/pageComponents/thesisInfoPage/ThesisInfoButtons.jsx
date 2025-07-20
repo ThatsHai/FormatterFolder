@@ -16,7 +16,8 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [text, setText] = useState("");
   const [successPopupText, setSuccessPopupText] = useState("");
-  const navigate = useNavigate(); 
+  const [confirmAction, setConfirmAction] = useState(null);
+  const navigate = useNavigate();
 
   const handleCardClick = () => {
     setShowDesignWindow(true);
@@ -35,22 +36,44 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
 
   const sendRecord = async () => {
     await api.put(
-      `/formRecords/status?formRecordId=${formRecord.formRecordId}&status=WAITING`
+      `/formRecords/${formRecord.formRecordId}/send`,
     );
 
     setShowSuccessPopup(true);
     setShowConfirmPopup(false);
   };
 
+  const deleteRecord = async () => {
+    await api.delete(`/formRecords/delete/${formRecord.formRecordId}`);
+
+    setShowSuccessPopup(true);
+    setShowConfirmPopup(false);
+  };
+
   const handleSendRecord = () => {
+    if (formRecord.status === "WAITING") {
+      alert("Bản ghi đã được gửi và đang chờ duyệt, không thể gửi lại");
+      return;
+    }
     setShowConfirmPopup(true);
     setText("Bạn chắc chắn muốn gửi bản ghi cho giảng viên?");
     setSuccessPopupText("Đã gửi bản ghi cho giảng viên!");
+    setConfirmAction("send");
+  };
+  const handleDeleteRecord = async () => {
+    setShowConfirmPopup(true);
+    setText("Bạn chắc chắn muốn xoá bản ghi này?");
+    setSuccessPopupText("Đã xoá bản ghi!");
+    setConfirmAction("delete");
   };
   const onSuccessPopupClosed = () => {
     setShowConfirmPopup(false);
     setShowSuccessPopup(false);
-    // onUpdated();
+    if (confirmAction === "delete") {
+    navigate("/student");
+  } else {
+    onUpdated();
+  }
   };
 
   if (!formRecord) return <div>Đang tải</div>;
@@ -66,7 +89,12 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
         </button>
         {user.role.name === "STUDENT" ? (
           <>
-            <button className="border p-2 rounded-md px-5 bg-white" onClick={()=> navigate(`/diff-viewer/${formRecord.formRecordId}`)}>
+            <button
+              className="border p-2 rounded-md px-5 bg-white"
+              onClick={() =>
+                navigate(`/diff-viewer/${formRecord.formRecordId}`)
+              }
+            >
               Xem lịch sử sửa
             </button>
             <button
@@ -74,6 +102,12 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
               onClick={handleFormToggle}
             >
               Chỉnh sửa
+            </button>
+            <button
+              className="border p-2 rounded-md px-5 bg-white"
+              onClick={handleDeleteRecord}
+            >
+              Xoá
             </button>
             <button
               className="border p-2 rounded-md px-5 bg-white"
@@ -111,7 +145,11 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
           isOpen={showConfirmPopup}
           text={text}
           onConfirm={() => {
-            sendRecord();
+            if (confirmAction === "send") {
+              sendRecord();
+            } else if (confirmAction === "delete") {
+              deleteRecord();
+            }
           }}
           onDecline={() => setShowConfirmPopup(false)}
         />

@@ -85,6 +85,21 @@ public class StudentService {
                 .build();
     }
 
+    public APIResponse<?> getById(String userId) {
+        Student student = studentRepo.findByUserId(userId);
+        if (student == null) {
+            return APIResponse.<StudentDTO>builder()
+                    .message("Không có sinh viên!")
+                    .code("400")
+                    .build();
+        }
+        StudentDTO studentDTO = studentMapper.toDTO(student);
+        return APIResponse.builder()
+                .code("200").result(studentDTO)
+                .build();
+
+    }
+
     public APIResponse<PaginationResponse<StudentDTO>> searchStudents(StudentSearchCriteria studentSearchCriteria, String page, String numberOfRecords) {
         Pageable pageable = PageRequest.of(Integer.parseInt(page), Integer.parseInt(numberOfRecords));
         Page<Student> studentPage = studentRepo.findAll(StudentSpecification.withCriteria(studentSearchCriteria), pageable);

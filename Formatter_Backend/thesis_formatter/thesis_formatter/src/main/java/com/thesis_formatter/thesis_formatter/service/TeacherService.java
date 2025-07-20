@@ -50,7 +50,7 @@ public class TeacherService {
 
     private final FacultyRepo facultyRepo;
 
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
 //    @PreAuthorize("hasAuthority('CREATE_TEACHER')")
 
     public APIResponse<TeacherDTO> addTeacher(Teacher teacher) {

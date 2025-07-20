@@ -32,11 +32,11 @@ const ConfirmationPopup = ({
           </button>
         </div>
       </div>
-      <SuccessPopup
+      {/* <SuccessPopup
         isOpen={displaySuccessPopup}
         successPopupText={successPopupText}
         onClose={onSuccessPopupClosed}
-      ></SuccessPopup>
+      ></SuccessPopup> */}
     </div>
   );
 };

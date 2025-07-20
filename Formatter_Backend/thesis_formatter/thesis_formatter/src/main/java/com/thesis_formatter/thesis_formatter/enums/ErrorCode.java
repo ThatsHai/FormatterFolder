@@ -34,6 +34,7 @@ public enum ErrorCode {
     FACULTY_NOT_FOUND("1019", "Faculty not found", HttpStatus.NOT_FOUND),
     ENTITY_NOT_FOUND("1020", "This entity does not exist", HttpStatus.NOT_FOUND),
     INVALID_ARGUMENT("1021", "Invalid argument", HttpStatus.BAD_REQUEST),
+    TOPIC_NOT_FOUND("1022", "Topic not found", HttpStatus.NOT_FOUND),
     ;
 
     private String code;

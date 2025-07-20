@@ -54,13 +54,13 @@ const TeacherHomePage = () => {
           }}
         />
       )}
-      <SuccessPopup
+      {/* <SuccessPopup
         isOpen={showPopup}
         onClose={() => {
           setShowPopup(false);
           setIsThesisFormOpen(false);
         }}
-      />
+      /> */}
     </div>
   );
 };

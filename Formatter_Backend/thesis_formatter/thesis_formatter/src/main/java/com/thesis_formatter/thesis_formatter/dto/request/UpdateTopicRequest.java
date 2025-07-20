@@ -1,13 +1,9 @@
-package com.thesis_formatter.thesis_formatter.dto.response;
+package com.thesis_formatter.thesis_formatter.dto.request;
 
-import com.thesis_formatter.thesis_formatter.entity.Form;
-import com.thesis_formatter.thesis_formatter.entity.Major;
-import com.thesis_formatter.thesis_formatter.entity.Teacher;
 import com.thesis_formatter.thesis_formatter.enums.Semester;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -15,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TopicResponse {
+public class UpdateTopicRequest {
     String topicId;
     String title;
     String description;
@@ -25,13 +21,10 @@ public class TopicResponse {
     String funding;
     String time;
     String implementationTime;
-    List<TeacherDTO> teachers;
+    List<String> teacherIds;
     String contactInfo;
-    List<Major> majors;
-    List<StudentDTO> students;
-    Form form;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
-    Semester semester;
+    List<String> majorIds;
+    List<String> studentIds;
     String year;
+    Semester semester;
 }

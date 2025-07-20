@@ -5,24 +5,31 @@ import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Button from "../../../component/Button";
 import TopicForm from "../TopicSuggestionPage";
-import SuccessPopup from "../../../component/SuccessPopup";
+import { useNavigate } from "react-router-dom";
 const TopicCard = ({ topic }) => {
+  const navigate = useNavigate();
   return (
-    <Link to={``}>
-      <div className="bg-white rounded-md border p-6 h-72 relative">
-        <p className="font-headerFont text-2xl font-bold">{topic.title}</p>
-        <p className="py-3">{topic.description}</p>
-        {/* <div className="flex items-end w-full justify-end absolute right-4 bottom-4">
+    <div
+      className="bg-white rounded-md border p-6 h-72 relative"
+      onClick={() => navigate(`/teacher/topic/${topic.topicId}`)}
+    >
+      <p className="font-headerFont text-2xl font-bold">{topic.title}</p>
+      <p className="py-3">{topic.description}</p>
+      <div className="flex items-end w-full justify-end absolute right-4 bottom-4">
           <button
             className={`text-end align-bottom font-semibold bg-white border-none text-base px-3 py-1 rounded-md  ${
-              form.status == "Đã duyệt" ? "text-greenCorrect" : "text-redError"
+              topic.status == "PUBLISHED" ? "text-greenCorrect" : "text-redError"
             }`}
           >
-            {form.status + " > "}
+            {topic.status === "PUBLISHED"
+            ? "Đã công khai"
+            : topic.status === "UNPUBLISHED"
+            ? "Chưa công khai"
+            : "Không rõ trạng thái"}{" "}
+          
           </button>
-        </div> */}
-      </div>
-    </Link>
+        </div>
+    </div>
   );
 };
 
@@ -39,7 +46,7 @@ const TopicContent = () => {
       console.log(result);
     };
     result();
-  }, [refreshTrigger,user]);
+  }, [refreshTrigger, user]);
 
   const handleFormToggle = async () => {
     setIsTopicFormOpen((prev) => !prev);
@@ -48,7 +55,7 @@ const TopicContent = () => {
     <div className="pt-6">
       <div className="flex justify-end">
         <div className="w-1/3 flex mr-3">
-          <Button label="Tìm kiếm..." ></Button>
+          <Button label="Tìm kiếm..."></Button>
           <Button label="Thêm đề tài" handleClick={handleFormToggle}></Button>
         </div>
       </div>
@@ -65,18 +72,18 @@ const TopicContent = () => {
           <TopicForm
             handleFormToggle={handleFormToggle}
             onSuccess={() => {
-              setShowPopup(true);
-              setRefreshTrigger((prev) => prev+1);
+              handleFormToggle();
+              setRefreshTrigger((prev) => prev + 1);
             }}
           ></TopicForm>
         )}
-        <SuccessPopup
+        {/* <SuccessPopup
           isOpen={showPopup}
           onClose={() => {
             setShowPopup(false);
             setIsTopicFormOpen(false);
           }}
-        />
+        /> */}
       </div>
     </div>
   );

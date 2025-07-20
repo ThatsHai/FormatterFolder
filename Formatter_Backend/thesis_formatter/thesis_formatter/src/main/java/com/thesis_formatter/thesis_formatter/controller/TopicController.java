@@ -1,6 +1,7 @@
 package com.thesis_formatter.thesis_formatter.controller;
 
 import com.thesis_formatter.thesis_formatter.dto.request.TopicRequest;
+import com.thesis_formatter.thesis_formatter.dto.request.UpdateTopicRequest;
 import com.thesis_formatter.thesis_formatter.dto.response.*;
 import com.thesis_formatter.thesis_formatter.entity.Topic;
 import com.thesis_formatter.thesis_formatter.enums.Semester;
@@ -31,9 +32,19 @@ public class TopicController {
         else return topicService.getTopicByFormId(formId);
     }
 
+    @GetMapping("topics/{id}")
+    public APIResponse<TopicResponse> getTopic(@PathVariable String id) {
+        return topicService.getByTopicId(id);
+    }
+
     @PostMapping("/topics/create")
     public APIResponse<TopicResponse> createTopic(@RequestBody TopicRequest topic) {
         return topicService.create(topic);
+    }
+
+    @PutMapping("topics/update")
+    public APIResponse<TopicResponse> updateTopic(@RequestBody UpdateTopicRequest topic) {
+        return topicService.update(topic);
     }
 
     @GetMapping("topics/teacher")

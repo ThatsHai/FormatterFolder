@@ -20,8 +20,9 @@ import RepoManagementPage from "../pages/adminPages/RepoManagementPage";
 import TopicManagementPage from "../pages/adminPages/TopicManagementPage";
 import Test from "../pages/Test";
 import PDFViewer from "../component/forms/SubmitThesisFormComponents/PDFViewer";
-import TopicContent from "../pages/teacherPages/topic/TopicContent";
+import TopicInfo from "../pages/teacherPages/topic/TopicInfo";
 import DiffViewerPage from "../component/pageComponents/thesisInfoPage/DiffViewerPage";
+import TopicContent from "../pages/teacherPages/topic/TopicContent";
 
 const Router = createBrowserRouter([
   {
@@ -72,6 +73,7 @@ const Router = createBrowserRouter([
       </ThesisInfoLayout>
     ),
   },
+  
    {
     path: "/diff-viewer/:formRecordId",
     element: (
@@ -158,6 +160,14 @@ const Router = createBrowserRouter([
       <DefaultLayout>
         <TopicContent />
       </DefaultLayout>
+    ),
+  },
+  {
+    path: "/teacher/topic/:topicId",
+    element: (
+      <ThesisInfoLayout>
+        <TopicInfo />
+      </ThesisInfoLayout>
     ),
   },
   {

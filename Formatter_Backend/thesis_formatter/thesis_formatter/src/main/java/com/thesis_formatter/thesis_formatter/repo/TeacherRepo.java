@@ -18,6 +18,7 @@ import java.util.Optional;
 @Repository
 public interface TeacherRepo extends JpaRepository<Teacher, String>, JpaSpecificationExecutor<Teacher> {
     Teacher findByUserId(String userId);
+    List<Teacher> findByUserIdIn(List<String> userIds);
 
     Teacher findByAcId(String acId);
 

@@ -40,6 +40,7 @@ public class FormRecord {
     Student student;
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 20)
     FormStatus status = FormStatus.PENDING;
 
     LocalDateTime createdAt = LocalDateTime.now();

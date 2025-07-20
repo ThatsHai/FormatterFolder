@@ -10,6 +10,7 @@ import java.util.List;
 @Repository
 public interface MajorRepo extends JpaRepository<Major, String> {
     Major findByMajorId(String majorId);
+    List<Major> findByMajorIdIn(List<String> majorIds);
 
     List<Major> findByDepartment_DepartmentId(String departmentId);
 

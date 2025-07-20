@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
         System.out.println("bắt lỗi nè");
         return ResponseEntity.status(errorCode.getHttpStatusCode()).body(apiResponse);
     }
-
+//
 //    @ExceptionHandler(value = SQLIntegrityConstraintViolationException.class)
 //    ResponseEntity<APIResponse> handleSQLException(SQLIntegrityConstraintViolationException e) {
 //        APIResponse apiResponse = new APIResponse();

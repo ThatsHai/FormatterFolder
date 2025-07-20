@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {TeacherMapper.class})
+@Mapper(componentModel = "spring", uses = {TeacherMapper.class,StudentMapper.class})
 public interface TopicMapper {
     TopicResponse toTopicResponse(Topic topic);
     Topic toTopic(TopicRequest topicRequest);
