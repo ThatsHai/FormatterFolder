@@ -2,7 +2,7 @@ import axios from "axios";
 //accessToken is saved inside session storage
 
 const api = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: "https://test-deploy-production-b451.up.railway.app",
 });
 
 api.interceptors.request.use((config) => {
@@ -48,7 +48,7 @@ api.interceptors.response.use(
 const refreshToken = async () => {
   try {
     const response = await refreshTokenApi.post(
-      "http://localhost:8080/auth/refresh"
+      "https://test-deploy-production-b451.up.railway.app/auth/refresh"
     );
     sessionStorage.setItem("accessToken", response.data.result.accesstoken);
     return response;
@@ -59,11 +59,11 @@ const refreshToken = async () => {
 };
 
 export const noTokenApi = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: "https://test-deploy-production-b451.up.railway.app",
 });
 
 export const refreshTokenApi = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: "https://test-deploy-production-b451.up.railway.app",
   withCredentials: true,
 });
 
