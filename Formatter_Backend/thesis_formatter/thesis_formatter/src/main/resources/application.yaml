@@ -15,9 +15,27 @@ spring:
       file-size-threshold: 2KB
       max-file-size: 100MB
       max-request-size: 115MB
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: huynhgiaopn8a2@gmail.com
+    password: bqnvxepxvkbnexzj
+
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
 server:
   port: 8080
 jwt:
   signerKey: "kDnLkIQNLqJ4Bm2AoiGLRQwk4RUUsrfVrT7Q0I3uxMx+/ngrZnKnOeCtIXpcmUF6"
-  valid-duration: 900 #in second 15minutes
-  refeshable-duration: 172800 #in second 2 days
+  valid-duration: 900 #in 15 minutes
+  refeshable-duration: 172800 #in 2 days
+
+

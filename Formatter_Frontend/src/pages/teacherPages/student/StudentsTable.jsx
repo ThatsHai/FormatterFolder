@@ -41,16 +41,16 @@ const StudentsTable = ({
           </tr>
         </thead>
         <tbody className="bg-lightGray">
-          {students?.length > 0 ? (
+          {students.length > 0 ? (
             students.map((student, index) => (
               <tr key={index}>
-                <td className="border border-gray py-1">{index + 1}</td>
-                <td className="border border-gray py-1">{student.userId}</td>
+                <td className="border border-gray py-1">{students.length}</td>
+                <td className="border border-gray py-1">{student?.userId}</td>
                 <td className="border border-gray py-1" colSpan="2">
-                  {student.name}
+                  {student?.name}
                 </td>
                 <td className="border border-gray py-1" colSpan="2">
-                  {student.studentClass.major.majorName}
+                  {student?.studentClass.major.majorName}
                 </td>
                 {selectable ? (
                   <td className="border border-gray py-1">

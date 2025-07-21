@@ -276,7 +276,10 @@ const TopicSuggestionPage = ({
         }
         setDisplaySuccessPopup(true);
       } catch (error) {
-        console.error("Error submitting topic form:", error);
+        // console.error("Error submitting topic form:", error);
+        if (error.response.status === 500){
+          alert("Sinh viên bạn chọn đang thực hiện 1 đề tài khác!");
+        }
       }
     };
     result();
@@ -578,7 +581,7 @@ const TopicSuggestionPage = ({
             isOpen={true}
             text={
               initialData
-                ? "Bạn chắc chắn cập nhật đề tài?"
+                ? "Bạn chắc chắn cập nhật đề tài? Mọi thay đổi sẽ được lưu và hiển thị cho sinh viên!"
                 : "Bạn chắc chắn muốn lưu đề tài?"
             }
             onConfirm={() => {

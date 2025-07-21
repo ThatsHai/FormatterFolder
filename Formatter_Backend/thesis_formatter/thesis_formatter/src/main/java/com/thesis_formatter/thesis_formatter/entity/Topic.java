@@ -56,8 +56,11 @@ public class Topic {
     @JoinColumn(name = "formId", referencedColumnName = "formId")
     Form form;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JsonManagedReference
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "topic_students",
+            joinColumns = @JoinColumn(name = "topicId"),
+            inverseJoinColumns = @JoinColumn(name = "acId")
+    )
     List<Student> students;
     @CreationTimestamp
     LocalDateTime createdAt;
@@ -67,6 +70,7 @@ public class Topic {
     Semester semester;
     String year;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
     TopicStatus status = TopicStatus.UNPUBLISHED;
 }

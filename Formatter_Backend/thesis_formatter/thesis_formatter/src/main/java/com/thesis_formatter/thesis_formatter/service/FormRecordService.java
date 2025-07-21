@@ -106,7 +106,6 @@ public class FormRecordService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-
         List<FormRecordField> currentFields = formRecord.getFormRecordFields();
         List<FormRecordField> allFields = new ArrayList<>();
 
@@ -132,7 +131,7 @@ public class FormRecordService {
         formRecord.setFormRecordFields(allFields);
         formRecord.setLastModifiedAt(LocalDateTime.now());
         formRecord.setVersion(currentVersion);
-        formRecord.setStatus(FormStatus.PENDING);
+//        formRecord.setStatus(FormStatus.PENDING);
         FormRecord savedRecord = formRecordRepo.save(formRecord);
 
         FormRecordResponse formRecordResponse = formRecordMapper.toResponse(savedRecord);
@@ -203,7 +202,6 @@ public class FormRecordService {
         } catch (IllegalArgumentException e) {
             System.out.println("Trạng thái không hợp lệ: " + status);
             throw new AppException(ErrorCode.INVALID_ARGUMENT);
-
         }
 
         Page<FormRecord> formRecords = formRecordRepo.findByTeacherAndStatus(teacherId, formStatus, pageable);

@@ -10,6 +10,8 @@ import com.thesis_formatter.thesis_formatter.entity.Student;
 import com.thesis_formatter.thesis_formatter.entity.StudentClass;
 import com.thesis_formatter.thesis_formatter.entity.StudentSpecification;
 import com.thesis_formatter.thesis_formatter.enums.EducationLevel;
+import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
+import com.thesis_formatter.thesis_formatter.exception.AppException;
 import com.thesis_formatter.thesis_formatter.mapper.StudentMapper;
 import com.thesis_formatter.thesis_formatter.repo.StudentClassRepo;
 import com.thesis_formatter.thesis_formatter.repo.DepartmentRepo;
@@ -88,10 +90,7 @@ public class StudentService {
     public APIResponse<?> getById(String userId) {
         Student student = studentRepo.findByUserId(userId);
         if (student == null) {
-            return APIResponse.<StudentDTO>builder()
-                    .message("Không có sinh viên!")
-                    .code("400")
-                    .build();
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
         }
         StudentDTO studentDTO = studentMapper.toDTO(student);
         return APIResponse.builder()

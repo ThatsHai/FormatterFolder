@@ -10,6 +10,7 @@ import com.thesis_formatter.thesis_formatter.entity.id.TeacherTopicLimitId;
 import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
 import com.thesis_formatter.thesis_formatter.enums.FormStatus;
 import com.thesis_formatter.thesis_formatter.enums.Semester;
+import com.thesis_formatter.thesis_formatter.enums.TopicStatus;
 import com.thesis_formatter.thesis_formatter.exception.AppException;
 import com.thesis_formatter.thesis_formatter.mapper.TeacherMapper;
 import com.thesis_formatter.thesis_formatter.mapper.TopicMapper;
@@ -46,7 +47,11 @@ public class TopicService {
 
     public APIResponse<List<TopicResponse>> getAll() {
         List<Topic> topics = topicRepo.findAll();
+
         List<TopicResponse> topicResponses = topicMapper.toTopicResponses(topics);
+        for (TopicResponse topicResponse : topicResponses) {
+            System.out.println("status: " + topicResponse.getStatus());
+        }
         return APIResponse.<List<TopicResponse>>builder()
                 .code("200")
                 .result(topicResponses)
@@ -81,7 +86,15 @@ public class TopicService {
         List<String> studentIds = topicRequest.getStudentIds();
         if (studentIds != null && !studentIds.isEmpty()) {
             List<Student> students = studentRepo.findByUserIdIn(studentIds);
+            for (Student student : students) {
+                Optional<Topic> existedTopic = topicRepo.findPublishedTopicsByStudent(student.getUserId());
+                if (existedTopic.isPresent()) {
+                    throw new RuntimeException("Sinh viên " + student.getName() + " đang thực hiện 1 đề tài khác!");
+                }
+            }
             topic.setStudents(students);
+
+            topic.setStatus(TopicStatus.PUBLISHED);
         }
 
         Topic savedTopic = topicRepo.save(topic);
@@ -120,7 +133,11 @@ public class TopicService {
         updateTeachersInTopic(topic, request.getTeacherIds());
 
         // Cập nhật sinh viên và FormRecord tương ứng
+
         updateStudentsAndFormRecords(topic, request.getStudentIds());
+        if (topic.getStudents() != null && !topic.getStudents().isEmpty()) {
+            topic.setStatus(TopicStatus.PUBLISHED);
+        }
 
         // Cập nhật ngành nếu khác
         updateMajorsInTopic(topic, request.getMajorIds());
@@ -178,6 +195,12 @@ public class TopicService {
         List<Student> updatedStudents = newStudentIds.stream()
                 .map(studentRepo::findByUserId)
                 .collect(Collectors.toList());
+        for (Student student : updatedStudents) {
+            Optional<Topic> existedTopic = topicRepo.findPublishedTopicsByStudent(student.getUserId());
+            if (existedTopic.isPresent()) {
+                throw new RuntimeException(("Sinh viên " + student.getName() + " đang thực hiện 1 đề tài khác!"));
+            }
+        }
         topic.setStudents(updatedStudents);
 
         // Tạo FormRecord cho sinh viên mới
@@ -242,7 +265,7 @@ public class TopicService {
 
 
     public APIResponse<List<TopicResponse>> getTopicByFormId(String formId) {
-        List<Topic> topics = topicRepo.findTopicsByForm_FormId(formId);
+        List<Topic> topics = topicRepo.findTopicsByForm_FormIdAndStatusIs(formId, TopicStatus.PUBLISHED);
         List<TopicResponse> topicResponses = topicMapper.toTopicResponses(topics);
         return APIResponse.<List<TopicResponse>>builder()
                 .code("200")
@@ -256,6 +279,22 @@ public class TopicService {
                 .code("200")
                 .result(topics).build();
     }
+
+    public APIResponse<Void> deleteTopic(String topicId) {
+        List<FormRecord> formRecords = formRecordRepo.findFormRecordByTopic_TopicId(topicId);
+        for (FormRecord formRecord : formRecords) {
+            formRecord.setStatus(FormStatus.DELETED);
+        }
+        formRecordRepo.saveAll(formRecords);
+        Topic topic = topicRepo.findById(topicId).orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOT_FOUND));
+        topic.setStatus(TopicStatus.DELETED);
+        topicRepo.save(topic);
+        return APIResponse.<Void>builder()
+                .code("200")
+                .message("Delete topic done!")
+                .build();
+    }
+
 
     //    public APIResponse<PaginationResponse<TeacherTopicsResponse>> getTopicByTeachersGroups() {
 //        List<Object[]> results = topicRepo.findTopicsGroupedByUserIdAndName();

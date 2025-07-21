@@ -323,7 +323,12 @@ const SubmitThesisForm = ({
                   formErrors={formErrors}
                 ></TopicDetail>
               </div>
-              {selectedTopic?.majors?.length > 0 ? (
+              { !initialData && selectedTopic?.students?.length > 0 ? (
+                 <p className="text-redError pt-2 text-center">
+                    Đề tài này đã có sinh viên thực hiện, vui lòng chọn đề tài khác!
+                  </p>
+              )
+              : selectedTopic?.majors?.length > 0 ? (
                 selectedTopic.majors.some(
                   (major) =>
                     major.majorId === student?.studentClass?.major?.majorId
@@ -337,7 +342,8 @@ const SubmitThesisForm = ({
                       Tiếp tục
                     </button>
                   </div>
-                ) : (
+                )
+               : (
                   <p className="text-redError pt-2 text-center">
                     Đề tài không thuộc ngành học của bạn
                   </p>

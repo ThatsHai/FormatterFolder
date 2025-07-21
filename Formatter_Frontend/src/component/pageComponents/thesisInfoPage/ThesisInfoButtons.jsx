@@ -56,7 +56,7 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
       return;
     }
     setShowConfirmPopup(true);
-    setText("Bạn chắc chắn muốn gửi bản ghi cho giảng viên?");
+    setText("Bạn chắc chắn muốn gửi bản ghi cho giảng viên? (Mọi thay đổi sau này sẽ tự động cập nhật cho giảng viên xem!)");
     setSuccessPopupText("Đã gửi bản ghi cho giảng viên!");
     setConfirmAction("send");
   };

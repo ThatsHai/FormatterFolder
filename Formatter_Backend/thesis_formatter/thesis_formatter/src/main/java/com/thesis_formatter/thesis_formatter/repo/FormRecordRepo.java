@@ -26,5 +26,5 @@ public interface FormRecordRepo extends JpaRepository<FormRecord, String> {
     @Query("SELECT f FROM FormRecord f WHERE f.student.userId = :studentId AND f.topic.topicId = :topicId AND f.status = com.thesis_formatter.thesis_formatter.enums.FormStatus.DELETED")
     Optional<FormRecord> findDeletedByStudentAndTopic(@Param("studentId") String studentId, @Param("topicId") String topicId);
 
-
+    List<FormRecord> findFormRecordByTopic_TopicId(String topicTopicId);
 }

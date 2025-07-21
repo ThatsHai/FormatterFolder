@@ -17,7 +17,6 @@ const QueryStudentContent = ({ selectedStudents, setSelectedStudents }) => {
       const res = await api.get("/students/get", {
         params: { id: id.trim() },
       });
-
       const newStudent = res.data.result;
       console.log("Search students response:", newStudent);
 
@@ -30,7 +29,10 @@ const QueryStudentContent = ({ selectedStudents, setSelectedStudents }) => {
         setStudents(updatedStudents);
       }
     } catch (err) {
-      console.error("Search students failed:", err);
+      // console.error("Search students failed:", err);
+      if (err.response && err.response.status === 404) {
+        alert("Không tìm thấy sinh viên với mã số sinh viên này.");
+      }
     }
   };
 
