@@ -28,6 +28,9 @@ public class DepartmentService {
             throw new AppException(ErrorCode.DUPLICATE_KEY);
         }
         Faculty faculty = facultyRepo.findByFacultyId(department.getFaculty().getFacultyId());
+        if (faculty == null) {
+            throw new AppException(ErrorCode.FACULTY_NOT_FOUND);
+        }
         department.setFaculty(faculty);
         departmentRepo.save(department);
         return APIResponse
@@ -83,6 +86,7 @@ public class DepartmentService {
         }
         existedDepartment.setFaculty(faculty);
         existedDepartment.setDepartmentName(department.getDepartmentName());
+        existedDepartment.setAvailability(department.getAvailability());
         departmentRepo.save(existedDepartment);
         return APIResponse.<Department>builder()
                 .code("200")

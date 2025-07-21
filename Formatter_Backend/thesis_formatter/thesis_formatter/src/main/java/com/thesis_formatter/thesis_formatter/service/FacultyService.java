@@ -57,6 +57,7 @@ public class FacultyService {
             throw new AppException(ErrorCode.FACULTY_NOT_FOUND);
         }
         existedFaculty.setFacultyName(faculty.getFacultyName());
+        existedFaculty.setAvailability(faculty.getAvailability());
         facultyRepo.save(existedFaculty);
         return APIResponse.<Faculty>builder()
                 .code("200")

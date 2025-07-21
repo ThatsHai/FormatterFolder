@@ -1,6 +1,7 @@
 package com.thesis_formatter.thesis_formatter.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.thesis_formatter.thesis_formatter.enums.AvailabilityEnum;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -23,4 +24,6 @@ public class Department {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "facultyId", referencedColumnName = "facultyId")
     Faculty faculty;
+    @Enumerated
+    AvailabilityEnum availability = AvailabilityEnum.ACTIVE;
 }

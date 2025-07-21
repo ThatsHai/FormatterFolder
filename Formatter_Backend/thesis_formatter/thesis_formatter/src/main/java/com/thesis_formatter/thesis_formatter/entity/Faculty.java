@@ -1,5 +1,6 @@
 package com.thesis_formatter.thesis_formatter.entity;
 
+import com.thesis_formatter.thesis_formatter.enums.AvailabilityEnum;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -18,4 +19,6 @@ public class Faculty {
 //    @GeneratedValue(strategy = GenerationType.UUID)
     String facultyId;
     String facultyName;
+    @Enumerated
+    AvailabilityEnum availability = AvailabilityEnum.ACTIVE;
 }

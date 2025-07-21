@@ -29,6 +29,9 @@ public class MajorService {
             throw new AppException(ErrorCode.DUPLICATE_KEY);
         }
         Department department = departmentRepo.findByDepartmentId(major.getDepartment().getDepartmentId());
+        if (department == null) {
+            throw new AppException(ErrorCode.DEPARTMENT_NOT_FOUND);
+        }
         major.setDepartment(department);
         majorRepo.save(major);
         return APIResponse
@@ -101,6 +104,7 @@ public class MajorService {
         }
         existedMajor.setDepartment(department);
         existedMajor.setMajorName(major.getMajorName());
+        existedMajor.setAvailability(major.getAvailability());
         majorRepo.save(existedMajor);
         return APIResponse.<Major>builder()
                 .code("200")
