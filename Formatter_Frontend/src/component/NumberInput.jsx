@@ -3,8 +3,8 @@ import PropTypes from "prop-types";
 const NumberInput = ({
   min = 0,
   max = 9999999999,
-  name,
-  placeholder,
+  name = "",
+  placeholder = "",
   className = "",
   disabled = false,
   value,
@@ -91,6 +91,7 @@ NumberInput.propTypes = {
   max: PropTypes.number,
   name: PropTypes.string,
   placeholder: PropTypes.string,
+  disabled: PropTypes.bool,
   className: PropTypes.string,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   onChange: PropTypes.func.isRequired,
