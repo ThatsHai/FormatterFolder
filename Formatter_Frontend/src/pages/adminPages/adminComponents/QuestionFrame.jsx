@@ -1,13 +1,12 @@
-import { IconButton } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import PropTypes from "prop-types";
+import { IconButton, Tooltip } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useEffect, useState } from "react";
-import PropTypes from "prop-types";
-import NumberInput from "../../../component/NumberInput";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import Tooltip from "@mui/material/Tooltip";
 import TableEditor from "./TableEditor";
-// Field type labels
+import NumberInput from "../../../component/NumberInput";
+
 const fieldTypeLabels = {
   SHORT_ANSWER: "Trả lời ngắn",
   LONG_ANSWER: "Trả lời dài",
@@ -62,28 +61,35 @@ const QuestionFrame = ({ setForm, formField, emptyFields }) => {
     enumToLabel[formField.fieldType] || "Trả lời ngắn"
   );
 
-  // Sync field type and clear length if needed
+  const isTableMethod = selectedMethod === "Bảng";
+
   useEffect(() => {
     const fieldType = labelToEnum[selectedMethod];
-    // const supportsLength = ["SHORT_ANSWER", "LONG_ANSWER", "BULLETS"].includes(
-    //   fieldType
-    // );
-
+  
     if (fieldType) {
       setForm((prevForm) => {
-        const updatedFields = prevForm.formFields.map((field) =>
-          field.formFieldId === formField.formFieldId
-            ? {
-                ...field,
-                fieldType,
-                length: 0,
-              }
-            : field
-        );
+        const updatedFields = prevForm.formFields.map((field) => {
+          if (field.formFieldId !== formField.formFieldId) return field;
+  
+          const isNowTable = fieldType === "TABLE";
+          const wasTable = field.fieldType === "TABLE";
+  
+          return {
+            ...field,
+            fieldType,
+            length: 0,
+            fieldName: isNowTable
+              ? field.fieldName // keep HTML if switching to table
+              : wasTable
+              ? "" // clear HTML when switching away from table
+              : field.fieldName, // keep normal text if not table
+          };
+        });
         return { ...prevForm, formFields: updatedFields };
       });
     }
   }, [selectedMethod]);
+  
 
   const handleFieldDataChange = (e) => {
     const { name, value } = e.target;
@@ -182,14 +188,21 @@ const QuestionFrame = ({ setForm, formField, emptyFields }) => {
             </div>
           </div>
         );
-
       case "Bảng":
         return (
-          // <p className="text-gray col-span-3">
-          //   Kiểu bảng — chưa có cấu hình chi tiết.
-          // </p>
           <div className="col-span-3">
-            <TableEditor></TableEditor>
+            <TableEditor
+              onChange={(html) => {
+                setForm((prev) => {
+                  const updatedFields = prev.formFields.map((field) =>
+                    field.formFieldId === formField.formFieldId
+                      ? { ...field, fieldName: html }
+                      : field
+                  );
+                  return { ...prev, formFields: updatedFields };
+                });
+              }}
+            />
           </div>
         );
       case "Ngày":
@@ -228,7 +241,12 @@ const QuestionFrame = ({ setForm, formField, emptyFields }) => {
           placeholder="Câu hỏi"
           onChange={handleFieldDataChange}
           name="fieldName"
-          value={formField.fieldName || ""}
+          value={
+            selectedMethod === "Bảng"
+              ? "Không thể đặt câu hỏi cho dạng bảng"
+              : formField.fieldName || ""
+          }
+          disabled={selectedMethod === "Bảng"}
         />
         <select
           className="border border-lightGray focus:outline-none p-1 px-3 rounded-md"

@@ -1,57 +1,67 @@
+import React, { useState, useRef, useEffect } from "react";
+import PropTypes from "prop-types";
+import { Menu, MenuItem } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import { Menu, MenuItem } from "@mui/material";
-import { useState } from "react";
-
-
-const TableEditor = () => {
-  const [columns, setColumns] = useState(["Cột 1", "Cột 2", "Cột 3"]);
+const TableEditor = ({ onChange }) => {
+  const [columns, setColumns] = useState(["Cột 1", "Cột 2"]);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [contextIndex, setContextIndex] = useState(null);
+  const [selectedIndex, setSelectedIndex] = useState(null);
 
-  const handleContextMenu = (event, index) => {
-    event.preventDefault();
-    setContextIndex(index);
-    setAnchorEl(event.currentTarget);
+  useEffect(() => {
+    const html = generateTableHTML();
+    onChange(html);
+  }, [columns]);
+
+  const handleContextMenu = (e, index) => {
+    e.preventDefault();
+    setAnchorEl(e.currentTarget);
+    setSelectedIndex(index);
   };
 
   const handleCloseMenu = () => {
     setAnchorEl(null);
-    setContextIndex(null);
+    setSelectedIndex(null);
   };
 
-  const addColumn = (direction) => {
-    const insertIndex = direction === "left" ? contextIndex : contextIndex + 1;
-    const newCols = [...columns];
-    newCols.splice(insertIndex, 0, `Cột ${columns.length + 1}`);
-    setColumns(newCols);
+  const addColumn = (position) => {
+    const newColumns = [...columns];
+    const newLabel = `Cột ${columns.length + 1}`;
+    if (position === "left") newColumns.splice(selectedIndex, 0, newLabel);
+    else newColumns.splice(selectedIndex + 1, 0, newLabel);
+    setColumns(newColumns);
     handleCloseMenu();
   };
 
   const deleteColumn = () => {
-    if (columns.length === 1) return;
-    const newCols = columns.filter((_, i) => i !== contextIndex);
-    setColumns(newCols);
+    if (columns.length <= 1) return;
+    const newColumns = columns.filter((_, idx) => idx !== selectedIndex);
+    setColumns(newColumns);
     handleCloseMenu();
   };
 
   const updateColumnName = (index, value) => {
-    const newCols = [...columns];
-    newCols[index] = value;
-    setColumns(newCols);
+    const updated = [...columns];
+    updated[index] = value;
+    setColumns(updated);
+  };
+
+  const generateTableHTML = () => {
+    const headers = columns.map((col) => `<th>${col}</th>`).join("");
+    return `<table><thead><tr>${headers}</tr></thead></table>`;
   };
 
   return (
-    <div className="overflow-x-auto text-darkGray border-lightGray">
-      <table className="table-auto w-full border-collapse border">
-        <thead className="bg-lightGray">
+    <div className="overflow-x-auto text-darkGray border border-lightGray">
+      <table className="table-auto w-full border-collapse">
+        <thead className="bg-gray-50">
           <tr>
             {columns.map((col, index) => (
               <th
                 key={index}
                 onContextMenu={(e) => handleContextMenu(e, index)}
-                className="p-2 border border-lightGray relative cursor-context-menu"
+                className="p-2 border relative cursor-context-menu"
               >
                 <input
                   className="w-full px-2 py-1 border rounded-md text-sm text-center focus:outline-none focus:ring-1 focus:ring-blue-400"
@@ -71,21 +81,18 @@ const TableEditor = () => {
         anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
         transformOrigin={{ vertical: "top", horizontal: "left" }}
       >
-        <MenuItem onClick={() => addColumn("left")}>
-          <AddIcon fontSize="small" className="mr-2" />
-          Thêm cột bên trái
-        </MenuItem>
-        <MenuItem onClick={() => addColumn("right")}>
-          <AddIcon fontSize="small" className="mr-2" />
-          Thêm cột bên phải
-        </MenuItem>
+        <MenuItem onClick={() => addColumn("left")}>Thêm cột bên trái</MenuItem>
+        <MenuItem onClick={() => addColumn("right")}>Thêm cột bên phải</MenuItem>
         <MenuItem onClick={deleteColumn} disabled={columns.length <= 1}>
-          <DeleteIcon fontSize="small" className="mr-2 text-red-500" />
-          Xoá cột này
+          <DeleteIcon fontSize="small" className="mr-2 text-red-500" /> Xoá cột
         </MenuItem>
       </Menu>
     </div>
   );
+};
+
+TableEditor.propTypes = {
+  onChange: PropTypes.func.isRequired,
 };
 
 export default TableEditor;
