@@ -1,11 +1,11 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { Menu, MenuItem } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 const TableEditor = ({ onChange }) => {
-  const [columns, setColumns] = useState(["Cột 1", "Cột 2"]);
+  const [columns, setColumns] = useState(["Tiêu đề cột 1", "Tiêu đề cột 2"]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(null);
 
@@ -27,7 +27,7 @@ const TableEditor = ({ onChange }) => {
 
   const addColumn = (position) => {
     const newColumns = [...columns];
-    const newLabel = `Cột ${columns.length + 1}`;
+    const newLabel = `Tiêu đề cột ${columns.length + 1}`;
     if (position === "left") newColumns.splice(selectedIndex, 0, newLabel);
     else newColumns.splice(selectedIndex + 1, 0, newLabel);
     setColumns(newColumns);

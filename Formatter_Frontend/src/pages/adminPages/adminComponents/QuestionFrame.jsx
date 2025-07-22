@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { IconButton, Tooltip } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
@@ -60,8 +60,6 @@ const QuestionFrame = ({ setForm, formField, emptyFields }) => {
   const [selectedMethod, setSelectedMethod] = useState(
     enumToLabel[formField.fieldType] || "Trả lời ngắn"
   );
-
-  const isTableMethod = selectedMethod === "Bảng";
 
   useEffect(() => {
     const fieldType = labelToEnum[selectedMethod];

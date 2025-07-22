@@ -5,6 +5,17 @@ import ConfirmationPopup from "../../component/ConfirmationPopup";
 import PropTypes from "prop-types";
 import { useLocation } from "react-router";
 
+const fieldTypeLabels = {
+  SHORT_ANSWER: "Trả lời ngắn",
+  LONG_ANSWER: "Trả lời dài",
+  BULLETS: "Kiểu liệt kê",
+  SELECT: "Bảng chọn",
+  TABLE: "Bảng",
+  DATE: "Ngày",
+};
+
+const enumToLabel = (fieldType) => fieldTypeLabels[fieldType];
+
 const RightSidebar = ({ formData }) => {
   const [isOpen, setIsOpen] = useState();
 
@@ -45,6 +56,42 @@ const RightSidebar = ({ formData }) => {
           <p className="text-sm text-gray">
             {formData.introduction || "Không có mô tả"}
           </p>
+
+          {/* Reader information */}
+          {formData.readersList.includes("TEACHER") && <div className="pt-4 grid grid-cols-1 gap-3">
+            {formData.formFields.length > 0 &&
+              formData.formFields.map((formField) => (
+                <div
+                  key={formField.formFieldId}
+                  className="border p-2 rounded-md cursor-move" // add cursor style
+                  draggable
+                  onDragStart={(e) => {
+                    e.dataTransfer.setData(
+                      "text/plain",
+                      JSON.stringify({
+                        formFieldId: formField.formFieldId,
+                        fieldName: formField.fieldName,
+                      })
+                    );
+                  }}
+                >
+                  <div className="flex">
+                    <p>{formField.fieldName}</p>
+                  </div>
+                  <p className="text-sm text-gray">
+                    {formField.description || "Không có mô tả"}
+                  </p>
+                  <div className="w-full items-end justify-end flex">
+                    <p className="inline-block border px-2 rounded-md bg-darkGray text-white py-1">
+                      {enumToLabel(formField.fieldType) || "Chưa chọn"}
+                    </p>
+                  </div>
+                </div>
+              ))}
+          </div>}
+          
+
+          {/* All form fields */}
           <div className="pt-4 grid grid-cols-1 gap-3">
             {formData.formFields.length > 0 &&
               formData.formFields.map((formField) => (
@@ -70,7 +117,7 @@ const RightSidebar = ({ formData }) => {
                   </p>
                   <div className="w-full items-end justify-end flex">
                     <p className="inline-block border px-2 rounded-md bg-darkGray text-white py-1">
-                      {formField.fieldType || "Chưa chọn"}
+                      {enumToLabel(formField.fieldType) || "Chưa chọn"}
                     </p>
                   </div>
                 </div>

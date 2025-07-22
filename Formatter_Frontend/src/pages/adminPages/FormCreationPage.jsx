@@ -98,8 +98,6 @@ const FormCreationPage = () => {
   };
 
   const handleSendFormData = async () => {
-    console.log(form);
-    return;
     try {
       const cleanedFields = form.formFields.map((field) => ({
         ...field,
@@ -112,6 +110,7 @@ const FormCreationPage = () => {
         title: form.title.trim(),
         description: form.description.trim(),
         formFields: cleanedFields,
+        readersList: form.readersList,
       };
       const result = await api.post("/forms/create", dataToSend);
       console.log(result);

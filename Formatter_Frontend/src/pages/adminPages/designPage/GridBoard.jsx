@@ -484,19 +484,19 @@ const GridBoard = ({
               >
                 <div
                   onClick={() => handleInsertRow(rowIdx - 1)}
-                  className="text-xs px-2 bg-darkBlue text-white rounded cursor-pointer"
+                  className="text-xs px-2 py-[2px] bg-darkBlue text-white rounded cursor-pointer"
                 >
                   + Thêm hàng trên
                 </div>
                 <div
                   onClick={() => handleInsertRow(rowIdx)}
-                  className="text-xs px-2 bg-lightBlue text-white rounded cursor-pointer"
+                  className="text-xs px-2 py-[2px] bg-lightBlue text-white rounded cursor-pointer"
                 >
                   + Thêm hàng dưới
                 </div>
                 <div
                   onClick={() => handleDeleteRow(rowIdx)}
-                  className="text-xs px-2 bg-red-500 text-white rounded cursor-pointer"
+                  className="text-xs px-2 py-[2px] bg-red-500 text-white rounded cursor-pointer"
                 >
                   - Xóa hàng này
                 </div>
@@ -542,7 +542,7 @@ const GridBoard = ({
         )}
       </div>
 
-    {/* Print Data Button */}
+      {/* Print Data Button */}
       {/* <button
         onClick={handlePrintData}
         style={{
@@ -558,7 +558,6 @@ const GridBoard = ({
         Print Grid Data
       </button>
       <button onClick={() => setRowSize((prev) => prev + 1)}>Add row</button> */}
-
     </>
   );
 };
@@ -567,4 +566,8 @@ export default GridBoard;
 
 GridBoard.propTypes = {
   onUpdateDesignInfo: PropTypes.func,
+  col: PropTypes.number.isRequired,
+  row: PropTypes.number.isRequired,
+  cellSize: PropTypes.number.isRequired,
+  formData: PropTypes.object,
 };

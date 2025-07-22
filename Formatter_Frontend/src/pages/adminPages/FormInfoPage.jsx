@@ -4,6 +4,16 @@ import { useParams } from "react-router-dom";
 import api from "../../services/api";
 import DesignsListWindow from "../../component/DesignListWindow";
 
+const fieldTypeLabels = {
+  SHORT_ANSWER: "Trả lời ngắn",
+  LONG_ANSWER: "Trả lời dài",
+  BULLETS: "Kiểu liệt kê",
+  SELECT: "Bảng chọn",
+  TABLE: "Bảng",
+  DATE: "Ngày",
+};
+
+const enumToLabel = (fieldType) => fieldTypeLabels[fieldType];
 
 const FormInfoPage = () => {
   const [form, setForm] = useState({});
@@ -73,7 +83,7 @@ const FormInfoPage = () => {
                 </thead>
                 <tbody>
                   {sortedFields.map(
-                    ({ formFieldId, fieldName, description, formType }) => (
+                    ({ formFieldId, fieldName, description, fieldType }) => (
                       <tr key={formFieldId} className="hover:bg-gray-50">
                         <td className="border border-gray-300 px-4 py-2">
                           {fieldName}
@@ -86,7 +96,7 @@ const FormInfoPage = () => {
                           )}
                         </td>
                         <td className="border border-gray-300 px-4 py-2">
-                          {formType || (
+                          {enumToLabel(fieldType) || (
                             <span className="italic text-gray-400">
                               Chưa định nghĩa
                             </span>

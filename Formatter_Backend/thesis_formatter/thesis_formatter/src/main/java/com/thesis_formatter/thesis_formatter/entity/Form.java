@@ -20,7 +20,7 @@ public class Form {
     @GeneratedValue(strategy = GenerationType.UUID)
     String formId;
     String title;
-    String introduction;
+    String description;
     @ElementCollection
     List<String> readersList;
     @OneToMany(mappedBy = "form", cascade = CascadeType.ALL)
