@@ -65,15 +65,15 @@ const QuestionFrame = ({ setForm, formField, emptyFields }) => {
 
   useEffect(() => {
     const fieldType = labelToEnum[selectedMethod];
-  
+
     if (fieldType) {
       setForm((prevForm) => {
         const updatedFields = prevForm.formFields.map((field) => {
           if (field.formFieldId !== formField.formFieldId) return field;
-  
+
           const isNowTable = fieldType === "TABLE";
           const wasTable = field.fieldType === "TABLE";
-  
+
           return {
             ...field,
             fieldType,
@@ -89,7 +89,6 @@ const QuestionFrame = ({ setForm, formField, emptyFields }) => {
       });
     }
   }, [selectedMethod]);
-  
 
   const handleFieldDataChange = (e) => {
     const { name, value } = e.target;

@@ -55,13 +55,13 @@ const TableEditor = ({ onChange }) => {
   return (
     <div className="overflow-x-auto text-darkGray border border-lightGray">
       <table className="table-auto w-full border-collapse">
-        <thead className="bg-gray-50">
+        <thead className="bg-lightGray">
           <tr>
             {columns.map((col, index) => (
               <th
                 key={index}
                 onContextMenu={(e) => handleContextMenu(e, index)}
-                className="p-2 border relative cursor-context-menu"
+                className="p-2 relative cursor-context-menu"
               >
                 <input
                   className="w-full px-2 py-1 border rounded-md text-sm text-center focus:outline-none focus:ring-1 focus:ring-blue-400"
@@ -81,10 +81,16 @@ const TableEditor = ({ onChange }) => {
         anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
         transformOrigin={{ vertical: "top", horizontal: "left" }}
       >
-        <MenuItem onClick={() => addColumn("left")}>Thêm cột bên trái</MenuItem>
-        <MenuItem onClick={() => addColumn("right")}>Thêm cột bên phải</MenuItem>
+        <MenuItem onClick={() => addColumn("left")}>
+          <AddIcon fontSize="small" className="mr-2 text-darkBlue" />
+          Thêm cột bên trái
+        </MenuItem>
+        <MenuItem onClick={() => addColumn("right")}>
+          <AddIcon fontSize="small" className="mr-2 text-darkBlue" />
+          Thêm cột bên phải
+        </MenuItem>
         <MenuItem onClick={deleteColumn} disabled={columns.length <= 1}>
-          <DeleteIcon fontSize="small" className="mr-2 text-red-500" /> Xoá cột
+          <DeleteIcon fontSize="small" className="mr-2 text-redError" /> Xoá cột
         </MenuItem>
       </Menu>
     </div>
