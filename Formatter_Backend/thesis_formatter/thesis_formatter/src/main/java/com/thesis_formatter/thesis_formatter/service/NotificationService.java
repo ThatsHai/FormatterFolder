@@ -106,7 +106,7 @@ public class NotificationService {
                 .build();
     }
 
-    public APIResponse<List<NotificationResponse>> getNotificationForAccount(String userId, String page, String numberOfNotification) throws AppException {
+    public APIResponse<List<NotificationResponse>> getNotificationsForAccount(String userId, String page, String numberOfNotification) throws AppException {
 
         Pageable pageable = PageRequest.of(Integer.parseInt(page), Integer.parseInt(numberOfNotification));
         Page<NotificationReceiver> notificationReceivers = notificationReceiverRepo.findByReceiver_UserId(userId, pageable);
@@ -115,6 +115,7 @@ public class NotificationService {
                 .map(receiver -> {
                     Notification notification = receiver.getNotification();
                     return NotificationResponse.builder()
+                            .notificationId(receiver.getId())
                             .title(notification.getTitle())
                             .message(notification.getMessage())
                             .isRead(receiver.isRead())
@@ -128,6 +129,16 @@ public class NotificationService {
         return APIResponse.<List<NotificationResponse>>builder()
                 .code("200")
                 .result(notificationResponses)
+                .build();
+    }
+
+    public APIResponse<Void> markNotificationAsRead(String notificationReceiverId) throws AppException {
+        NotificationReceiver notificationReceiver = notificationReceiverRepo.findById(notificationReceiverId).orElseThrow(() -> new AppException(ErrorCode.NOTIFICATION_RECEIVER_NOT_FOUND));
+        notificationReceiver.setRead(true);
+        notificationReceiverRepo.save(notificationReceiver);
+        return APIResponse.<Void>builder()
+                .code("200")
+                .message("Successfully marked notification as read")
                 .build();
     }
 }

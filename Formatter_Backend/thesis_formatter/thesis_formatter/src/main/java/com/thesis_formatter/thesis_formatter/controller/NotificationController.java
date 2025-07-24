@@ -32,6 +32,11 @@ public class NotificationController {
 
     @GetMapping
     public APIResponse<List<NotificationResponse>> getNotificationsForAccount(@RequestParam String userId, @RequestParam String page, @RequestParam String number) {
-        return notificationService.getNotificationForAccount(userId, page, number);
+        return notificationService.getNotificationsForAccount(userId, page, number);
+    }
+
+    @PutMapping("/markAsRead")
+    public APIResponse<Void> markAsRead(@RequestParam String notificationId) throws MessagingException {
+        return notificationService.markNotificationAsRead(notificationId);
     }
 }

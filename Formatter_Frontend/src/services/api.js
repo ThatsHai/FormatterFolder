@@ -51,6 +51,7 @@ const refreshToken = async () => {
       "http://localhost:8080/auth/refresh"
     );
     sessionStorage.setItem("accessToken", response.data.result.accesstoken);
+    
     return response;
   } catch (e) {
     console.log("Error refreshing token:", e);

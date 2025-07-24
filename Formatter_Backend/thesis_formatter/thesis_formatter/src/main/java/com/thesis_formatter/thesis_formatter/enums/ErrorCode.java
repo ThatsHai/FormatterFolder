@@ -35,7 +35,9 @@ public enum ErrorCode {
     ENTITY_NOT_FOUND("1020", "This entity does not exist", HttpStatus.NOT_FOUND),
     INVALID_ARGUMENT("1021", "Invalid argument", HttpStatus.BAD_REQUEST),
     TOPIC_NOT_FOUND("1022", "Topic not found", HttpStatus.NOT_FOUND),
-    DUPLICATE_NAME("1023", "Duplicate name", HttpStatus.CONFLICT),
+    STUDENT_ALREADY_IN_OTHER_TOPIC("1023", "Student already in other topic", HttpStatus.BAD_REQUEST),
+    DUPLICATE_NAME("1024", "Duplicate name", HttpStatus.CONFLICT),
+    NOTIFICATION_RECEIVER_NOT_FOUND("1025", "Notification receiver not found", HttpStatus.NOT_FOUND),
     ;
 
     private String code;

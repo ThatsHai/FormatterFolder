@@ -108,7 +108,7 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
               </IconButton>
             </div>
             {showStudentInfo && (
-              <div className="relative text-start w-full font-textFont text-lg mb-8 px-10 ">
+              <div className="relative text-start w-full font-textFont text-lg px-10 ">
                 {/* Student info */}
                 <div className="w-full grid grid-cols-3 items-center mb-3">
                   <p>Tên sinh viên</p>
