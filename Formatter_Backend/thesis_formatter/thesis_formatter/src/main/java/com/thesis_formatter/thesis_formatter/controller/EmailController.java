@@ -41,9 +41,9 @@ public class EmailController {
         return ResponseEntity.ok("Gửi mail group thành công!");
     }
 
-    @PostMapping("/sendHTML")
-    public APIResponse<Void> sendHTML(@RequestBody SendEmailRequest request) throws MessagingException {
-        return emailService.sendHtmlEmail(request);
-
-    }
+//    @PostMapping("/sendHTML")
+//    public APIResponse<Void> sendHTML(@RequestBody SendEmailRequest request) throws MessagingException {
+//        return emailService.sendHtmlEmail(request);
+//
+//    }
 }

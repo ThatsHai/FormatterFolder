@@ -43,6 +43,25 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
     setShowConfirmPopup(false);
   };
 
+  const approveRecord = async () => {
+    await api.put(
+      `/formRecords/${formRecord.formRecordId}/approve`,
+    );
+
+    setShowSuccessPopup(true);
+    setShowConfirmPopup(false);
+  };
+
+  const denyRecord = async () => {
+    await api.put(
+      `/formRecords/${formRecord.formRecordId}/deny`,
+    );
+
+    setShowSuccessPopup(true);
+    setShowConfirmPopup(false);
+  };
+
+
   const deleteRecord = async () => {
     await api.delete(`/formRecords/delete/${formRecord.formRecordId}`);
 
@@ -60,6 +79,28 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
     setSuccessPopupText("Đã gửi bản ghi cho giảng viên!");
     setConfirmAction("send");
   };
+
+  const handleApproveRecord = () => {
+    if (formRecord.status === "ACCEPTED") {
+      alert("Bản ghi đã được duyệt trước đó, không thể duyệt lại");
+      return;
+    }
+    setShowConfirmPopup(true);
+    setText("Bạn chắc chắn muốn duyệt đề cương này? Thông báo duyệt sẽ được gửi đến sinh viên!");
+    setSuccessPopupText("Đã duyệt!");
+    setConfirmAction("approve");
+  };
+  const handleDenyRecord = () => {
+    if (formRecord.status === "DENIED") {
+      alert("Bản ghi đã bị từ chối trước đó, không thể từ chối lại");
+      return;
+    }
+    setShowConfirmPopup(true);
+    setText("Bạn chắc chắn muốn từ chối đề cương này? Thông báo từ chối sẽ được gửi đến sinh viên!");
+    setSuccessPopupText("Đã từ chối!");
+    setConfirmAction("deny");
+  };
+
   const handleDeleteRecord = async () => {
     setShowConfirmPopup(true);
     setText("Bạn chắc chắn muốn xoá bản ghi này?");
@@ -118,8 +159,11 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
           </>
         ) : (
           <>
-            <button className="border p-2 rounded-md px-5 bg-white">
+            <button className="border p-2 rounded-md px-5 bg-white" onClick={handleApproveRecord}>
               Phê duyệt
+            </button>
+            <button className="border p-2 rounded-md px-5 bg-white" onClick={handleDenyRecord}>
+              Từ chối
             </button>
           </>
         )}
@@ -149,6 +193,10 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
               sendRecord();
             } else if (confirmAction === "delete") {
               deleteRecord();
+            } else if (confirmAction === "approve") {
+              approveRecord();
+            } else if (confirmAction === "deny") {
+              denyRecord();
             }
           }}
           onDecline={() => setShowConfirmPopup(false)}

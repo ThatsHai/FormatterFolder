@@ -27,7 +27,7 @@ const ThesisCard = ({ formRecord }) => {
             ? "Chưa gửi"
             : formRecord.status === "WAITING"
             ? "Đang chờ duyệt"
-            : formRecord.status === "WAITING"
+            : formRecord.status === "DENIED"
             ? "Bị từ chối"
             : formRecord.status === "DELETED"
             ? "Đã xóa"

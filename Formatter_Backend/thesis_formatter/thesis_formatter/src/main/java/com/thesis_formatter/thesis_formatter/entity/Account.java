@@ -5,6 +5,8 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
+import java.util.List;
+
 @SuperBuilder
 @Entity
 @Data
@@ -31,5 +33,10 @@ public class Account {
     @JoinColumn(name = "role", referencedColumnName = "name")
     Role role;
 
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notification> sentNotifications;
+
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<NotificationReceiver> receivedNotifications;
 
 }

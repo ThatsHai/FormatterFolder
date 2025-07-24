@@ -1,9 +1,6 @@
 package com.thesis_formatter.thesis_formatter.service;
 
-import com.thesis_formatter.thesis_formatter.dto.request.AddFormRecordFieldRequest;
-import com.thesis_formatter.thesis_formatter.dto.request.AddFormRecordRequest;
-import com.thesis_formatter.thesis_formatter.dto.request.TopicRequest;
-import com.thesis_formatter.thesis_formatter.dto.request.UpdateTopicRequest;
+import com.thesis_formatter.thesis_formatter.dto.request.*;
 import com.thesis_formatter.thesis_formatter.dto.response.*;
 import com.thesis_formatter.thesis_formatter.entity.*;
 import com.thesis_formatter.thesis_formatter.entity.id.TeacherTopicLimitId;
@@ -15,6 +12,7 @@ import com.thesis_formatter.thesis_formatter.exception.AppException;
 import com.thesis_formatter.thesis_formatter.mapper.TeacherMapper;
 import com.thesis_formatter.thesis_formatter.mapper.TopicMapper;
 import com.thesis_formatter.thesis_formatter.repo.*;
+import jakarta.mail.MessagingException;
 import jakarta.persistence.criteria.From;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +42,7 @@ public class TopicService {
     StudentRepo studentRepo;
     FormRecordService formRecordService;
     FormRecordRepo formRecordRepo;
+    private final NotificationService notificationService;
 
     public APIResponse<List<TopicResponse>> getAll() {
         List<Topic> topics = topicRepo.findAll();
@@ -58,7 +57,7 @@ public class TopicService {
                 .build();
     }
 
-    public APIResponse<TopicResponse> create(TopicRequest topicRequest) {
+    public APIResponse<TopicResponse> create(TopicRequest topicRequest) throws MessagingException {
         List<String> teacherIds = topicRequest.getTeacherIds();
         if (teacherIds.isEmpty()) {
             throw new AppException(ErrorCode.TEACHER_NOT_EXISTED);
@@ -111,7 +110,7 @@ public class TopicService {
 
 
     @Transactional
-    public APIResponse<TopicResponse> update(UpdateTopicRequest request) {
+    public APIResponse<TopicResponse> update(UpdateTopicRequest request) throws MessagingException {
         Topic topic = topicRepo.findById(request.getTopicId())
                 .orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOT_FOUND));
 
@@ -176,7 +175,7 @@ public class TopicService {
     }
 
 
-    private void updateStudentsAndFormRecords(Topic topic, List<String> newStudentIds) {
+    private void updateStudentsAndFormRecords(Topic topic, List<String> newStudentIds) throws MessagingException {
 
         Set<String> oldIds = topic.getStudents().stream()
                 .map(student -> student.getUserId())
@@ -198,19 +197,19 @@ public class TopicService {
         for (Student student : updatedStudents) {
             Optional<Topic> existedTopic = topicRepo.findPublishedTopicsByStudent(student.getUserId());
             if (existedTopic.isPresent()) {
-                throw new RuntimeException(("Sinh viên " + student.getName() + " đang thực hiện 1 đề tài khác!"));
+                throw new AppException(ErrorCode.STUDENT_ALREADY_IN_OTHER_TOPIC);
             }
         }
         topic.setStudents(updatedStudents);
 
         // Tạo FormRecord cho sinh viên mới
-        createFormRecordsForNewStudents(topic, new ArrayList<>(toAdd));
+        if (!toAdd.isEmpty()) createFormRecordsForNewStudents(topic, new ArrayList<>(toAdd));
 
         // Xoá FormRecord của sinh viên bị loại
-        deleteFormRecordsByStudentsAndTopic(topic, new ArrayList<>(toRemove));
+        if (!toRemove.isEmpty()) deleteFormRecordsByStudentsAndTopic(topic, new ArrayList<>(toRemove));
     }
 
-    public void deleteFormRecordsByStudentsAndTopic(Topic topic, List<String> studentIds) {
+    public void deleteFormRecordsByStudentsAndTopic(Topic topic, List<String> studentIds) throws MessagingException {
 
         for (String studentId : studentIds) {
             Student student = studentRepo.findByUserId(studentId);
@@ -222,10 +221,17 @@ public class TopicService {
             }
             formRecordRepo.saveAll(formRecords);
         }
+        notificationService.createSystemNotification(NotificationRequest.builder()
+                .senderId(null)
+                .recipientIds(studentIds)
+                .title("Xoá tên khỏi đề tài")
+                .message("Bạn vừa bị giảng viên xoá tên khỏi đề tài " + topic.getTitle() + ". Đề cương cho đề tài này đã được tự động xoá, hãy chọn đề tài khác hoặc liên hệ giảng viên để biết thêm chi tiết!")
+                .build());
+
     }
 
 
-    public void createFormRecordsForNewStudents(Topic topic, List<String> studentIds) {
+    public void createFormRecordsForNewStudents(Topic topic, List<String> studentIds) throws MessagingException {
         Form form = topic.getForm();
         if (form == null) return;
 
@@ -251,6 +257,12 @@ public class TopicService {
                         .build());
             }
         }
+        notificationService.createSystemNotification(NotificationRequest.builder()
+                .senderId(null)
+                .recipientIds(studentIds)
+                .title("Được giảng viên thêm vào đề tài")
+                .message("Bạn vừa được giảng viên thêm vào đề tài " + topic.getTitle() + ". Đề cương cho đề tài này đã được tự động tạo cho bạn trong hệ thống. Truy cập để chỉnh sửa đề cương!")
+                .build());
     }
 
 
@@ -272,12 +284,13 @@ public class TopicService {
                 .result(topicResponses).build();
     }
 
-    public APIResponse<List<Topic>> getTopicByTeacher_AcId(String acId) {
+    public APIResponse<List<TopicResponse>> getTopicByTeacher_AcId(String acId) {
         List<Topic> topics = topicRepo.findTopicsByTeachers_AcId(acId);
+        List<TopicResponse> topicResponses = topicMapper.toTopicResponses(topics);
 
-        return APIResponse.<List<Topic>>builder()
+        return APIResponse.<List<TopicResponse>>builder()
                 .code("200")
-                .result(topics).build();
+                .result(topicResponses).build();
     }
 
     public APIResponse<Void> deleteTopic(String topicId) {

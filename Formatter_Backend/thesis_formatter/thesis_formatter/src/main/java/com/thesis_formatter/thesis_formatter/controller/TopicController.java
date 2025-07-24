@@ -6,6 +6,7 @@ import com.thesis_formatter.thesis_formatter.dto.response.*;
 import com.thesis_formatter.thesis_formatter.entity.Topic;
 import com.thesis_formatter.thesis_formatter.enums.Semester;
 import com.thesis_formatter.thesis_formatter.service.TopicService;
+import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -38,17 +39,17 @@ public class TopicController {
     }
 
     @PostMapping("/topics/create")
-    public APIResponse<TopicResponse> createTopic(@RequestBody TopicRequest topic) {
+    public APIResponse<TopicResponse> createTopic(@RequestBody TopicRequest topic) throws MessagingException {
         return topicService.create(topic);
     }
 
     @PutMapping("topics/update")
-    public APIResponse<TopicResponse> updateTopic(@RequestBody UpdateTopicRequest topic) {
+    public APIResponse<TopicResponse> updateTopic(@RequestBody UpdateTopicRequest topic) throws MessagingException {
         return topicService.update(topic);
     }
 
     @GetMapping("topics/teacher")
-    public APIResponse<List<Topic>> getTeacherTopics(@RequestParam String teacherId) {
+    public APIResponse<List<TopicResponse>> getTeacherTopics(@RequestParam String teacherId) {
         return topicService.getTopicByTeacher_AcId(teacherId);
     }
 

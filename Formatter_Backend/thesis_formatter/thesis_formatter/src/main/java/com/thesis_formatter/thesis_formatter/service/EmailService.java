@@ -66,7 +66,7 @@ public class EmailService {
         mailSender.send(message);
     }
 
-    public APIResponse<Void> sendHtmlEmail(SendEmailRequest request) throws MessagingException {
+    public void sendHtmlEmail(SendEmailRequest request) throws MessagingException {
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
@@ -74,7 +74,7 @@ public class EmailService {
             if (request.getToEmails() != null) helper.setTo(request.getToEmails());
             if (request.getCcEmails() != null) helper.setCc(request.getBccEmails());
             if (request.getBccEmails() != null) helper.setBcc(request.getBccEmails());
-            helper.setSubject("Thông báo mới: " + request.getSubject());
+            helper.setSubject("Hệ thống đề cương luận văn - Thông báo mới: " + request.getSubject());
             helper.setText(generateHtmlContent(request.getSender(), request.getMessage(), request.getActionUrl(), request.getActionText()), true); // true = isHtml
 
             mailSender.send(mimeMessage);
@@ -82,10 +82,10 @@ public class EmailService {
             throw new RuntimeException("Lỗi khi gửi email: " + e.getMessage(), e);
         }
 
-        return APIResponse.<Void>builder()
-                .code("200")
-                .message("Gửi email thành công!")
-                .build();
+//        return APIResponse.<Void>builder()
+//                .code("200")
+//                .message("Gửi email thành công!")
+//                .build();
     }
 
     private String generateHtmlContent(String sender, String message, String actionUrl, String actionText) {

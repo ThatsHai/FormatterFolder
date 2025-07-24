@@ -5,11 +5,13 @@ import com.thesis_formatter.thesis_formatter.dto.request.UpdateFormRecordRequest
 import com.thesis_formatter.thesis_formatter.dto.response.*;
 import com.thesis_formatter.thesis_formatter.entity.FormRecord;
 import com.thesis_formatter.thesis_formatter.service.FormRecordService;
+import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,25 +37,37 @@ public class FormRecordController {
     }
 
     @PutMapping("/formRecords/update")
-    public APIResponse<FormRecordResponse> update(@RequestBody UpdateFormRecordRequest request) {
+    public APIResponse<FormRecordResponse> update(@RequestBody UpdateFormRecordRequest request) throws MessagingException {
         return formRecordService.updateFormRecord(request);
     }
 
     @PostMapping("/formRecords/{formRecordId}/restore/{fromVersion}")
     public APIResponse<FormRecordResponse> restoreFormRecordFromVersion(
             @PathVariable String formRecordId,
-            @PathVariable String fromVersion) {
+            @PathVariable String fromVersion) throws MessagingException {
         return formRecordService.restoreFormRecord(formRecordId, fromVersion);
     }
 
-    @PutMapping("/formRecords/status")
-    public APIResponse<FormRecordResponse> updateStatus(@RequestParam String formRecordId, @RequestParam String status) {
-        return formRecordService.updateStatus(formRecordId, status);
-    }
+//    @PutMapping("/formRecords/status")
+//    public APIResponse<FormRecordResponse> updateStatus(@RequestParam String formRecordId, @RequestParam String status) {
+//        return formRecordService.updateStatus(formRecordId, status);
+//    }
 
     @PutMapping("/formRecords/{formRecordId}/send")
-    public APIResponse<FormRecordResponse> sendRecord(@PathVariable String formRecordId) {
-        return formRecordService.updateStatus(formRecordId, "WAITING");
+    public APIResponse<Void> sendRecord(@PathVariable String formRecordId) throws MessagingException {
+        return formRecordService.sendRecord(formRecordId);
+    }
+
+    @PreAuthorize("hasRole('TEACHER')")
+    @PutMapping("/formRecords/{formRecordId}/approve")
+    public APIResponse<Void> approveRecord(@PathVariable String formRecordId) throws MessagingException {
+        return formRecordService.approveRecord(formRecordId);
+    }
+
+    @PreAuthorize("hasRole('TEACHER')")
+    @PutMapping("/formRecords/{formRecordId}/deny")
+    public APIResponse<Void> denyRecord(@PathVariable String formRecordId) throws MessagingException {
+        return formRecordService.denyRecord(formRecordId);
     }
 
     @GetMapping("/formRecords/student")
@@ -62,8 +76,13 @@ public class FormRecordController {
     }
 
     @GetMapping("/formRecords/teacher")
-    public APIResponse<PaginationResponse<FormRecordResponse>> searchFormRecordForTeacher(@RequestParam String teacherId, @RequestParam String status, @RequestParam("p") String page, @RequestParam("n") String numberOfRecords) {
-        return formRecordService.searchByTeacherId(teacherId, status, page, numberOfRecords);
+    public APIResponse<PaginationResponse<FormRecordResponse>> searchFormRecordForTeacher(@RequestParam String teacherId, @RequestParam("p") String page, @RequestParam("n") String numberOfRecords) {
+        return formRecordService.searchByTeacherId(teacherId, page, numberOfRecords);
+    }
+
+    @GetMapping("/formRecords/teacher/status")
+    public APIResponse<PaginationResponse<FormRecordResponse>> searchFormRecordForTeacherAndStatus(@RequestParam String teacherId, @RequestParam String status, @RequestParam("p") String page, @RequestParam("n") String numberOfRecords) {
+        return formRecordService.searchByTeacherIdAndStatus(teacherId, status, page, numberOfRecords);
     }
 
     @GetMapping("/formRecords/{id}")

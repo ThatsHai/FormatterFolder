@@ -30,7 +30,7 @@ const ContentHomepage = ({
       if (user.role.name === "STUDENT") {
         url = `/formRecords/student?studentId=${user.userId}&p=${currentPage}&n=4`;
       } else {
-        url = `/formRecords/teacher?teacherId=${user.acId}&status=WAITING&p=${currentPage}&n=4`;
+        url = `/formRecords/teacher?teacherId=${user.acId}&p=${currentPage}&n=4`;
       }
       const result = await api.get(url);
       setThesisList(result.data.result.content || []);

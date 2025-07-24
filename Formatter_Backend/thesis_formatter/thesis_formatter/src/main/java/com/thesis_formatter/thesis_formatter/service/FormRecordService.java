@@ -1,9 +1,6 @@
 package com.thesis_formatter.thesis_formatter.service;
 
-import com.thesis_formatter.thesis_formatter.dto.request.AddFormRecordRequest;
-import com.thesis_formatter.thesis_formatter.dto.request.AddFormRecordFieldRequest;
-import com.thesis_formatter.thesis_formatter.dto.request.UpdateFormRecordFieldRequest;
-import com.thesis_formatter.thesis_formatter.dto.request.UpdateFormRecordRequest;
+import com.thesis_formatter.thesis_formatter.dto.request.*;
 import com.thesis_formatter.thesis_formatter.dto.response.*;
 import com.thesis_formatter.thesis_formatter.entity.*;
 import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
@@ -13,6 +10,7 @@ import com.thesis_formatter.thesis_formatter.mapper.FormRecordMapper;
 import com.thesis_formatter.thesis_formatter.repo.*;
 import com.thesis_formatter.thesis_formatter.utils.HtmlToStyledTextParser;
 import com.thesis_formatter.thesis_formatter.utils.PDFDesignUtils;
+import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -51,6 +49,7 @@ public class FormRecordService {
     private final FormRecordFieldRepo formRecordFieldRepo;
     private final TeacherRepo teacherRepo;
     private final RestoredVersionRepo restoredVersionRepo;
+    private final NotificationService notificationService;
 
     public APIResponse<FormRecordResponse> create(AddFormRecordRequest request) {
         FormRecord savedFormRecord = createFormRecord(request);
@@ -95,7 +94,7 @@ public class FormRecordService {
     }
 
     @Transactional
-    public APIResponse<FormRecordResponse> updateFormRecord(UpdateFormRecordRequest request) {
+    public APIResponse<FormRecordResponse> updateFormRecord(UpdateFormRecordRequest request) throws MessagingException {
         FormRecord formRecord = formRecordRepo.findById(request.getFormRecordId()).orElseThrow(
                 () -> new AppException(ErrorCode.FormRecord_NOT_FOUND));
 
@@ -133,6 +132,12 @@ public class FormRecordService {
         formRecord.setVersion(currentVersion);
 //        formRecord.setStatus(FormStatus.PENDING);
         FormRecord savedRecord = formRecordRepo.save(formRecord);
+//        notificationService.createSystemNotification(NotificationRequest.builder()
+//                .senderId(formRecord.getStudent().getUserId())
+//                .recipientIds(formRecord.getTopic().getTeachers().stream().map(Teacher::getUserId).collect(Collectors.toList()))
+//                .title("Cập nhật bản ghi đề cương")
+//                .message(formRecord.getStudent().getName() + " đã chỉnh sửa và cập nhật đề cương cho đề tài " + formRecord.getTopic().getTitle())
+//                .build());
 
         FormRecordResponse formRecordResponse = formRecordMapper.toResponse(savedRecord);
         return APIResponse.<FormRecordResponse>builder()
@@ -149,7 +154,7 @@ public class FormRecordService {
 //                .build();
 //    }
 
-    public APIResponse<FormRecordResponse> updateStatus(String formRecordId, String status) {
+    public void updateStatus(String formRecordId, String status) {
 
         FormRecord formRecord = formRecordRepo.findById(formRecordId).orElseThrow(() -> new AppException(ErrorCode.FormRecord_NOT_FOUND));
 
@@ -157,7 +162,72 @@ public class FormRecordService {
             FormStatus newStatus = FormStatus.valueOf(status.toUpperCase()); // String to Enum
             formRecord.setStatus(newStatus);
         } catch (IllegalArgumentException e) {
-            throw new AppException(ErrorCode.INVALID_FORM_STATUS); // bạn nên thêm enum này trong ErrorCode
+            throw new AppException(ErrorCode.INVALID_FORM_STATUS);
+        }
+
+        formRecordRepo.save(formRecord);
+    }
+
+    public APIResponse<Void> sendRecord(String formRecordId) throws MessagingException {
+        FormRecord formRecord = formRecordRepo.findById(formRecordId).orElseThrow(() -> new AppException(ErrorCode.FormRecord_NOT_FOUND));
+        updateStatus(formRecordId, "WAITING");
+
+        notificationService.createSystemNotification(NotificationRequest.builder()
+                .senderId(formRecord.getStudent().getUserId())
+                .recipientIds(formRecord.getTopic().getTeachers().stream().map(Teacher::getUserId).collect(Collectors.toList()))
+                .title("Bản ghi đề cương mới")
+                .message(formRecord.getStudent().getName() + " đã gửi 1 bản ghi đề cương cho đề tài " + formRecord.getTopic().getTitle() + " và đang chờ bạn duyệt.")
+                .build());
+
+        return APIResponse.<Void>builder()
+                .code("200")
+                .message("Gửi bản ghi cho giảng viên thành công!")
+                .build();
+    }
+
+    public APIResponse<Void> approveRecord(String formRecordId) throws MessagingException {
+        FormRecord formRecord = formRecordRepo.findById(formRecordId).orElseThrow(() -> new AppException(ErrorCode.FormRecord_NOT_FOUND));
+        updateStatus(formRecordId, "ACCEPTED");
+
+        notificationService.createSystemNotification(NotificationRequest.builder()
+                .senderId(null)
+                .recipientIds(new ArrayList<>(List.of(formRecord.getStudent().getUserId())))
+                .title("Đề cương được duyệt")
+                .message("Đề cương cho đề tài " + formRecord.getTopic().getTitle() + " của bạn đã được duyệt. Truy cập hệ thống để kiểm tra và thực hiện bước tiếp theo.")
+                .build());
+
+        return APIResponse.<Void>builder()
+                .code("200")
+                .message("Duyệt đề cương thành công!")
+                .build();
+    }
+
+    public APIResponse<Void> denyRecord(String formRecordId) throws MessagingException {
+        FormRecord formRecord = formRecordRepo.findById(formRecordId).orElseThrow(() -> new AppException(ErrorCode.FormRecord_NOT_FOUND));
+        updateStatus(formRecordId, "DENIED");
+
+        notificationService.createSystemNotification(NotificationRequest.builder()
+                .senderId(null)
+                .recipientIds(new ArrayList<>(List.of(formRecord.getStudent().getUserId())))
+                .title("Đề cương bị từ chối")
+                .message("Rất tiếc! Đề cương cho đề tài " + formRecord.getTopic().getTitle() + " của bạn đã bị giảng viên từ chối. Vui lòng chọn đề tài khác hoặc liên hệ giảng viên.")
+                .build());
+
+        return APIResponse.<Void>builder()
+                .code("200")
+                .message("Từ chối đề cương thành công!")
+                .build();
+    }
+
+    public APIResponse<FormRecordResponse> sendToTeacher(String formRecordId) {
+
+        FormRecord formRecord = formRecordRepo.findById(formRecordId).orElseThrow(() -> new AppException(ErrorCode.FormRecord_NOT_FOUND));
+
+        try {
+            FormStatus newStatus = FormStatus.WAITING;
+            formRecord.setStatus(newStatus);
+        } catch (IllegalArgumentException e) {
+            throw new AppException(ErrorCode.INVALID_FORM_STATUS);
         }
 
         formRecordRepo.save(formRecord);
@@ -189,7 +259,7 @@ public class FormRecordService {
                 .build();
     }
 
-    public APIResponse<PaginationResponse<FormRecordResponse>> searchByTeacherId(String teacherId, String status, String page, String numberOfRecords) {
+    public APIResponse<PaginationResponse<FormRecordResponse>> searchByTeacherIdAndStatus(String teacherId, String status, String page, String numberOfRecords) {
         Teacher teacher = teacherRepo.findByAcId(teacherId);
         if (teacher == null) {
             throw new AppException(ErrorCode.USER_NOT_EXISTED);
@@ -206,6 +276,33 @@ public class FormRecordService {
 
         Page<FormRecord> formRecords = formRecordRepo.findByTeacherAndStatus(teacherId, formStatus, pageable);
 
+        List<FormRecordResponse> dtoList = formRecordMapper.toResponses(formRecords.getContent());
+
+        PaginationResponse<FormRecordResponse> paginationResponse = new PaginationResponse<>();
+        paginationResponse.setContent(dtoList);
+        paginationResponse.setTotalElements(formRecords.getTotalElements());
+        paginationResponse.setTotalPages(formRecords.getTotalPages());
+        paginationResponse.setCurrentPage(formRecords.getNumber());
+        return APIResponse.<PaginationResponse<FormRecordResponse>>builder()
+                .code("200")
+                .result(paginationResponse)
+                .build();
+    }
+
+    public APIResponse<PaginationResponse<FormRecordResponse>> searchByTeacherId(String teacherId, String page, String numberOfRecords) {
+        Teacher teacher = teacherRepo.findByAcId(teacherId);
+        if (teacher == null) {
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
+        }
+        Pageable pageable = PageRequest.of(Integer.parseInt(page), Integer.parseInt((numberOfRecords)));
+
+        List<FormStatus> visibleStatuses = List.of(
+                FormStatus.WAITING,
+                FormStatus.ACCEPTED,
+                FormStatus.DENIED
+        );
+
+        Page<FormRecord> formRecords = formRecordRepo.findByTeacherAndStatuses(teacherId, visibleStatuses, pageable);
 
         List<FormRecordResponse> dtoList = formRecordMapper.toResponses(formRecords.getContent());
 
@@ -420,7 +517,7 @@ public class FormRecordService {
     }
 
     @Transactional
-    public APIResponse<FormRecordResponse> restoreFormRecord(String formRecordId, String targetVersion) {
+    public APIResponse<FormRecordResponse> restoreFormRecord(String formRecordId, String targetVersion) throws MessagingException {
 
         FormRecord formRecord = formRecordRepo.findById(formRecordId).orElseThrow(() -> new AppException(ErrorCode.FormRecord_NOT_FOUND));
 

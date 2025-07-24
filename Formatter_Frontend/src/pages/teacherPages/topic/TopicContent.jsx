@@ -62,7 +62,7 @@ const TopicContent = () => {
       <div className="bg-lightGray m-5 p-6 rounded-md">
         <p className="mb-3 text-2xl">ĐỀ TÀI CỦA BẠN</p>
         <div className="min-h-[400px]  rounded-md grid grid-cols-2 md:grid-cols-4 gap-3">
-          {topicsList.length > 0 ? (
+          {topicsList?.length > 0 ? (
             topicsList.map((t) => <TopicCard topic={t}></TopicCard>)
           ) : (
             <p>Chưa có đề tài nào</p>

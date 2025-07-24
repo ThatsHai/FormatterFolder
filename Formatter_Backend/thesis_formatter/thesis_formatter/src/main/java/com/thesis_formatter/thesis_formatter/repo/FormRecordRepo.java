@@ -21,6 +21,21 @@ public interface FormRecordRepo extends JpaRepository<FormRecord, String> {
     @Query("SELECT fr from FormRecord fr join fr.topic t join t.teachers teacher where teacher.acId = :userId and fr.status = :status")
     Page<FormRecord> findByTeacherAndStatus(@Param("userId") String userId, @Param("status") FormStatus status, Pageable pageable);
 
+    @Query("""
+    SELECT fr 
+    FROM FormRecord fr 
+    JOIN fr.topic t 
+    JOIN t.teachers teacher 
+    WHERE teacher.acId = :userId 
+      AND fr.status IN :statuses
+    """)
+    Page<FormRecord> findByTeacherAndStatuses(
+            @Param("userId") String userId,
+            @Param("statuses") List<FormStatus> statuses,
+            Pageable pageable
+    );
+
+
     List<FormRecord> findByStudentAndTopic(Student student, Topic topic);
 
     @Query("SELECT f FROM FormRecord f WHERE f.student.userId = :studentId AND f.topic.topicId = :topicId AND f.status = com.thesis_formatter.thesis_formatter.enums.FormStatus.DELETED")
