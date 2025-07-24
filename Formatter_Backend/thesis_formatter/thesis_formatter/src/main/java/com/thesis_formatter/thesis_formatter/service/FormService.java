@@ -1,6 +1,8 @@
 package com.thesis_formatter.thesis_formatter.service;
 
 import com.thesis_formatter.thesis_formatter.entity.*;
+import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
+import com.thesis_formatter.thesis_formatter.exception.AppException;
 import com.thesis_formatter.thesis_formatter.repo.*;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import lombok.AccessLevel;
@@ -13,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +26,7 @@ public class FormService {
     StudentRepo studentRepo;
     TeacherRepo teacherRepo;
     RoleRepo roleRepo;
+    private final FormFieldRepo formFieldRepo;
 
     public APIResponse<Form> saveForm(Form form) {
 //        Student student = studentRepo.findByStId(form.getStudent().getStId());
@@ -75,13 +79,31 @@ public class FormService {
     }
 
     public APIResponse<Form> createForm(Form form) {
+        String title = form.getTitle() == null ? null : form.getTitle().trim();
 
+        // If formId is client-supplied; skip if it's DB-generated
+        if (formRepo.existsByFormId(form.getFormId())) {
+            throw new AppException(ErrorCode.DUPLICATE_KEY);
+        }
+        if (formRepo.existsByTitleIgnoreCase(title)) {
+            throw new AppException(ErrorCode.DUPLICATE_NAME);
+        }
         // Set the back-reference on each FormField
-        if (form.getFormFields() != null) {
+        if (form.getFormFields() != null && !form.getFormFields().isEmpty()) {
+            List<String> fieldIds = form.getFormFields().stream()
+                    .map(FormField::getFormFieldId)
+                    .collect(Collectors.toList());
+
+            List<FormField> existingFields = formFieldRepo.findAllById(fieldIds);
+            if (!existingFields.isEmpty()) {
+                throw new AppException(ErrorCode.DUPLICATE_KEY);
+            }
+
             for (FormField field : form.getFormFields()) {
                 field.setForm(form);
             }
         }
+
         Form savedForm = formRepo.save(form);
         return APIResponse.<Form>builder()
                 .code("200")

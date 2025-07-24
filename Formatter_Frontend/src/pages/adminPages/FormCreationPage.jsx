@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import QuestionFrame from "./adminComponents/QuestionFrame";
 import ConfirmationPopup from "../../component/ConfirmationPopup";
 import { v4 as uuidv4 } from "uuid";
@@ -8,8 +8,9 @@ import SuccessPopup from "../../component/SuccessPopup";
 
 const FormCreationPage = () => {
   const [form, setForm] = useState({
-    title: "Tiêu đề biểu mẫu",
-    description: "Tua cua cai form",
+    title: "",
+    description: "",
+    readersList: ["TEACHER", "STUDENT"],
     formFields: [
       {
         position: 0,
@@ -17,6 +18,7 @@ const FormCreationPage = () => {
         formFieldId: uuidv4(),
         description: "",
         fieldType: "",
+        length: 0,
       },
       {
         position: 1,
@@ -24,9 +26,11 @@ const FormCreationPage = () => {
         formFieldId: uuidv4(),
         description: "",
         fieldType: "",
+        length: 0,
       },
     ],
   });
+
   //For popup
   const [displayConfirmationPopup, setDisplayConfirmationPopup] =
     useState(false);
@@ -38,10 +42,6 @@ const FormCreationPage = () => {
   const textareaRef = useRef(null);
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   console.log(form);
-  // }, [form]);
-
   const onBasicInfoChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({
@@ -50,12 +50,20 @@ const FormCreationPage = () => {
     }));
   };
 
+  const readerLabels = {
+    "TEACHER AND STUDENT": "Giáo viên và Sinh viên",
+    TEACHER: "Giáo viên",
+    STUDENT: "Sinh viên",
+  };
+
   const addNewFormField = () => {
     const newField = {
       position: form.formFields.length,
       fieldName: "",
       description: "",
       formFieldId: uuidv4(),
+      fieldType: "",
+      length: 0,
     };
     setForm((prev) => ({
       ...prev,
@@ -82,7 +90,7 @@ const FormCreationPage = () => {
     const emptyFields = form.formFields.filter(
       (form) => form.fieldName.trim() === ""
     );
-    
+
     setEmptyFields(emptyFields);
     if (emptyFields.length === 0 && form.title !== "") {
       setDisplayConfirmationPopup(true);
@@ -102,6 +110,7 @@ const FormCreationPage = () => {
         title: form.title.trim(),
         description: form.description.trim(),
         formFields: cleanedFields,
+        readersList: form.readersList,
       };
       const result = await api.post("/forms/create", dataToSend);
       console.log(result);
@@ -135,6 +144,39 @@ const FormCreationPage = () => {
             {emptyTitleError && (
               <p className="text-redError">Tên biểu mẫu không được để trống</p>
             )}
+            
+
+            <div className="mt-4">
+              <label className="text-sm">Đối tượng sử dụng:</label>
+              <select
+              className="w-full text-lg border border-gray rounded-md p-3 focus:outline-none focus:ring-1 focus:ring-darkBlue resize-none overflow-hidden leading-tight"
+              value={
+                form.readersList.includes("TEACHER") &&
+                form.readersList.includes("STUDENT")
+                  ? "TEACHER AND STUDENT"
+                  : form.readersList[0]
+              }
+              onChange={(e) => {
+                const value = e.target.value;
+                const newReadersList =
+                  value === "TEACHER AND STUDENT"
+                    ? ["TEACHER", "STUDENT"]
+                    : [value];
+
+                setForm((prev) => ({
+                  ...prev,
+                  readersList: newReadersList,
+                }));
+              }}
+            >
+              {Object.keys(readerLabels).map((reader) => (
+                <option key={reader} value={reader}>
+                  {readerLabels[reader]}
+                </option>
+              ))}
+            </select>
+            </div>
+
             <div className="mt-4">
               <label className="text-sm">Mô tả biểu mẫu:</label>
               <textarea

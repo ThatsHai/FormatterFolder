@@ -1,68 +1,110 @@
-import { IconButton } from "@mui/material";
+import { useEffect, useState } from "react";
+import PropTypes from "prop-types";
+import { IconButton, Tooltip } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useState } from "react";
-import PropTypes from "prop-types";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import TableEditor from "./TableEditor";
+import NumberInput from "../../../component/NumberInput";
 
-const ShortAnswerTemplate = () => {
-  const [maxPage, setMaxPage] = useState(1);
+const fieldTypeLabels = {
+  SHORT_ANSWER: "Trả lời ngắn",
+  LONG_ANSWER: "Trả lời dài",
+  BULLETS: "Kiểu liệt kê",
+  SELECT: "Bảng chọn",
+  TABLE: "Bảng",
+  DATE: "Ngày",
+};
+
+const labelToEnum = Object.fromEntries(
+  Object.entries(fieldTypeLabels).map(([k, v]) => [v, k])
+);
+
+const enumToLabel = fieldTypeLabels;
+
+const LengthInput = ({ formFieldId, setForm, unit, length }) => {
+  const handleLengthChange = (e) => {
+    const value = parseInt(e.target.value, 10) || 0;
+    setForm((prev) => {
+      const updatedFields = prev.formFields.map((field) =>
+        field.formFieldId === formFieldId ? { ...field, length: value } : field
+      );
+      return { ...prev, formFields: updatedFields };
+    });
+  };
+
   return (
-    <div className="flex items-end gap-2 text-sm ">
-      <p>Dài</p>
-      <input
+    <div className="flex items-end gap-2 text-sm py-[5px]">
+      <p className="text-gray">Tối đa</p>
+      <NumberInput
         type="number"
-        min={1}
-        max={99}
+        min={0}
+        max={5000}
+        value={length || ""}
+        onChange={handleLengthChange}
         className="w-1/3 bg-lightGray rounded-md border-b-2 border-gray text-sm p-1 px-3"
-        value={maxPage}
-        onChange={(e) => setMaxPage(e.target.value)}
       />
-      <p className="text-redError">hàng</p>
+      <p className="text-redError">{unit}</p>
     </div>
   );
 };
 
-const LongAnswerTemplate = () => {
-  const [maxPage, setMaxPage] = useState(1);
-  return (
-    <div className="flex items-end gap-2 text-sm ">
-      <p>Dài</p>
-      <input
-        type="number"
-        min={1}
-        max={99}
-        className="w-1/3 bg-lightGray rounded-md border-b-2 border-gray text-sm p-1 px-3"
-        value={maxPage}
-        onChange={(e) => setMaxPage(e.target.value)}
-      />
-      <p className="text-redError">trang</p>
-    </div>
-  );
+LengthInput.propTypes = {
+  formFieldId: PropTypes.string.isRequired,
+  setForm: PropTypes.func.isRequired,
+  unit: PropTypes.string.isRequired,
+  length: PropTypes.number,
 };
 
 const QuestionFrame = ({ setForm, formField, emptyFields }) => {
-  const questionTemplates = ["Trả lời ngắn", "Trả lời dài"];
-  const [selectedMethod, setSelectedMethod] = useState(questionTemplates[0]);
+  const [selectedMethod, setSelectedMethod] = useState(
+    enumToLabel[formField.fieldType] || "Trả lời ngắn"
+  );
+
+  useEffect(() => {
+    const fieldType = labelToEnum[selectedMethod];
+
+    if (fieldType) {
+      setForm((prevForm) => {
+        const updatedFields = prevForm.formFields.map((field) => {
+          if (field.formFieldId !== formField.formFieldId) return field;
+
+          const isNowTable = fieldType === "TABLE";
+          const wasTable = field.fieldType === "TABLE";
+
+          return {
+            ...field,
+            fieldType,
+            length: 0,
+            fieldName: isNowTable
+              ? field.fieldName // keep HTML if switching to table
+              : wasTable
+              ? "" // clear HTML when switching away from table
+              : field.fieldName, // keep normal text if not table
+          };
+        });
+        return { ...prevForm, formFields: updatedFields };
+      });
+    }
+  }, [selectedMethod]);
 
   const handleFieldDataChange = (e) => {
     const { name, value } = e.target;
     setForm((prevForm) => {
-      const updatedFields = prevForm.formFields.map((field) => {
-        if (field.formFieldId === formField.formFieldId) {
-          return { ...field, [name]: value };
-        }
-        return field;
-      });
+      const updatedFields = prevForm.formFields.map((field) =>
+        field.formFieldId === formField.formFieldId
+          ? { ...field, [name]: value }
+          : field
+      );
       return { ...prevForm, formFields: updatedFields };
     });
   };
 
   const handleCopy = (index) => {
     const newField = {
+      ...formField,
       position: index,
-      fieldName: formField.fieldName,
-      description: formField.description,
-      formFieldId: "12424",
+      formFieldId: crypto.randomUUID(),
     };
     setForm((prev) => {
       const updatedFields = [
@@ -70,28 +112,122 @@ const QuestionFrame = ({ setForm, formField, emptyFields }) => {
         newField,
         ...prev.formFields.slice(index),
       ];
-      const reindexedFields = updatedFields.map((field, idx) => ({
-        ...field,
-        position: idx,
-      }));
-      return {
-        ...prev,
-        formFields: reindexedFields,
-      };
+      const reindexed = updatedFields.map((f, i) => ({ ...f, position: i }));
+      return { ...prev, formFields: reindexed };
     });
   };
 
   const handleDelete = (index) => {
     setForm((prev) => {
       const updatedFields = prev.formFields
-        .filter((field) => field.position !== index)
-        .map((field, i) => ({ ...field, position: i }));
-
-      return {
-        ...prev,
-        formFields: updatedFields,
-      };
+        .filter((f) => f.position !== index)
+        .map((f, i) => ({ ...f, position: i }));
+      return { ...prev, formFields: updatedFields };
     });
+  };
+
+  const renderFieldTypeDetails = () => {
+    switch (selectedMethod) {
+      case "Trả lời ngắn":
+      case "Trả lời dài":
+        return (
+          <LengthInput
+            formFieldId={formField.formFieldId}
+            setForm={setForm}
+            unit="từ"
+            length={formField.length}
+          />
+        );
+      case "Kiểu liệt kê":
+        return (
+          <LengthInput
+            formFieldId={formField.formFieldId}
+            setForm={setForm}
+            unit="chấm đầu dòng"
+            length={formField.length}
+          />
+        );
+      case "Bảng chọn":
+        return (
+          <div className="flex flex-col gap-2 font-textFont">
+            <div className="flex items-center gap-2 text-gray">
+              <Tooltip
+                title={
+                  <div className="p-3 flex gap-6 items-center text-md md:min-w-48">
+                    <p>Kiểu bảng chọn — người dùng chọn/không chọn ô.</p>
+                    <label className="flex items-center gap-2 text-md text-gray">
+                      <input
+                        type="checkbox"
+                        disabled
+                        checked
+                        className="w-4 h-4 accent-blue-500"
+                      />
+                      Đã chọn
+                    </label>
+                    <label className="flex items-center gap-2 text-md text-gray">
+                      <input
+                        type="checkbox"
+                        disabled
+                        checked={false}
+                        className="w-4 h-4 accent-blue-500"
+                      />
+                      Chưa chọn
+                    </label>
+                  </div>
+                }
+                arrow
+                placement="right"
+              >
+                <IconButton size="medium">
+                  <HelpOutlineIcon fontSize="medium" />
+                </IconButton>
+              </Tooltip>
+            </div>
+          </div>
+        );
+      case "Bảng":
+        return (
+          <div className="col-span-3">
+            <TableEditor
+              onChange={(html) => {
+                setForm((prev) => {
+                  const updatedFields = prev.formFields.map((field) =>
+                    field.formFieldId === formField.formFieldId
+                      ? { ...field, fieldName: html }
+                      : field
+                  );
+                  return { ...prev, formFields: updatedFields };
+                });
+              }}
+            />
+          </div>
+        );
+      case "Ngày":
+        return (
+          <div className="flex flex-col gap-2 font-textFont">
+            <div className="flex items-center gap-2 text-gray">
+              <Tooltip
+                title={
+                  <div className="p-3 flex gap-6 items-center text-md md:min-w-48">
+                    <p>Người dùng chọn một ngày theo định dạng DD/YY/MMMM.</p>
+                  </div>
+                }
+                arrow
+                placement="right"
+              >
+                <IconButton size="medium">
+                  <HelpOutlineIcon
+                    fontSize="medium"
+                    sx={{ color: "#D9D9D9" }}
+                  />
+                </IconButton>
+              </Tooltip>
+            </div>
+          </div>
+        );
+      default:
+        return null;
+    }
   };
 
   return (
@@ -102,16 +238,21 @@ const QuestionFrame = ({ setForm, formField, emptyFields }) => {
           placeholder="Câu hỏi"
           onChange={handleFieldDataChange}
           name="fieldName"
-          value={formField.fieldName || ""}
+          value={
+            selectedMethod === "Bảng"
+              ? "Không thể đặt câu hỏi cho dạng bảng"
+              : formField.fieldName || ""
+          }
+          disabled={selectedMethod === "Bảng"}
         />
         <select
           className="border border-lightGray focus:outline-none p-1 px-3 rounded-md"
           onChange={(e) => setSelectedMethod(e.target.value)}
           value={selectedMethod}
         >
-          {questionTemplates.map((question, index) => (
-            <option key={index} value={question}>
-              {question}
+          {Object.values(enumToLabel).map((label, index) => (
+            <option key={index} value={label}>
+              {label}
             </option>
           ))}
         </select>
@@ -123,49 +264,35 @@ const QuestionFrame = ({ setForm, formField, emptyFields }) => {
           name="description"
           value={formField.description || ""}
         />
-        {selectedMethod === "Trả lời ngắn" && <ShortAnswerTemplate />}
-        {selectedMethod === "Trả lời dài" && <LongAnswerTemplate />}
-        {emptyFields &&
-          emptyFields.length > 0 &&
-          emptyFields.some(
-            (field) => formField.formFieldId === field.formFieldId
-          ) && (
-            <p className="col-span-3 pt-1 text-redError">
-              Câu hỏi không được để trống
-            </p>
-          )}
+
+        {renderFieldTypeDetails()}
+
+        {emptyFields?.some((f) => f.formFieldId === formField.formFieldId) && (
+          <p className="col-span-3 pt-1 text-redError">
+            Câu hỏi không được để trống
+          </p>
+        )}
       </div>
 
-      {/* Edit buttons ... */}
       <div className="flex gap-2 mt-4 p-2 pt-3 border-t-2 border-gray">
         <IconButton
-          size=""
           color="info"
           onMouseDown={(e) => {
             e.preventDefault();
             handleCopy(formField.position + 1);
           }}
-          sx={{
-            border: "1px solid #2196f3",
-            width: "26px",
-            height: "26px",
-          }}
+          sx={{ border: "1px solid #2196f3", width: "26px", height: "26px" }}
         >
           <ContentCopyIcon sx={{ fontSize: "18px", padding: "2px" }} />
         </IconButton>
 
         <IconButton
-          size="small"
           color="error"
           onMouseDown={(e) => {
             e.preventDefault();
             handleDelete(formField.position);
           }}
-          sx={{
-            border: "1px solid #f44336",
-            width: "26px",
-            height: "26px",
-          }}
+          sx={{ border: "1px solid #f44336", width: "26px", height: "26px" }}
         >
           <DeleteIcon sx={{ fontSize: "18px", padding: "2px" }} />
         </IconButton>
@@ -174,10 +301,10 @@ const QuestionFrame = ({ setForm, formField, emptyFields }) => {
   );
 };
 
-export default QuestionFrame;
-
 QuestionFrame.propTypes = {
-  setForm: PropTypes.func,
-  formField: PropTypes.object,
+  setForm: PropTypes.func.isRequired,
+  formField: PropTypes.object.isRequired,
   emptyFields: PropTypes.array,
 };
+
+export default QuestionFrame;

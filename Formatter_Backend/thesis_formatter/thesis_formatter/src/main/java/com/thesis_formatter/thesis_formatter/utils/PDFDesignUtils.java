@@ -18,6 +18,7 @@ public class PDFDesignUtils {
         public int leftPos;
         public boolean fromDataSource;
         public boolean fromDrag;
+        public String fieldType;
     }
 
     public static class DesignData {
@@ -81,7 +82,37 @@ public class PDFDesignUtils {
                     int span = 1;
                     while (col + span < totalColumns && regionMap[row][col + span] == region) span++;
 
-                    Phrase phrase = buildFormattedPhrase(region.styledTexts, unicodeFont, unicodeFontBold, unicodeFontItalic);
+//                    Phrase phrase = buildFormattedPhrase(region.styledTexts, unicodeFont, unicodeFontBold, unicodeFontItalic);
+
+                    Phrase phrase;
+                    String type = region.fieldType != null ? region.fieldType.toUpperCase() : "TEXT";
+
+                    switch (type) {
+                        case "SHORT_ANSWER":
+                            phrase = new Phrase("__________________", unicodeFont);
+                            break;
+                        case "LONG_ANSWER":
+                            phrase = new Phrase("__________________\n\n__________________", unicodeFont);
+                            break;
+                        case "SELECT":
+                            phrase = new Phrase("☐", unicodeFont);
+                            break;
+                        case "DATE":
+                            phrase = new Phrase("__/__/____", unicodeFont);
+                            break;
+                        case "BULLETS":
+                            phrase = new Phrase("• First item\n• Second item", unicodeFont);
+                            break;
+                        case "TABLE":
+                            phrase = new Phrase("[ Embedded table ]", unicodeFontItalic); // Placeholder for now
+                            break;
+                        case "TEXT":
+                        default:
+                            phrase = buildFormattedPhrase(region.styledTexts, unicodeFont, unicodeFontBold, unicodeFontItalic);
+                            break;
+                    }
+
+
                     PdfPCell cell = new PdfPCell(phrase);
                     cell.setColspan(span);
                     cell.setBorder(Rectangle.NO_BORDER);

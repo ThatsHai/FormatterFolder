@@ -22,6 +22,7 @@ public class Cell {
     int topPos;
     boolean fromDataSource;
     boolean fromDrag;
+    String fieldType;
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "designId", referencedColumnName = "designId")
     @JsonBackReference

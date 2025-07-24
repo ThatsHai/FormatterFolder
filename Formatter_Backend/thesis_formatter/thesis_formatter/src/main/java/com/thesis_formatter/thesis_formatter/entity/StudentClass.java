@@ -1,9 +1,7 @@
 package com.thesis_formatter.thesis_formatter.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import com.thesis_formatter.thesis_formatter.enums.AvailabilityEnum;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -20,4 +18,6 @@ public class StudentClass {
     @ManyToOne
     @JoinColumn(name = "majorId", referencedColumnName = "majorId")
     Major major;
+    @Enumerated
+    AvailabilityEnum availability = AvailabilityEnum.ACTIVE;
 }

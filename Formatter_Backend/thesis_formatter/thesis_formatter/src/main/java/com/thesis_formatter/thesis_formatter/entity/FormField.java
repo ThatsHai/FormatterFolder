@@ -18,13 +18,10 @@ public class FormField {
 //    @GeneratedValue(strategy = GenerationType.UUID)
     String formFieldId;
     String fieldName;
-    //    int colSpan;
-//    int rowSpan;
     int position;
     String description;
-    //Form type is used for further expansion
-//    String formType;
     String fieldType;
+    int length;
     @ManyToOne
     @JoinColumn(name = "formId", referencedColumnName = "formId")
     @JsonBackReference

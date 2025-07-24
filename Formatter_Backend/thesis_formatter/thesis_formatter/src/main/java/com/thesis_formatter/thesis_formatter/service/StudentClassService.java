@@ -23,15 +23,17 @@ public class StudentClassService {
     StudentClassRepo studentClassRepo;
 
     public APIResponse<StudentClass> addClass(StudentClass studentClassRequest) {
-        StudentClass classFinding = studentClassRepo.findByStudentClassId(studentClassRequest.getStudentClassId());
-        if (classFinding != null) {
+        if (studentClassRepo.findByStudentClassId(studentClassRequest.getStudentClassId()) != null) {
             throw new AppException(ErrorCode.DUPLICATE_KEY);
         }
-        Optional<Major> major = majorRepo.findById(studentClassRequest.getMajor().getMajorId());
-        studentClassRequest.setMajor(major.orElse(null));
+
+        Major major = majorRepo.findById(studentClassRequest.getMajor().getMajorId())
+                .orElseThrow(() -> new AppException(ErrorCode.MAJOR_NOT_EXISTED));
+
+        studentClassRequest.setMajor(major);
         studentClassRepo.save(studentClassRequest);
-        return APIResponse
-                .<StudentClass>builder()
+
+        return APIResponse.<StudentClass>builder()
                 .code("200")
                 .result(studentClassRequest)
                 .build();
@@ -76,6 +78,7 @@ public class StudentClassService {
         }
         existedStudentClass.setMajor(major);
         existedStudentClass.setStudentClassName(studentClass.getStudentClassName());
+        existedStudentClass.setAvailability(studentClass.getAvailability());
         studentClassRepo.save(existedStudentClass);
         return APIResponse.<StudentClass>builder()
                 .code("200")
