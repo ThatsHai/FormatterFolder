@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import api from "../../services/api";
 import GridBoard from "./designPage/GridBoard";
-import RightSidebar from "./designPage/RightSideBar"
+import RightSidebar from "./designPage/RightSideBar";
 import ConfirmationPopup from "../../component/ConfirmationPopup";
 import PropTypes from "prop-types";
 import { useLocation } from "react-router";
-
 
 const Tooltip = () => {
   const [displayTooltip, setDisplayToolTip] = useState(false);
@@ -101,8 +100,8 @@ const DesignMainContent = ({ formData, fetchFormInfo }) => {
   };
 
   const handleSendFormData = async () => {
-    console.log(formData)
-    return
+    // console.log(designInfo);
+    // return;
     try {
       if (Object.keys(formData).length === 0) {
         await fetchFormInfo();
@@ -113,7 +112,7 @@ const DesignMainContent = ({ formData, fetchFormInfo }) => {
 
       const latestDesignInfo = { ...designInfo, form: formData };
       const result = await api.post("/designs", latestDesignInfo);
-      console.log(JSON.stringify(result));
+      console.log(result);
 
       setDesignInfo(latestDesignInfo);
     } catch (e) {
@@ -199,7 +198,7 @@ const FormDesignCreationPage = () => {
   }, [formId]);
 
   return (
-    <div className="p-6 h-[200vh]">
+    <div className="p-6">
       <DesignMainContent
         formData={formData}
         fetchFormInfo={fetchFormInfo}

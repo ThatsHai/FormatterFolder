@@ -33,7 +33,7 @@ const TeacherInfoDiv = () => {
       </div>
 
       {isOpen && (
-        <div className="gap-3 grid grid-cols-1 border-b-[1px] pb-3 border-lightGray shadow-sm">
+        <div className="gap-3 grid grid-cols-1 border-b-[1px] border-x-[0px] border-t-[0px] pb-4 border-lightGray shadow-[0_1px_0_rgba(0,0,0,0.1)]">
           <div
             className="border p-2 rounded-md cursor-move"
             draggable
@@ -111,7 +111,7 @@ const StudentInfoDiv = () => {
       </div>
 
       {isOpen && (
-        <div className="gap-3 grid grid-cols-1 border-b-[1px] pb-3 border-lightGray shadow-sm">
+        <div className="gap-3 grid grid-cols-1 border-b-[1px] border-x-[0px] border-t-[0px] pb-4 border-lightGray shadow-[0_1px_0_rgba(0,0,0,0.1)]">
           <div
             className="border p-2 rounded-md cursor-move"
             draggable
@@ -219,6 +219,7 @@ const Fields = ({ formData }) => {
                     JSON.stringify({
                       formFieldId: formField.formFieldId,
                       fieldName: formField.fieldName,
+                      fieldType: formField.fieldType,
                     })
                   );
                 }}
@@ -249,7 +250,7 @@ const RightSidebar = ({ formData }) => {
     return (
       <>
         <div
-          className={`fixed top-0 right-0 h-full bg-white shadow-lg transition-all duration-300 ease-in-out z-50 font-textFont ${
+          className={`overflow-y-auto fixed top-0 right-0 h-full bg-white shadow-lg transition-all duration-300 ease-in-out z-50 font-textFont ${
             isOpen ? "w-64" : "w-0 overflow-hidden"
           }`}
         >
@@ -277,10 +278,10 @@ const RightSidebar = ({ formData }) => {
           isOpen ? "w-64" : "w-0 overflow-hidden"
         }`}
       >
-        <div className="p-4">
+        <div className="flex flex-col h-full overflow-y-auto p-4 hide-scrollbar">
           <h2 className="text-lg font-semibold">{formData.title}</h2>
           <p className="text-sm text-gray">
-            {formData.introduction || "Không có mô tả"}
+            {formData.description || "Không có mô tả"}
           </p>
 
           {/* Reader information */}

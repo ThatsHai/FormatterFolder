@@ -35,6 +35,7 @@ public enum ErrorCode {
     ENTITY_NOT_FOUND("1020", "This entity does not exist", HttpStatus.NOT_FOUND),
     INVALID_ARGUMENT("1021", "Invalid argument", HttpStatus.BAD_REQUEST),
     TOPIC_NOT_FOUND("1022", "Topic not found", HttpStatus.NOT_FOUND),
+    DUPLICATE_NAME("1023", "Duplicate name", HttpStatus.CONFLICT),
     ;
 
     private String code;

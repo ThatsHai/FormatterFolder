@@ -79,9 +79,14 @@ public class FormService {
     }
 
     public APIResponse<Form> createForm(Form form) {
-        Form existedForm = formRepo.findByFormId(form.getFormId());
-        if (existedForm != null) {
+        String title = form.getTitle() == null ? null : form.getTitle().trim();
+
+        // If formId is client-supplied; skip if it's DB-generated
+        if (formRepo.existsByFormId(form.getFormId())) {
             throw new AppException(ErrorCode.DUPLICATE_KEY);
+        }
+        if (formRepo.existsByTitleIgnoreCase(title)) {
+            throw new AppException(ErrorCode.DUPLICATE_NAME);
         }
         // Set the back-reference on each FormField
         if (form.getFormFields() != null && !form.getFormFields().isEmpty()) {

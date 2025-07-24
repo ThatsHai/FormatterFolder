@@ -95,6 +95,7 @@ public class DesignService {
             c.rowSpan = cell.getRowSpan();
             c.topPos = cell.getTopPos();
             c.leftPos = cell.getLeftPos();
+            c.fieldType = cell.getFieldType();
             return c;
         }).collect(Collectors.toList());
 
@@ -113,7 +114,7 @@ public class DesignService {
         Path filePath = Paths.get("user_resource/pdf_design/design-" + designId + ".pdf");
 
         if (!Files.exists(filePath)) {
-            throw new RuntimeException("PDF design not found");
+            throw new AppException(ErrorCode.DESIGN_NOT_FOUND);
         }
 
         Resource resource = new UrlResource(filePath.toUri());

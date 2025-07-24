@@ -11,5 +11,10 @@ import java.util.Optional;
 @Repository
 public interface FormRepo extends JpaRepository<Form, String> {
     Optional<Form> findByReadersListContainingIgnoreCase(String reader);
+
     Form findByFormId(String formId);
+
+    boolean existsByFormId(String formId);
+
+    boolean existsByTitleIgnoreCase(String title);
 }

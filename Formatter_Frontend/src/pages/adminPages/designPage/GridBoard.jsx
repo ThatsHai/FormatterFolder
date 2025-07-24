@@ -89,6 +89,7 @@ const GridBoard = ({
       height: bottom - topPos + 1,
       text: "",
       fromDrag: false,
+      fieldType: "TEXT",
     };
 
     const overlaps = mergeRegions.some((region) =>
@@ -189,6 +190,7 @@ const GridBoard = ({
               leftPos: c,
               fromDataSource: region.fromDataSource || false,
               fromDrag: region.fromDrag || false,
+              fieldType: region.fieldType || "SHORT_ANSWER",
             });
 
             for (
@@ -430,6 +432,7 @@ const GridBoard = ({
                   ...copy[index],
                   text: "Dữ liệu từ ${{" + droppedField.fieldName + "}}",
                   fromDrag: true,
+                  fieldType: droppedField.fieldType || "TEXT", 
                 };
                 return copy;
               });
