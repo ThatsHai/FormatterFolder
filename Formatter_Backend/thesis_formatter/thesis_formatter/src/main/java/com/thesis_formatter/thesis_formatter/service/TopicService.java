@@ -196,7 +196,7 @@ public class TopicService {
                 .collect(Collectors.toList());
         for (Student student : updatedStudents) {
             Optional<Topic> existedTopic = topicRepo.findPublishedTopicsByStudent(student.getUserId());
-            if (existedTopic.isPresent()) {
+            if (existedTopic.isPresent() && !existedTopic.get().getTopicId().equals(topic.getTopicId())) {
                 throw new AppException(ErrorCode.STUDENT_ALREADY_IN_OTHER_TOPIC);
             }
         }

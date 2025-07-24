@@ -60,45 +60,37 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
               {formRecord.topic.form.title}
             </h1>
             {/* Title */}
-            <div className="relative text-start w-full font-textFont text-lg mb-8 px-10">
-              <h3 className="text-black font-semibold mb-2">1. ĐỀ TÀI</h3>
-              <p className="w-full">{formData.title}</p>
-            </div>
-            {/* <div className="relative text-start w-full font-textFont text-lg mb-8 px-10 ">
-                <h3 className="text-black font-semibold mb-2">
-                  2. CÁN BỘ HƯỚNG DẪN
-                </h3>
-                <div className="grid grid-cols-2 items-center mb-3">
-                  <div className="rounded-md col-span-1 bg-[#e4e4e4] py-1">
-                    {formData.topic.teachers.map((teacher, index) => (
-                      <div className="m-8" key={index}>
-                        {index + 1}. {teacher.name} - {teacher.email}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div> */}
             <div className="relative text-start w-full font-textFont text-lg px-10 w-full grid grid-cols-3 items-center mb-3">
+              <h3 className="text-black font-semibold">1. ĐỀ TÀI</h3>
+              <p className="rounded-md col-span-2 bg-[#e4e4e4] px-6 py-1">{formData.title}</p>
+            </div>
+            {/* Teacher Information */}
+            <div className="relative text-start w-full font-textFont text-lg px-10 w-full grid grid-cols-3 items-center">
               <p className="text-black font-semibold">2. CÁN BỘ HƯỚNG DẪN</p>
-              {formData.topic.teachers > 1 ? (
+              {formData.topic.teachers.length > 1 ? (
                 <div className="rounded-md col-span-2 bg-[#e4e4e4] px-4 py-1">
-                  {formData.topic.teachers.map((teacher, index) => (
-                    <div key={index}>
-                      {index + 1}. {teacher.name} - {teacher.email}
+                  {formData.topic.teachers?.map((teacher, index) => (
+                    <div
+                      key={index}
+                      className="grid grid-cols-[1.5rem_auto] gap-2"
+                    >
+                      <span className="text-right">{index + 1}.</span>
+                      <span>
+                        {teacher.name} - Email: {teacher.email}
+                      </span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="col-span-2 rounded-md px-4 py-1 ">
-                  {formData.topic.teachers[0].name} -{" "}
-                  {formData.topic.teachers[0].email}
+                <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
+                  {formData.topic.teachers[0].name} - {formData.topic.teachers[0].email}
                 </p>
               )}
             </div>
 
             {/* Student Information */}
             <div className="flex items-center text-start w-full font-textFont text-lg px-10">
-              <h3 className="text-black font-semibold">2. NGƯỜI THỰC HIỆN</h3>
+              <h3 className="text-black font-semibold">3. NGƯỜI THỰC HIỆN</h3>
               <IconButton
                 color="black"
                 aria-label="add"
@@ -112,31 +104,31 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
                 {/* Student info */}
                 <div className="w-full grid grid-cols-3 items-center mb-3">
                   <p>Tên sinh viên</p>
-                  <p className="col-span-2 rounded-md px-4 py-1 ">
+                  <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
                     {formData.student.studentName}
                   </p>
                 </div>
                 <div className="w-full grid grid-cols-3 items-center mb-3">
                   <p>Khóa (MSSV)</p>
-                  <p className="col-span-2 rounded-md px-4 py-1 ">
+                  <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
                     {formData.student.studentId}
                   </p>
                 </div>
                 <div className="w-full grid grid-cols-3 items-center mb-3">
-                  <p>Ngành</p>
-                  <p className="col-span-2 rounded-md px-4 py-1 ">
+                  <p>Ngành</p>  
+                  <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
                     {formData.student.major}
                   </p>
                 </div>
                 <div className="w-full grid grid-cols-3 items-center mb-3">
                   <p>Đơn vị (Khoa/Bộ môn)</p>
-                  <p className="col-span-2 rounded-md px-4 py-1 ">
+                  <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
                     {formData.student.department}
                   </p>
                 </div>
                 <div className="w-full grid grid-cols-3 items-center mb-3">
                   <p>Khoa/Trường</p>
-                  <p className="col-span-2 rounded-md px-4 py-1 ">
+                  <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
                     {formData.student.faculty}
                   </p>
                 </div>
@@ -146,7 +138,7 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
             {/* Topic Information */}
             <div className="flex items-center text-start w-full font-textFont text-lg px-10">
               <h3 className="text-black font-semibold">
-                3. THÔNG TIN GỢI Ý ĐỀ TÀI
+                4. THÔNG TIN GỢI Ý ĐỀ TÀI
               </h3>
               <IconButton
                 color="black"
@@ -159,69 +151,72 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
             {showTopicInfo && (
               <div className="relative text-start w-full font-textFont text-lg mb-8 px-10">
                 <div className="w-full grid grid-cols-3 items-center mb-3">
-                  <p>Giới thiệu</p>
-                  <p className="col-span-2 rounded-md px-4 py-1 ">
-                    {formData.topic.description}
-                  </p>
-                </div>
-                <div className="w-full grid grid-cols-3 items-center mb-3">
-                  <p>Nội dung nghiên cứu</p>
-                  <p className="col-span-1 rounded-md px-4 py-1 bg-[#e4e4e4]">
-                    {formData.topic.researchContent}
-                  </p>
-                </div>
-                <div className="w-full grid grid-cols-3 items-center mb-3">
-                  <p>Mục tiêu tổng quát</p>
-                  <p className="col-span-2 rounded-md px-4 py-1 ">
-                    {formData.topic.objective}
-                  </p>
-                </div>
-                <div className="w-full grid grid-cols-3 items-center mb-3">
-                  <p>Mục tiêu cụ thể</p>
-                  <div
-                    className="col-span-1 bg-[#e4e4e4] rounded-md min-h-[40px] text-lg rounded-md px-4 py-1 prose prose-sm 
+                <p>Giới thiệu</p>
+                <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
+                  {formData.topic.description || "Bỏ trống"}
+                </p>
+              </div>
+              <div className="w-full grid grid-cols-3 items-center mb-3">
+                <p>Nội dung nghiên cứu</p>
+                <p className="col-span-2 rounded-md px-6 py-1 bg-[#e4e4e4]">
+                  {formData.topic.researchContent}
+                </p>
+              </div>
+              <div className="w-full grid grid-cols-3 items-center mb-3">
+                <p>Mục tiêu tổng quát</p>
+                <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
+                  {formData.topic.objective || "Bỏ trống"}
+                </p>
+              </div>
+              <div className="w-full grid grid-cols-3 items-center mb-3">
+                <p>Mục tiêu cụ thể</p>
+                <div
+                  className="col-span-2 bg-[#e4e4e4] rounded-md min-h-[40px] text-lg rounded-md px-3 py-1 prose prose-sm max-w-none
                     prose-ul:list-disc prose-ol:list-decimal prose-li:ml-1 text-black  prose-li:marker:text-black"
-                    dangerouslySetInnerHTML={{
-                      __html: formData.topic.objectiveDetails,
-                    }}
-                  ></div>
-                </div>
-                <div className="w-full grid grid-cols-3 items-center mb-3">
-                  <p>Kinh phí</p>
-                  <p className="col-span-2 rounded-md px-4 py-1 ">
-                    {formData.topic.funding}
-                  </p>
-                </div>
-                <div className="w-full grid grid-cols-3 items-center mb-3">
-                  <p>Thời gian thực hiện</p>
-                  <p className="col-span-2 rounded-md px-4 py-1 ">
-                    {formData.topic.time} - Bắt đầu từ{" "}
-                    {formData.topic.implementationTime}
-                  </p>
-                </div>
+                  dangerouslySetInnerHTML={{
+                    __html: formData.topic.objectiveDetails,
+                  }}
+                ></div>
+              </div>
+              <div className="w-full grid grid-cols-3 items-center mb-3">
+                <p>Kinh phí</p>
+                <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
+                  {formData.topic.funding || "Bỏ trống"}
+                </p>
+              </div>
+              <div className="w-full grid grid-cols-3 items-center mb-3">
+                <p>Thời gian thực hiện</p>
+                <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
+                  {formData.topic.time} - Bắt đầu từ {formData.topic.implementationTime}
+                </p>
+              </div>
 
-                <div className="w-full grid grid-cols-3 items-center mb-3">
-                  <p>Thông tin liên hệ về đề tài</p>
-                  <p className="col-span-2 rounded-md px-4 py-1 ">
-                    {formData.topic.contactInfo}
+              <div className="w-full grid grid-cols-3 items-center mb-3">
+                <p>Thông tin liên hệ về đề tài</p>
+                <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
+                  {formData.topic.contactInfo}
+                </p>
+              </div>
+              <div className="w-full grid grid-cols-3 items-center mb-3">
+                <p className="">Dành cho sinh viên ngành</p>
+                {formData.topic.majors.length > 1 ? (
+                  <div className="rounded-md bg-[#e4e4e4] px-4 py-1 col-span-2">
+                    {formData.topic.majors.map((major, index) => (
+                      <div
+                        key={index}
+                        className="grid grid-cols-[1.5rem_auto] gap-2"
+                      >
+                        <span className="text-right">{index + 1}.</span>
+                        <span>{major.majorName}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="col-span-2 bg-[#e4e4e4] rounded-md px-6 py-1 ">
+                    {formData.topic.majors[0].majorName}
                   </p>
-                </div>
-                <div className="w-full grid grid-cols-3 items-center mb-3">
-                  <p className="self-start">Dành cho sinh viên ngành</p>
-                  {formData.topic.majors > 1 ? (
-                    <div className="rounded-md bg-[#e4e4e4] px-4 py-1">
-                      {formData.topic.majors.map((major, index) => (
-                        <div key={index}>
-                          {index + 1}. {major.majorName}
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="col-span-2 rounded-md px-4 py-1 ">
-                      {formData.topic.majors[0].majorName}
-                    </p>
-                  )}
-                </div>
+                )}
+              </div>
               </div>
             )}
             {/* Form Record Fields */}
@@ -236,7 +231,7 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
                   {index + 1}. {field.formField.fieldName}
                 </h3>
 
-                <p className="w-2/3 rounded-md px-4 py-1">{field.value}</p>
+                <p className="w-2/3 rounded-md px-6 py-1">{field.value}</p>
               </div>
             ))}
           </div>

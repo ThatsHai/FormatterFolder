@@ -5,6 +5,7 @@ import PropTypes from "prop-types";
 import { useEffect } from "react";
 import TeachersTable from "../../../pages/teacherPages/TeachersTable";
 import MajorsTable from "../../../pages/teacherPages/major/MajorsTable";
+import parse from "html-react-parser";
 const TopicDetail = ({ topic, onChange, formErrors }) => {
   const [selectedTopic, setSelectedTopic] = useState(topic?.topicId || "");
 
@@ -31,39 +32,35 @@ const TopicDetail = ({ topic, onChange, formErrors }) => {
         <div>
           <DisabledField title="Tên đề tài" value={topic.title}></DisabledField>
           <DisabledField
-            title="Mô tả"
+            title="Giới thiệu"
             value={topic.description}
           ></DisabledField>
+          <DisabledField
+            title="Nội dung nghiên cứu"
+            value={topic.researchContent}
+          ></DisabledField>
+          <DisabledField
+            title="Mục tiêu tổng quát"
+            value={topic.objective}
+          ></DisabledField>
           <div className="w-full grid grid-cols-3 items-start mb-3">
-            <label className="text-black">Mục tiêu</label>
-            <div
-              className="col-span-2 bg-[#e4e4e4] text-[#686868] rounded-md px-4 py-1 min-h-[40px] text-lg
-               pointer-events-none prose prose-sm 
-               prose-ul:list-disc prose-ol:list-decimal prose-li:ml-5 
-               prose-li:marker:text-[#686868] prose-p:text-[#686868]"
-              dangerouslySetInnerHTML={{ __html: topic.objective || "" }}
-            />
+            <label className="text-black">Mục tiêu cụ thể</label>
+            <div className="col-span-2 bg-[#e4e4e4] rounded-md min-h-[40px] text-lg px-4 py-1 
+            prose prose-sm max-w-none prose-ul:list-disc prose-ol:list-decimal prose-li:ml-0 
+            prose-li:marker:[#4c4c4c] text-[#4c4c4c]">
+              {parse(topic.objectiveDetails || "")}
+            </div>
           </div>
 
-          <DisabledField
-            title="Nguồn kinh phí"
-            value={topic.funding}
-          ></DisabledField>
-          <DisabledField
-            title="Nguồn kinh phí (nếu có)"
-            value={topic.fundingSource}
-          ></DisabledField>
+          <DisabledField title="Kinh phí" value={topic.funding}></DisabledField>
+
           <DisabledField
             title="Thời gian thực hiện"
-            value={topic.implementationTime}
+            value={topic.time + " - Bắt đầu từ " + topic.implementationTime}
           ></DisabledField>
           <DisabledField
-            title="Thông tin liên hệ"
+            title="Thông tin liên hệ về đề tài"
             value={topic.contactInfo}
-          ></DisabledField>
-          <DisabledField
-            title="Thời điểm tạo đề tài"
-            value={topic.semester + " - năm " + topic.year}
           ></DisabledField>
           <div>
             <p className="mb-3">Cán bộ hướng dẫn</p>

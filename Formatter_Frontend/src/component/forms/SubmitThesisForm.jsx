@@ -230,7 +230,7 @@ const SubmitThesisForm = ({
   return (
     <div className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-black bg-opacity-50 p-6">
       {/* Modal content wrapper */}
-      <div className="relative z-10 mt-10 w-full max-w-3xl bg-white rounded shadow-lg p-6">
+      <div className="relative z-10 mt-10 w-full max-w-4xl bg-white rounded shadow-lg p-6">
         {/* Close button just outside modal corner */}
         <button
           className="absolute -top-4 -right-4 bg-white border border-gray-300 px-2 py-1 rounded-full z-20 shadow-md"

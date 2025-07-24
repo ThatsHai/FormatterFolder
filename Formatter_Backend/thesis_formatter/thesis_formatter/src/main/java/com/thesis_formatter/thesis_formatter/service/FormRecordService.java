@@ -189,6 +189,14 @@ public class FormRecordService {
         FormRecord formRecord = formRecordRepo.findById(formRecordId).orElseThrow(() -> new AppException(ErrorCode.FormRecord_NOT_FOUND));
         updateStatus(formRecordId, "ACCEPTED");
 
+        Topic topic = formRecord.getTopic();
+        Student student = formRecord.getStudent();
+
+        if (topic.getStudents() == null || topic.getStudents().isEmpty()) {
+            topic.getStudents().add(student);
+            topicRepo.save(topic);
+        }
+
         notificationService.createSystemNotification(NotificationRequest.builder()
                 .senderId(null)
                 .recipientIds(new ArrayList<>(List.of(formRecord.getStudent().getUserId())))

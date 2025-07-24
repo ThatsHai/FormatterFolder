@@ -44,16 +44,22 @@ const TopicInfo = () => {
 
             <div className="relative text-start w-full font-textFont text-lg px-10 w-full grid grid-cols-3 items-center mb-3">
               <p className="text-black font-semibold">1. CÁN BỘ HƯỚNG DẪN</p>
-              {formData.teachers > 1 ? (
+              {formData.teachers.length > 1 ? (
                 <div className="rounded-md col-span-2 bg-[#e4e4e4] px-4 py-1">
                   {formData.teachers?.map((teacher, index) => (
-                    <div key={index}>
-                      {index + 1}. {teacher.name} - {teacher.email}
+                    <div
+                      key={index}
+                      className="grid grid-cols-[1.5rem_auto] gap-2"
+                    >
+                      <span className="text-right">{index + 1}.</span>
+                      <span>
+                        {teacher.name} - Email: {teacher.email}
+                      </span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="col-span-2 rounded-md px-4 py-1 ">
+                <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
                   {formData.teachers[0].name} - {formData.teachers[0].email}
                 </p>
               )}
@@ -65,27 +71,27 @@ const TopicInfo = () => {
               </h3>
               <div className="w-full grid grid-cols-3 items-center mb-3">
                 <p>Giới thiệu</p>
-                <p className="col-span-2 rounded-md px-4 py-1 ">
-                  {formData.description}
+                <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
+                  {formData.description || "Bỏ trống"}
                 </p>
               </div>
               <div className="w-full grid grid-cols-3 items-center mb-3">
                 <p>Nội dung nghiên cứu</p>
-                <p className="col-span-2 rounded-md px-4 py-1 bg-[#e4e4e4]">
+                <p className="col-span-2 rounded-md px-6 py-1 bg-[#e4e4e4]">
                   {formData.researchContent}
                 </p>
               </div>
               <div className="w-full grid grid-cols-3 items-center mb-3">
                 <p>Mục tiêu tổng quát</p>
-                <p className="col-span-2 rounded-md px-4 py-1 ">
-                  {formData.objective}
+                <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
+                  {formData.objective || "Bỏ trống"}
                 </p>
               </div>
               <div className="w-full grid grid-cols-3 items-center mb-3">
                 <p>Mục tiêu cụ thể</p>
                 <div
                   className="col-span-2 bg-[#e4e4e4] rounded-md min-h-[40px] text-lg rounded-md px-4 py-1 prose prose-sm max-w-none
-                    prose-ul:list-disc prose-ol:list-decimal prose-li:ml-1 text-black  prose-li:marker:text-black"
+                    prose-ul:list-disc prose-ol:list-decimal prose-li:ml-1 text-black prose-li:marker:text-black prose-p:ml-4"
                   dangerouslySetInnerHTML={{
                     __html: formData.objectiveDetails,
                   }}
@@ -93,52 +99,68 @@ const TopicInfo = () => {
               </div>
               <div className="w-full grid grid-cols-3 items-center mb-3">
                 <p>Kinh phí</p>
-                <p className="col-span-2 rounded-md px-4 py-1 ">
-                  {formData.funding}
+                <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
+                  {formData.funding || "Bỏ trống"}
                 </p>
               </div>
               <div className="w-full grid grid-cols-3 items-center mb-3">
                 <p>Thời gian thực hiện</p>
-                <p className="col-span-2 rounded-md px-4 py-1 ">
+                <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
                   {formData.time} - Bắt đầu từ {formData.implementationTime}
                 </p>
               </div>
 
               <div className="w-full grid grid-cols-3 items-center mb-3">
                 <p>Thông tin liên hệ về đề tài</p>
-                <p className="col-span-2 rounded-md px-4 py-1 ">
+                <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
                   {formData.contactInfo}
                 </p>
               </div>
               <div className="w-full grid grid-cols-3 items-center mb-3">
-                <p className="self-start">Dành cho sinh viên ngành</p>
-                {formData.majors > 1 ? (
-                  <div className="rounded-md bg-[#e4e4e4] px-4 py-1">
+                <p className="">Dành cho sinh viên ngành</p>
+                {formData.majors.length > 1 ? (
+                  <div className="rounded-md bg-[#e4e4e4] px-4 py-1 col-span-2">
                     {formData.majors.map((major, index) => (
-                      <div key={index}>
-                        {index + 1}. {major.majorName}
+                      <div
+                        key={index}
+                        className="grid grid-cols-[1.5rem_auto] gap-2"
+                      >
+                        <span className="text-right">{index + 1}.</span>
+                        <span>{major.majorName}</span>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="col-span-2 rounded-md px-4 py-1 ">
+                  <p className="col-span-2 bg-[#e4e4e4] rounded-md px-6 py-1 ">
                     {formData.majors[0].majorName}
                   </p>
                 )}
               </div>
             </div>
             {formData.students.length > 0 && (
-              <div className="relative text-start w-full font-textFont text-lg mb-8 px-10 ">
-                {/* Student info */}
-                <h3 className="text-black font-semibold">3. NGƯỜI THỰC HIỆN</h3>
-                {formData.students.map((student, index) => (
-                  <div key={index} className="w-full items-center mb-3">
-                    <p className="rounded-md px-4 py-1 ">
-                      {index + 1}. {student.name} - {student.userId} - Ngành{" "}
-                      {student.studentClass.major.majorName}
-                    </p>
+              <div className="relative text-start w-full font-textFont text-lg px-10 w-full grid grid-cols-3 items-center mb-3">
+                <p className="text-black font-semibold">3. NGƯỜI THỰC HIỆN</p>
+                {formData.students.length > 1 ? (
+                  <div className="rounded-md col-span-2 bg-[#e4e4e4] px-4 py-1">
+                    {formData.students?.map((student, index) => (
+                      <div
+                        key={index}
+                        className="grid grid-cols-[1.5rem_auto] gap-2"
+                      >
+                        <span className="text-right">{index + 1}.</span>
+                        <span>
+                          {student.name} - {student.userId} -{" "}
+                          {student.studentClass.major.majorName}
+                        </span>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                ) : (
+                  <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
+                    {formData.students[0].name} - {formData.students[0].userId}{" "}
+                    - {formData.students[0].studentClass.major.majorName}
+                  </p>
+                )}
               </div>
             )}
           </div>
