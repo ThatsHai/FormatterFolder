@@ -115,8 +115,12 @@ const FormCreationPage = () => {
       const result = await api.post("/forms/create", dataToSend);
       console.log(result);
       setDisplaySuccessPopup(true);
-    } catch (e) {
-      console.log("Lỗi không gửi được dữ liệu" + e);
+    } catch (err) {
+      const status = err.response?.status; // 409, 400, 500...
+      const backendCode = err.response?.data?.code; // e.g. "DUPLICATE_NAME"
+      if (status === 409 || backendCode === "DUPLICATE_NAME") {
+        alert("Tên biểu mẫu đã tồn tại");
+      }
     }
   };
 
@@ -144,37 +148,36 @@ const FormCreationPage = () => {
             {emptyTitleError && (
               <p className="text-redError">Tên biểu mẫu không được để trống</p>
             )}
-            
 
             <div className="mt-4">
               <label className="text-sm">Đối tượng sử dụng:</label>
               <select
-              className="w-full text-lg border border-gray rounded-md p-3 focus:outline-none focus:ring-1 focus:ring-darkBlue resize-none overflow-hidden leading-tight"
-              value={
-                form.readersList.includes("TEACHER") &&
-                form.readersList.includes("STUDENT")
-                  ? "TEACHER AND STUDENT"
-                  : form.readersList[0]
-              }
-              onChange={(e) => {
-                const value = e.target.value;
-                const newReadersList =
-                  value === "TEACHER AND STUDENT"
-                    ? ["TEACHER", "STUDENT"]
-                    : [value];
+                className="w-full text-lg border border-gray rounded-md p-3 focus:outline-none focus:ring-1 focus:ring-darkBlue resize-none overflow-hidden leading-tight"
+                value={
+                  form.readersList.includes("TEACHER") &&
+                  form.readersList.includes("STUDENT")
+                    ? "TEACHER AND STUDENT"
+                    : form.readersList[0]
+                }
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const newReadersList =
+                    value === "TEACHER AND STUDENT"
+                      ? ["TEACHER", "STUDENT"]
+                      : [value];
 
-                setForm((prev) => ({
-                  ...prev,
-                  readersList: newReadersList,
-                }));
-              }}
-            >
-              {Object.keys(readerLabels).map((reader) => (
-                <option key={reader} value={reader}>
-                  {readerLabels[reader]}
-                </option>
-              ))}
-            </select>
+                  setForm((prev) => ({
+                    ...prev,
+                    readersList: newReadersList,
+                  }));
+                }}
+              >
+                {Object.keys(readerLabels).map((reader) => (
+                  <option key={reader} value={reader}>
+                    {readerLabels[reader]}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="mt-4">

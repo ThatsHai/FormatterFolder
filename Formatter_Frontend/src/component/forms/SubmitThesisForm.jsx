@@ -71,18 +71,19 @@ const SubmitThesisForm = ({
           return !initialField || initialField.value !== field.value;
         });
       }
-      console.log("fields to send: ",fieldsToSend);
+      console.log("fields to send: ", fieldsToSend);
       if (initialData && fieldsToSend.length === 0) {
         setSuccessPopupText(
-          "Không có trường nào thay đổi, không cần cập nhật!");
+          "Không có trường nào thay đổi, không cần cập nhật!"
+        );
         setDisplaySuccessPopup(true);
         return;
       }
-      
+
       const dataToSend = {
         ...formData,
         formRecordFields: fieldsToSend,
-      }
+      };
       console.log("Data to send: ", dataToSend);
       if (initialData) {
         await api.put("/formRecords/update", dataToSend);
@@ -323,12 +324,12 @@ const SubmitThesisForm = ({
                   formErrors={formErrors}
                 ></TopicDetail>
               </div>
-              { !initialData && selectedTopic?.students?.length > 0 ? (
-                 <p className="text-redError pt-2 text-center">
-                    Đề tài này đã có sinh viên thực hiện, vui lòng chọn đề tài khác!
-                  </p>
-              )
-              : selectedTopic?.majors?.length > 0 ? (
+              {!initialData && selectedTopic?.students?.length > 0 ? (
+                <p className="text-redError pt-2 text-center">
+                  Đề tài này đã có sinh viên thực hiện, vui lòng chọn đề tài
+                  khác!
+                </p>
+              ) : selectedTopic?.majors?.length > 0 ? (
                 selectedTopic.majors.some(
                   (major) =>
                     major.majorId === student?.studentClass?.major?.majorId
@@ -342,8 +343,7 @@ const SubmitThesisForm = ({
                       Tiếp tục
                     </button>
                   </div>
-                )
-               : (
+                ) : (
                   <p className="text-redError pt-2 text-center">
                     Đề tài không thuộc ngành học của bạn
                   </p>
@@ -420,9 +420,7 @@ const SubmitThesisForm = ({
         {displaySuccessPopup && (
           <SuccessPopup
             isOpen={true}
-            successPopupText={
-              successPopupText
-            }
+            successPopupText={successPopupText}
             onClose={onSuccessPopupClosed}
           />
         )}

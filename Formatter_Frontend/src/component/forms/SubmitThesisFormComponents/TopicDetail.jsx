@@ -45,9 +45,11 @@ const TopicDetail = ({ topic, onChange, formErrors }) => {
           ></DisabledField>
           <div className="w-full grid grid-cols-3 items-start mb-3">
             <label className="text-black">Mục tiêu cụ thể</label>
-            <div className="col-span-2 bg-[#e4e4e4] rounded-md min-h-[40px] text-lg px-4 py-1 
+            <div
+              className="col-span-2 bg-[#e4e4e4] rounded-md min-h-[40px] text-lg px-4 py-1 
             prose prose-sm max-w-none prose-ul:list-disc prose-ol:list-decimal prose-li:ml-0 
-            prose-li:marker:[#4c4c4c] text-[#4c4c4c]">
+            prose-li:marker:[#4c4c4c] text-[#4c4c4c]"
+            >
               {parse(topic.objectiveDetails || "")}
             </div>
           </div>
@@ -56,7 +58,13 @@ const TopicDetail = ({ topic, onChange, formErrors }) => {
 
           <DisabledField
             title="Thời gian thực hiện"
-            value={topic.time + " - Bắt đầu từ " + topic.implementationTime}
+            value={`${topic?.time ?? ""}${
+              topic?.time && topic?.implementationTime ? " - " : ""
+            }${
+              topic?.implementationTime
+                ? `Bắt đầu từ ${topic.implementationTime}`
+                : ""
+            }`}
           ></DisabledField>
           <DisabledField
             title="Thông tin liên hệ về đề tài"

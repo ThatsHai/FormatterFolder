@@ -16,5 +16,6 @@ public interface StudentRepo extends JpaRepository<Student, String>, JpaSpecific
 
     Student findByAcId(String acId);
 
+    boolean existsByUserId(String userId);
 
 }

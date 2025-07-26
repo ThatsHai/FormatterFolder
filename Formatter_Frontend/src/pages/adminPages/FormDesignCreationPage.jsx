@@ -108,15 +108,21 @@ const DesignMainContent = ({ formData, fetchFormInfo }) => {
       }
 
       console.log(formData);
-      setDisplaySuccessPopup(true);
 
       const latestDesignInfo = { ...designInfo, form: formData };
       const result = await api.post("/designs", latestDesignInfo);
+      setDisplaySuccessPopup(true);
       console.log(result);
 
       setDesignInfo(latestDesignInfo);
-    } catch (e) {
-      console.log("Lỗi không gửi được dữ liệu" + e);
+    } catch (err) {
+      const status = err.response?.status; // 409, 400, 500...
+      const backendCode = err.response?.data?.code; // e.g. "DUPLICATE_NAME"
+      setDisplayConfirmationPopup(false);
+      setDisplaySuccessPopup(false);
+      if (status === 409 || backendCode === "DUPLICATE_NAME") {
+        alert("Tên thiết kế đã tồn tại");
+      }
     }
   };
 

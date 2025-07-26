@@ -56,6 +56,11 @@ public class StudentService {
 //                .build();
 //    }
     public APIResponse<StudentDTO> addStudent(AddStudentRequest studentRequest) {
+        String userId = studentRequest.getUserId();
+        if (studentRepo.existsByUserId(userId)) {
+            throw new AppException(ErrorCode.DUPLICATE_KEY);
+        }
+
         Student student = studentMapper.toStudent(studentRequest);
         StudentClass studentClass = studentClassRepo.findByStudentClassId(studentRequest.getClassId());
         Role role = roleRepo.findByName("STUDENT");

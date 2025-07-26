@@ -102,9 +102,8 @@ const SignUp = () => {
   };
 
   const isValidDate = (value) => {
-      return dayjs(value, "DD/MM/YYYY", true).isValid();
-    };
-  
+    return dayjs(value, "DD/MM/YYYY", true).isValid();
+  };
 
   const validateForm = () => {
     const errors = {};
@@ -183,21 +182,28 @@ const SignUp = () => {
         setResetSignal((prev) => prev + 1);
         navigate("/student");
       } catch (error) {
-        const errorData = error.response?.data;
-        console.log("Error during registration:", error);
-        if (
-          errorData?.code === "1009" &&
-          errorData.message === "Duplicate key"
-        ) {
-          setError("MSSV đã tồn tại");
-        } else if (error.request) {
-          // request được gửi đi nhưng không nhận được phản hồi
-          console.error("Không nhận được phản hồi từ server:", error.request);
-          setError("Không kết nối được đến server. Vui lòng thử lại sau.");
+        // const errorData = error.response?.data;
+        // console.log("Error during registration:", error);
+        // if (
+        //   errorData?.code === "1009" &&
+        //   errorData.message === "Duplicate key"
+        // ) {
+        //   setError("MSSV đã tồn tại");
+        // } else if (error.request) {
+        //   // request được gửi đi nhưng không nhận được phản hồi
+        //   console.error("Không nhận được phản hồi từ server:", error.request);
+        //   setError("Không kết nối được đến server. Vui lòng thử lại sau.");
+        // } else {
+        //   // lỗi khi tạo request (cú pháp axios hoặc code logic)
+        //   console.error("Lỗi không xác định:", error.message);
+        //   setError("Lỗi không xác định. Vui lòng thử lại.");
+        // }
+        const status = error.response?.status;
+        const backendCode = error.response?.data?.code;
+        if (status === 409 || backendCode === "1009") {
+          alert("MSSV đã tồn tại");
         } else {
-          // lỗi khi tạo request (cú pháp axios hoặc code logic)
-          console.error("Lỗi không xác định:", error.message);
-          setError("Lỗi không xác định. Vui lòng thử lại.");
+          console.error("API Error:", error.response?.data || error.message);
         }
       }
       setFormErrors({});
@@ -249,13 +255,14 @@ const SignUp = () => {
         )}
       </div>
       <form onSubmit={handleSubmit}>
-        {fields.map((field) => {
+        {fields.map((field, index) => {
           const { label, type, minLength } = field;
 
           const isSpecialSelect = specialSelectFields[label];
 
           return (
             <FormField
+              key={index}
               type={
                 type === "password"
                   ? "password"

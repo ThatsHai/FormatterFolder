@@ -53,6 +53,13 @@ public class DesignService {
     }
 
     public APIResponse<Design> addDesign(Design design) {
+        String title = design.getTitle() == null ? null : design.getTitle().trim();
+        String formId = design.getForm().getFormId();
+
+        if (designRepo.existsByForm_FormIdAndTitleIgnoreCase(formId, title)) {
+            throw new AppException(ErrorCode.DUPLICATE_NAME);
+        }
+
         if (design.getCells() != null) {
             for (Cell c : design.getCells()) {
                 c.setDesign(design);

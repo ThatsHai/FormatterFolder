@@ -19,6 +19,7 @@ public class Form {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String formId;
+    @Column(unique = true)
     String title;
     String description;
     @ElementCollection

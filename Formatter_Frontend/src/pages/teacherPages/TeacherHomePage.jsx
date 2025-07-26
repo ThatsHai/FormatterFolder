@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Button from "../../component/Button";
 import SubmitThesisForm from "../../component/forms/SubmitThesisForm";
 import ContentHomepage from "../../component/pageComponents/homepage/ContentHomepage";
+import useBootstrapUser from "../../hook/useBootstrapUser"
 import SuccessPopup from "../../component/SuccessPopup";
 import api from "../../services/api";
 
@@ -12,14 +13,17 @@ const TeacherHomePage = () => {
   const [refreshCounter, setRefreshCounter] = useState(0);
   const navigate = useNavigate();
 
+  const { loading } = useBootstrapUser(); // hydrates redux on mount
+  if (loading) return null;
+
   const handleFormToggle = async () => {
-    const result = await api.get("/myInfo");
-    const userId = result.data.result.useId;
-    console.log(result.data.result.userId);
-    if (userId === "") {
-      alert("Phiên đăng nhập hết hạn");
-      navigate("/login");
-    }
+    // const result = await api.get("/myInfo");
+    // const userId = result.data.result.useId;
+    // console.log(result.data.result.userId);
+    // if (userId === "") {
+    //   alert("Phiên đăng nhập hết hạn");
+    //   navigate("/login");
+    // }
     setIsThesisFormOpen((prev) => !prev);
   };
 
