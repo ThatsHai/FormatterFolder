@@ -46,4 +46,5 @@ public interface FormRecordRepo extends JpaRepository<FormRecord, String> {
 
     @Query("SELECT fr from FormRecord fr join fr.topic t join t.teachers teacher where teacher.acId = :userId and fr.status = com.thesis_formatter.thesis_formatter.enums.FormStatus.ACCEPTED and t.semester= :semester and t.year = :year")
     Page<FormRecord> findAcceptedByTeacherAndTime(@Param("userId") String userId, @Param("semester") Semester semester, @Param("year") String year, Pageable pageable);
+
 }

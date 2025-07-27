@@ -3,15 +3,20 @@ package com.thesis_formatter.thesis_formatter.service;
 import com.thesis_formatter.thesis_formatter.dto.request.NotificationRequest;
 import com.thesis_formatter.thesis_formatter.dto.request.SendEmailRequest;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
+import com.thesis_formatter.thesis_formatter.dto.response.FormRecordResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.NotificationResponse;
+import com.thesis_formatter.thesis_formatter.dto.response.PaginationResponse;
 import com.thesis_formatter.thesis_formatter.entity.Account;
 import com.thesis_formatter.thesis_formatter.entity.Notification;
 import com.thesis_formatter.thesis_formatter.entity.NotificationReceiver;
+import com.thesis_formatter.thesis_formatter.entity.Student;
 import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
+import com.thesis_formatter.thesis_formatter.enums.Semester;
 import com.thesis_formatter.thesis_formatter.exception.AppException;
 import com.thesis_formatter.thesis_formatter.repo.AccountRepo;
 import com.thesis_formatter.thesis_formatter.repo.NotificationReceiverRepo;
 import com.thesis_formatter.thesis_formatter.repo.NotificationRepo;
+import com.thesis_formatter.thesis_formatter.repo.StudentRepo;
 import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +28,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.MonthDay;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -38,6 +47,7 @@ public class NotificationService {
     private final AccountRepo accountRepo;
     private final NotificationReceiverRepo notificationReceiverRepo;
     private final EmailService emailService;
+    private final StudentRepo studentRepo;
 
     private Notification createNotification(NotificationRequest request) {
         Account sender = null;
@@ -106,7 +116,7 @@ public class NotificationService {
                 .build();
     }
 
-    public APIResponse<List<NotificationResponse>> getNotificationsForAccount(String userId, String page, String numberOfNotification) throws AppException {
+    public APIResponse<PaginationResponse<NotificationResponse>> getNotificationsForAccount(String userId, String page, String numberOfNotification) throws AppException {
 
         Account account = accountRepo.findByUserId(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
@@ -128,9 +138,14 @@ public class NotificationService {
                 .sorted(Comparator.comparing(NotificationResponse::getCreatedAt).reversed()) //lastest
                 .toList();
 
-        return APIResponse.<List<NotificationResponse>>builder()
+        PaginationResponse<NotificationResponse> paginationResponse = new PaginationResponse<>();
+        paginationResponse.setContent(notificationResponses);
+        paginationResponse.setTotalElements(notificationReceivers.getTotalElements());
+        paginationResponse.setTotalPages(notificationReceivers.getTotalPages());
+        paginationResponse.setCurrentPage(notificationReceivers.getNumber());
+        return APIResponse.<PaginationResponse<NotificationResponse>>builder()
                 .code("200")
-                .result(notificationResponses)
+                .result(paginationResponse)
                 .build();
     }
 
@@ -144,8 +159,17 @@ public class NotificationService {
                 .build();
     }
 
-//    public APIResponse<Void> sendNotificationtoAllStudents(String userId,) throws AppException {
-//
-//    }
+    public APIResponse<Void> sendNotificationtoAllStudents(NotificationRequest request) throws AppException, MessagingException {
+        Account account = accountRepo.findByUserId(request.getSenderId()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        int month = LocalDate.now().getMonth().getValue();
+        Semester semester = month < 5 ? Semester.HK2 : month < 9 ? Semester.HK3 : Semester.HK1;
+        String year = String.valueOf(LocalDate.now().getYear());
+
+        List<Student> students = studentRepo.findGuidedStudentsByTeacherId(request.getSenderId(), semester, year);
+        request.setRecipientIds(students.stream().map(student -> student.getUserId()).collect(Collectors.toList()));
+        return createUserNotification(request);
+
+    }
 }
 

@@ -1,5 +1,6 @@
 package com.thesis_formatter.thesis_formatter.dto.request;
 
+import jakarta.annotation.Nullable;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
