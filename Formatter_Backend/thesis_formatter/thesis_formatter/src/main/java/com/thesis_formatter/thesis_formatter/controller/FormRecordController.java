@@ -85,6 +85,12 @@ public class FormRecordController {
         return formRecordService.searchByTeacherIdAndStatus(teacherId, status, page, numberOfRecords);
     }
 
+    @GetMapping("/formRecords/teacher/time")
+    public APIResponse<PaginationResponse<FormRecordResponse>> searchFormRecordForTeacherAndTime(@RequestParam String teacherId, @RequestParam String semester, @RequestParam String year, @RequestParam("p") String page, @RequestParam("n") String numberOfRecords) {
+        return formRecordService.searchAccecptedByTeacherIdAndTime(teacherId, semester, year, page, numberOfRecords);
+    }
+
+
     @GetMapping("/formRecords/{id}")
     public APIResponse<FormRecordResponse> getFormRecord(@PathVariable String id, @RequestParam(required = false) String version) {
         return formRecordService.getFormRecordById(id, version);

@@ -4,6 +4,7 @@ import com.thesis_formatter.thesis_formatter.entity.FormRecord;
 import com.thesis_formatter.thesis_formatter.entity.Student;
 import com.thesis_formatter.thesis_formatter.entity.Topic;
 import com.thesis_formatter.thesis_formatter.enums.FormStatus;
+import com.thesis_formatter.thesis_formatter.enums.Semester;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,13 +23,13 @@ public interface FormRecordRepo extends JpaRepository<FormRecord, String> {
     Page<FormRecord> findByTeacherAndStatus(@Param("userId") String userId, @Param("status") FormStatus status, Pageable pageable);
 
     @Query("""
-    SELECT fr 
-    FROM FormRecord fr 
-    JOIN fr.topic t 
-    JOIN t.teachers teacher 
-    WHERE teacher.acId = :userId 
-      AND fr.status IN :statuses
-    """)
+            SELECT fr 
+            FROM FormRecord fr 
+            JOIN fr.topic t 
+            JOIN t.teachers teacher 
+            WHERE teacher.acId = :userId 
+              AND fr.status IN :statuses
+            """)
     Page<FormRecord> findByTeacherAndStatuses(
             @Param("userId") String userId,
             @Param("statuses") List<FormStatus> statuses,
@@ -42,4 +43,7 @@ public interface FormRecordRepo extends JpaRepository<FormRecord, String> {
     Optional<FormRecord> findDeletedByStudentAndTopic(@Param("studentId") String studentId, @Param("topicId") String topicId);
 
     List<FormRecord> findFormRecordByTopic_TopicId(String topicTopicId);
+
+    @Query("SELECT fr from FormRecord fr join fr.topic t join t.teachers teacher where teacher.acId = :userId and fr.status = com.thesis_formatter.thesis_formatter.enums.FormStatus.ACCEPTED and t.semester= :semester and t.year = :year")
+    Page<FormRecord> findAcceptedByTeacherAndTime(@Param("userId") String userId, @Param("semester") Semester semester, @Param("year") String year, Pageable pageable);
 }

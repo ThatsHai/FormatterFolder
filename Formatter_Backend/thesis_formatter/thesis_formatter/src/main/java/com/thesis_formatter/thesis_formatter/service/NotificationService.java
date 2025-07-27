@@ -108,6 +108,8 @@ public class NotificationService {
 
     public APIResponse<List<NotificationResponse>> getNotificationsForAccount(String userId, String page, String numberOfNotification) throws AppException {
 
+        Account account = accountRepo.findByUserId(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
         Pageable pageable = PageRequest.of(Integer.parseInt(page), Integer.parseInt(numberOfNotification));
         Page<NotificationReceiver> notificationReceivers = notificationReceiverRepo.findByReceiver_UserId(userId, pageable);
 
@@ -141,5 +143,9 @@ public class NotificationService {
                 .message("Successfully marked notification as read")
                 .build();
     }
+
+//    public APIResponse<Void> sendNotificationtoAllStudents(String userId,) throws AppException {
+//
+//    }
 }
 

@@ -28,8 +28,9 @@ public class EmailService {
 
         //  chuyển tên thành không dấu và viết liền
         String baseName = removeAccents(lastName).toLowerCase();
+        String userIdLowerCase = removeAccents(userId).toLowerCase();
 
-        return baseName + userId + "@student.ctu.edu.vn";
+        return baseName + userIdLowerCase + "@student.ctu.edu.vn";
     }
 
     private static String removeAccents(String text) {

@@ -5,6 +5,7 @@ import com.thesis_formatter.thesis_formatter.dto.response.*;
 import com.thesis_formatter.thesis_formatter.entity.*;
 import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
 import com.thesis_formatter.thesis_formatter.enums.FormStatus;
+import com.thesis_formatter.thesis_formatter.enums.Semester;
 import com.thesis_formatter.thesis_formatter.exception.AppException;
 import com.thesis_formatter.thesis_formatter.mapper.FormRecordMapper;
 import com.thesis_formatter.thesis_formatter.repo.*;
@@ -277,12 +278,41 @@ public class FormRecordService {
         FormStatus formStatus;
         try {
             formStatus = FormStatus.valueOf(status.toUpperCase());
+            System.out.println("status: " + formStatus);
         } catch (IllegalArgumentException e) {
             System.out.println("Trạng thái không hợp lệ: " + status);
             throw new AppException(ErrorCode.INVALID_ARGUMENT);
         }
 
         Page<FormRecord> formRecords = formRecordRepo.findByTeacherAndStatus(teacherId, formStatus, pageable);
+
+        List<FormRecordResponse> dtoList = formRecordMapper.toResponses(formRecords.getContent());
+
+        PaginationResponse<FormRecordResponse> paginationResponse = new PaginationResponse<>();
+        paginationResponse.setContent(dtoList);
+        paginationResponse.setTotalElements(formRecords.getTotalElements());
+        paginationResponse.setTotalPages(formRecords.getTotalPages());
+        paginationResponse.setCurrentPage(formRecords.getNumber());
+        return APIResponse.<PaginationResponse<FormRecordResponse>>builder()
+                .code("200")
+                .result(paginationResponse)
+                .build();
+    }
+
+    public APIResponse<PaginationResponse<FormRecordResponse>> searchAccecptedByTeacherIdAndTime(String teacherId, String semester, String year, String page, String numberOfRecords) {
+        Teacher teacher = teacherRepo.findByAcId(teacherId);
+        if (teacher == null) {
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
+        }
+        Pageable pageable = PageRequest.of(Integer.parseInt(page), Integer.parseInt((numberOfRecords)));
+        Semester semesterEnum;
+        try {
+            semesterEnum = Semester.valueOf(semester.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new AppException(ErrorCode.INVALID_ARGUMENT);
+        }
+
+        Page<FormRecord> formRecords = formRecordRepo.findAcceptedByTeacherAndTime(teacherId, semesterEnum, year, pageable);
 
         List<FormRecordResponse> dtoList = formRecordMapper.toResponses(formRecords.getContent());
 
