@@ -1,4 +1,5 @@
 import { IconButton, Badge } from "@mui/material";
+import { Link } from "react-router";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 
@@ -9,14 +10,22 @@ const Header = () => {
         Đề cương luận văn luận án
       </p>
       <div className="flex gap-10">
-        <IconButton aria-label="notifications" style={{ color: "white", padding: "0px" }}>
-          <Badge badgeContent={1} color="error">
-            <NotificationsIcon style={{ height: "28px", width: "28px" }}/>
-          </Badge>
-        </IconButton>
+        <Link to={"/notifications"}>
+          <IconButton
+            aria-label="notifications"
+            style={{ color: "white", padding: "0px" }}
+          >
+            <Badge badgeContent={1} color="error">
+              <NotificationsIcon style={{ height: "28px", width: "28px" }} />
+            </Badge>
+          </IconButton>
+        </Link>
 
-        <IconButton aria-label="account" style={{ color: "white", padding: "0px" }}>
-          <AccountCircleIcon style={{ height: "28px", width: "28px" }}/>
+        <IconButton
+          aria-label="account"
+          style={{ color: "white", padding: "0px" }}
+        >
+          <AccountCircleIcon style={{ height: "28px", width: "28px" }} />
         </IconButton>
       </div>
     </div>

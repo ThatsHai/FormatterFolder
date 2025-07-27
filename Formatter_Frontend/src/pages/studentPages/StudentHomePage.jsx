@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useBootstrapUser from "../hook/useBootstrapUser";
-import Button from "../component/Button";
-import SubmitThesisForm from "../component/forms/SubmitThesisForm";
-import ContentHomepage from "../component/pageComponents/homepage/ContentHomepage";
-import SuccessPopup from "../component/SuccessPopup";
-import api from "../services/api";
+import useBootstrapUser from "../../hook/useBootstrapUser";
+import Button from "../../component/Button";
+import SubmitThesisForm from "../../component/forms/SubmitThesisForm";
+import ContentHomepage from "../../component/pageComponents/homepage/ContentHomepage";
+// import SuccessPopup from "../../component/SuccessPopup";
+import api from "../../services/api";
 
 const StudentHomePage = () => {
   const [thesisFormOpen, setIsThesisFormOpen] = useState(false);
@@ -23,7 +23,6 @@ const StudentHomePage = () => {
     //   navigate("/login");
     // }
     setIsThesisFormOpen((prev) => !prev);
-    
   };
 
   const handleSearch = async () => {

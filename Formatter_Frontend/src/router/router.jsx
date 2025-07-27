@@ -4,7 +4,7 @@ import Login from "../pages/Login";
 import SignUp from "../pages/SignUp";
 import AuthLayout from "../layout/AuthLayout";
 import DefaultLayout from "../layout/DefaultLayout";
-import StudentHomePage from "../pages/StudentHomePage";
+import StudentHomePage from "../pages/studentPages/StudentHomePage";
 import ThesisInfo from "../pages/ThesisInfo";
 import AdminHomePage from "../pages/adminPages/AdminHomePage";
 import ThesisInfoLayout from "../layout/ThesisInfoLayout";
@@ -23,6 +23,8 @@ import PDFViewer from "../component/forms/SubmitThesisFormComponents/PDFViewer";
 import TopicInfo from "../pages/teacherPages/topic/TopicInfo";
 import DiffViewerPage from "../component/pageComponents/thesisInfoPage/DiffViewerPage";
 import TopicContent from "../pages/teacherPages/topic/TopicContent";
+import NotificationPage from "../pages/adminPages/NotificationPage";
+import TeacherNotificationPage from "../pages/teacherPages/TeacherNotificationPage";
 
 const Router = createBrowserRouter([
   {
@@ -73,8 +75,8 @@ const Router = createBrowserRouter([
       </ThesisInfoLayout>
     ),
   },
-  
-   {
+
+  {
     path: "/diff-viewer/:formRecordId",
     element: (
       <ThesisInfoLayout>
@@ -144,6 +146,14 @@ const Router = createBrowserRouter([
       <AdminLayout>
         <RepoManagementPage />
       </AdminLayout>
+    ),
+  },
+  {
+    path: "/notifications",
+    element: (
+      <DefaultLayout>
+        <TeacherNotificationPage />
+      </DefaultLayout>
     ),
   },
   {
