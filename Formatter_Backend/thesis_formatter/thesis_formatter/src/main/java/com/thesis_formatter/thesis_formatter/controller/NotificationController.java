@@ -4,6 +4,7 @@ import com.thesis_formatter.thesis_formatter.dto.request.NotificationRequest;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.NotificationResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.PaginationResponse;
+import com.thesis_formatter.thesis_formatter.dto.response.SentNotificationResponse;
 import com.thesis_formatter.thesis_formatter.entity.Notification;
 import com.thesis_formatter.thesis_formatter.service.NotificationService;
 import jakarta.mail.MessagingException;
@@ -37,10 +38,20 @@ public class NotificationController {
         return notificationService.sendNotificationtoAllStudents(notification);
     }
 
+    @PostMapping("/admin/department")
+    public APIResponse<Void> sendToTeacherGroupByDepartment(@RequestBody NotificationRequest notification) throws MessagingException {
+        return notificationService.sendToTeachersGroupByDepartment(notification);
+    }
+
 
     @GetMapping
     public APIResponse<PaginationResponse<NotificationResponse>> getNotificationsForAccount(@RequestParam String userId, @RequestParam String page, @RequestParam String number) {
         return notificationService.getNotificationsForAccount(userId, page, number);
+    }
+
+    @GetMapping("/sent")
+    public APIResponse<PaginationResponse<SentNotificationResponse>> getSentNotificationsForAccount(@RequestParam String userId, @RequestParam String page, @RequestParam String number) {
+        return notificationService.getSentNotifications(userId, page, number);
     }
 
     @PutMapping("/markAsRead")

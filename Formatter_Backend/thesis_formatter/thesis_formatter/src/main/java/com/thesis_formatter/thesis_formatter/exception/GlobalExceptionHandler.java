@@ -5,6 +5,7 @@ import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.PropertyValueException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -18,12 +19,17 @@ import java.sql.SQLIntegrityConstraintViolationException;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-//    @ExceptionHandler(value = Exception.class)
-//    ResponseEntity<APIResponse> handleRuntimeException(RuntimeException e) {
-//        APIResponse apiResponse = new APIResponse();
-//        apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
-//        apiResponse.setMessage(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
-//        return ResponseEntity.badRequest().body(apiResponse);
+    @ExceptionHandler(value = Exception.class)
+    ResponseEntity<APIResponse> handleRuntimeException(RuntimeException e) {
+        APIResponse apiResponse = new APIResponse();
+        apiResponse.setCode("400");
+        apiResponse.setMessage(e.getMessage());
+        return ResponseEntity.badRequest().body(apiResponse);
+    }
+//    @ExceptionHandler(RuntimeException.class)
+//    public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                .body(ex.getMessage());
 //    }
 
     @ExceptionHandler(value = AppException.class)

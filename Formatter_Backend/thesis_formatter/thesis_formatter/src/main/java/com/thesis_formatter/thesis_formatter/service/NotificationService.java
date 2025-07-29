@@ -2,21 +2,12 @@ package com.thesis_formatter.thesis_formatter.service;
 
 import com.thesis_formatter.thesis_formatter.dto.request.NotificationRequest;
 import com.thesis_formatter.thesis_formatter.dto.request.SendEmailRequest;
-import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
-import com.thesis_formatter.thesis_formatter.dto.response.FormRecordResponse;
-import com.thesis_formatter.thesis_formatter.dto.response.NotificationResponse;
-import com.thesis_formatter.thesis_formatter.dto.response.PaginationResponse;
-import com.thesis_formatter.thesis_formatter.entity.Account;
-import com.thesis_formatter.thesis_formatter.entity.Notification;
-import com.thesis_formatter.thesis_formatter.entity.NotificationReceiver;
-import com.thesis_formatter.thesis_formatter.entity.Student;
+import com.thesis_formatter.thesis_formatter.dto.response.*;
+import com.thesis_formatter.thesis_formatter.entity.*;
 import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
 import com.thesis_formatter.thesis_formatter.enums.Semester;
 import com.thesis_formatter.thesis_formatter.exception.AppException;
-import com.thesis_formatter.thesis_formatter.repo.AccountRepo;
-import com.thesis_formatter.thesis_formatter.repo.NotificationReceiverRepo;
-import com.thesis_formatter.thesis_formatter.repo.NotificationRepo;
-import com.thesis_formatter.thesis_formatter.repo.StudentRepo;
+import com.thesis_formatter.thesis_formatter.repo.*;
 import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +39,9 @@ public class NotificationService {
     private final NotificationReceiverRepo notificationReceiverRepo;
     private final EmailService emailService;
     private final StudentRepo studentRepo;
+    private final DepartmentService departmentService;
+    private final DepartmentRepo departmentRepo;
+    private final TeacherRepo teacherRepo;
 
     private Notification createNotification(NotificationRequest request) {
         Account sender = null;
@@ -62,7 +56,12 @@ public class NotificationService {
                 .sender(sender)
                 .build();
 
-        List<Account> receivers = accountRepo.findByUserIdIn(request.getRecipientIds());
+//        List<Account> receivers = accountRepo.findByUserIdIn(request.getRecipientIds());
+        List<Account> receivers = new ArrayList<>();
+        for (String recieverId : request.getRecipientIds()) {
+            Account receiver = accountRepo.findByUserId(recieverId).orElseThrow(() -> new RuntimeException("Không tồn tại gười dùng có mã số " + recieverId));
+            receivers.add(receiver);
+        }
         List<NotificationReceiver> receiverList = receivers.stream()
                 .map(receiver -> NotificationReceiver.builder()
                         .notification(notification)
@@ -171,5 +170,61 @@ public class NotificationService {
         return createUserNotification(request);
 
     }
+
+    public APIResponse<Void> sendToTeachersGroupByDepartment(NotificationRequest request) throws AppException, MessagingException {
+        List<String> departmentIds = request.getRecipientIds();
+        if (departmentIds.isEmpty()) {
+            throw new RuntimeException("Không có mã khoa truyền vào");
+        }
+        List<Teacher> teachers = new ArrayList<>();
+        for (String departmentId : departmentIds) {
+            Department department = departmentRepo.findByDepartmentId(departmentId);
+            if (department == null) {
+                throw new RuntimeException("Không tồn tại khoa có mã số " + departmentId);
+            } else {
+                teachers.addAll(teacherRepo.findAllByDepartment(department));
+            }
+        }
+        if (teachers.isEmpty()) {
+            throw new RuntimeException("Không có giáo viên ưứng với mã khoa truyền vào");
+        }
+        request.setRecipientIds(teachers.stream().map(Teacher::getUserId).collect(Collectors.toList()));
+        return createUserNotification(request);
+    }
+
+    public APIResponse<PaginationResponse<SentNotificationResponse>> getSentNotifications(String userId, String page, String numberOfNotification) {
+        Account account = accountRepo.findByUserId(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        Pageable pageable = PageRequest.of(Integer.parseInt(page), Integer.parseInt(numberOfNotification));
+        Page<Notification> notifications = notificationRepo.findBySender_UserId(userId, pageable);
+        List<SentNotificationResponse> notificationResponses = notifications.stream()
+                .map(notification -> {
+                    List<NotificationReceiver> receivers = notification.getReceivers();
+                    List<String> receiverNames = receivers.stream()
+                            .map(receiver ->
+                                    receiver.getReceiver().getName() + " - " + receiver.getReceiver().getUserId()
+                            ).collect(Collectors.toList());
+                    return SentNotificationResponse.builder()
+                            .notificationId(notification.getId())
+                            .title(notification.getTitle())
+                            .message(notification.getMessage())
+                            .createdAt(notification.getCreatedAt())
+                            .recipientNames(receiverNames)
+                            .build();
+                })
+                .sorted(Comparator.comparing(SentNotificationResponse::getCreatedAt).reversed()) //lastest
+                .toList();
+        PaginationResponse<SentNotificationResponse> paginationResponse = new PaginationResponse<>();
+        paginationResponse.setContent(notificationResponses);
+        paginationResponse.setTotalElements(notifications.getTotalElements());
+        paginationResponse.setTotalPages(notifications.getTotalPages());
+        paginationResponse.setCurrentPage(notifications.getNumber());
+
+        return APIResponse.<PaginationResponse<SentNotificationResponse>>builder()
+                .code("200")
+                .result(paginationResponse)
+                .build();
+
+    }
 }
+
 
