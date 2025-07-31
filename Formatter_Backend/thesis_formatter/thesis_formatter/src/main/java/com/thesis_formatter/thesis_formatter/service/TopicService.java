@@ -134,6 +134,7 @@ public class TopicService {
         // Cập nhật sinh viên và FormRecord tương ứng
 
         updateStudentsAndFormRecords(topic, request.getStudentIds());
+
         if (topic.getStudents() != null && !topic.getStudents().isEmpty()) {
             topic.setStatus(TopicStatus.PUBLISHED);
         }
@@ -487,6 +488,16 @@ public class TopicService {
         return buildSuccessResponse(paginationResponse);
     }
 
+    public APIResponse<Void> setPublishedTopic(String topicId) {
+
+        Topic topic = topicRepo.findById(topicId).orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOT_FOUND));
+        
+
+        return APIResponse.<Void>builder()
+                .code("200")
+                .message("Set published topic successfully")
+                .build();
+    }
 
 }
 

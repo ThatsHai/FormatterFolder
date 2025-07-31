@@ -19,13 +19,13 @@ import java.sql.SQLIntegrityConstraintViolationException;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(value = Exception.class)
-    ResponseEntity<APIResponse> handleRuntimeException(RuntimeException e) {
-        APIResponse apiResponse = new APIResponse();
-        apiResponse.setCode("400");
-        apiResponse.setMessage(e.getMessage());
-        return ResponseEntity.badRequest().body(apiResponse);
-    }
+//    @ExceptionHandler(value = Exception.class)
+//    ResponseEntity<APIResponse> handleRuntimeException(RuntimeException e) {
+//        APIResponse apiResponse = new APIResponse();
+//        apiResponse.setCode("400");
+//        apiResponse.setMessage(e.getMessage());
+//        return ResponseEntity.badRequest().body(apiResponse);
+//    }
 //    @ExceptionHandler(RuntimeException.class)
 //    public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
 //        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
