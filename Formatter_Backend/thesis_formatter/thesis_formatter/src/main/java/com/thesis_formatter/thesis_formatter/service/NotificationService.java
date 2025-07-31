@@ -59,7 +59,7 @@ public class NotificationService {
 //        List<Account> receivers = accountRepo.findByUserIdIn(request.getRecipientIds());
         List<Account> receivers = new ArrayList<>();
         for (String recieverId : request.getRecipientIds()) {
-            Account receiver = accountRepo.findByUserId(recieverId).orElseThrow(() -> new RuntimeException("Không tồn tại gười dùng có mã số " + recieverId));
+            Account receiver = accountRepo.findByUserId(recieverId).orElseThrow(() -> new RuntimeException("Không tồn tại người dùng có mã số " + recieverId));
             receivers.add(receiver);
         }
         List<NotificationReceiver> receiverList = receivers.stream()
