@@ -7,7 +7,6 @@ import PageNumberFooter from "../../component/PageNumberFooter";
 import api from "../../services/api";
 import { useSelector } from "react-redux";
 import useBootstrapUser from "../../hook/useBootstrapUser";
-import { Link } from "react-router";
 
 const truncateWords = (str, charLimit, end = "…") => {
   if (!str) return "";
@@ -17,31 +16,32 @@ const truncateWords = (str, charLimit, end = "…") => {
 
 const MailList = ({ userId = "", setSelectedMail = () => {} }) => {
   const [mailList, setMailList] = useState([
-    {
-      notificationId: "id123",
-      title:
-        "Tieu de kaljeweflwjflkjlfejewlaefejlajwfklajfljwlfjawljfhlj ljafelaekwejfalw jeflkaewjflkawf lfjlakwfjlwakjflkawjflakjfljaf;lkjawlfjawlfhawljhl",
-      message: "Message",
-      isRead: false,
-      createdAt: "11h",
-      senderName: "Nguyen Van A",
-    },
-    {
-      notificationId: "id123",
-      title: "Tieu de",
-      message: "Message",
-      isRead: true,
-      createdAt: "11h",
-      senderName: null,
-    },
+    // {
+    //   notificationId: "id123",
+    //   title:
+    //     "Tieu de kaljeweflwjflkjlfejewlaefejlajwfklajfljwlfjawljfhlj ljafelaekwejfalw jeflkaewjflkawf lfjlakwfjlwakjflkawjflakjfljaf;lkjawlfjawlfhawljhl",
+    //   message: "Message",
+    //   isRead: false,
+    //   createdAt: "11h",
+    //   senderName: "Nguyen Van A",
+    // },
+    // {
+    //   notificationId: "id123",
+    //   title: "Tieu de",
+    //   message: "Message",
+    //   isRead: true,
+    //   createdAt: "11h",
+    //   senderName: null,
+    // },
   ]);
   const [currentPage, setCurrentPage] = useState(0);
   // const [totalPages, setTotalPage] = useState(0);
 
   const fetchMail = async () => {
-    await api.get(
+    const result = await api.get(
       `/notifications?userId=${userId}&page=${currentPage}&number=8`
     );
+    setMailList(result.data.result);
   };
 
   useEffect(() => {
@@ -72,7 +72,9 @@ const MailList = ({ userId = "", setSelectedMail = () => {} }) => {
                     {truncateWords(mail.title, 20, ".")} -{" "}
                     {truncateWords(mail.message, 30, ".")}
                   </p>
-                  <p className="pl-2 w-1/6">{mail.createdAt}</p>
+                  <p className="pl-2 w-1/6">
+                    {new Date(mail.createdAt).toLocaleDateString("vi-VN")}
+                  </p>
                 </div>
               ))}
             </div>
@@ -91,17 +93,17 @@ const MailList = ({ userId = "", setSelectedMail = () => {} }) => {
 const Sidebar = ({ setIsComposerOpen = () => {} }) => {
   return (
     <>
-      <aside className="w-64 bg-white shadow-md p-4 flex flex-col">
+      <aside className="w-64 bg-white shadow-md p-4 flex flex-col md:min-h-[450px]">
         <button
           onClick={() => setIsComposerOpen(3)}
-          className="bg-lightBlue text-white rounded-md px-4 py-2 text-lg font-semibold mb-4"
+          className="bg-lightBlue text-white rounded-md px-4 py-2 text-lg font-semibold mb-4 hover:shadow-sm"
         >
           Soạn thông báo
         </button>
         <ul className="text-gray-700 space-y-2">
-          <li className="font-medium">Hộp thông báo đến</li>
-          <li>Đã gửi</li>
-          <li>Thư nháp</li>
+          <li className="font-medium">Hộp thông báo</li>
+          <li className="pl-3">Đã nhận</li>
+          <li className="pl-3">Đã gửi</li>
         </ul>
       </aside>
     </>
@@ -144,6 +146,10 @@ const Composer = ({
         recipientIds: recipientIds,
       };
       console.log(payload);
+      setConfirmSend(false);
+      const result = await api.post("/notifications/user", payload);
+      alert("Gửi thành công.");
+      console.log(result);
     } catch (error) {
       alert("Lỗi không gửi được thư");
       console.log(error);
@@ -283,21 +289,43 @@ const Composer = ({
 const MailDetail = ({ selectedMail = {}, setSelectedMail = () => {} }) => {
   return (
     <>
-      <div className="flex-1 p-6 w-full min-h-80">
-        <div onClick={() => setSelectedMail({})} className="hover:cursor-default">
-          <p>{"< Quay lại"}</p>
+      <div className="flex-1 px-6 w-full min-h-80">
+        <div
+          onClick={() => setSelectedMail({})}
+          className="hover:cursor-pointer"
+        >
+          <p className="pb-6">{"< Quay lại"}</p>
         </div>
 
-        <p className="font-semibold text-xl">{selectedMail.title}</p>
-        <p className="">{selectedMail.message}</p>
+        <div className="p-6 bg-white shadow rounded-lg">
+          {/* Title */}
+          <p className="font-bold text-3xl text-gray-900 pb-3 border-b border-gray-200">
+            {selectedMail.title}
+          </p>
+
+          {/* Sender */}
+          <div className="flex items-center justify-between pt-3 pb-5">
+            <p className="text-sm text-gray-600 italic">
+              {selectedMail.senderName || "Từ HỆ THỐNG"}
+            </p>
+            <p className="text-xs text-gray-400">
+              {" "}
+              {new Date(selectedMail.createdAt).toLocaleDateString("vi-VN")}
+            </p>
+          </div>
+
+          {/* Message */}
+          <p className="text-base text-gray-800 leading-relaxed whitespace-pre-line">
+            {selectedMail.message}
+          </p>
+        </div>
       </div>
     </>
   );
 };
 
-const TeacherNotificationPage = ({ userId = "" }) => {
+const TeacherNotificationPage = () => {
   const [isComposerOpen, setIsComposerOpen] = useState(1); //1 == none, 2 == minimize, 3 == yes
-  const [isReviewNotification, setIsReviewNotification] = useState(1); //1 == mails list, 2 == review received mail
   const [selectedMail, setSelectedMail] = useState({});
   const { loading } = useBootstrapUser(); // hydrates redux on mount
   const user = useSelector((state) => state.auth.user);
@@ -312,13 +340,16 @@ const TeacherNotificationPage = ({ userId = "" }) => {
   if (!user.userId) return null;
 
   return (
-    <div className="flex bg-gray-100">
+    <div className="flex bg-gray-100 pt-6">
       {/* Sidebar */}
       <Sidebar setIsComposerOpen={setIsComposerOpen}></Sidebar>
 
       {/* Main Content */}
       {Object.keys(selectedMail).length === 0 && (
-        <MailList userId={userId} setSelectedMail={setSelectedMail}></MailList>
+        <MailList
+          userId={user.userId}
+          setSelectedMail={setSelectedMail}
+        ></MailList>
       )}
       {Object.keys(selectedMail).length > 0 && (
         <MailDetail
@@ -330,7 +361,7 @@ const TeacherNotificationPage = ({ userId = "" }) => {
       <Composer
         isComposerOpen={isComposerOpen}
         setIsComposerOpen={setIsComposerOpen}
-        userId={userId}
+        userId={user.userId}
       ></Composer>
     </div>
   );
@@ -338,10 +369,26 @@ const TeacherNotificationPage = ({ userId = "" }) => {
 
 MailList.propTypes = {
   userId: PropTypes.string,
+  setSelectedMail: PropTypes.func,
 };
 
 TeacherNotificationPage.propTypes = {
   userId: PropTypes.string,
+};
+
+Composer.propTypes = {
+  isComposerOpen: PropTypes.number,
+  setIsComposerOpen: PropTypes.func,
+  userId: PropTypes.string,
+};
+
+MailDetail.propTypes = {
+  selectedMail: PropTypes.object,
+  setSelectedMail: PropTypes.func,
+};
+
+Sidebar.propTypes = {
+  setIsComposerOpen: PropTypes.func,
 };
 
 export default TeacherNotificationPage;

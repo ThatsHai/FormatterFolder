@@ -141,7 +141,7 @@ const TopicManagementPageContent = ({
                   <p>Số lượng đề tài</p>
                   <p>{queriedWithSemester ? "trong học kỳ" : "cả năm"}</p>
                 </th>
-                <th className="border p-1">Danh sách đề tài</th>
+                <th className="border p-1">Danh sách đề tài đã tạo</th>
               </tr>
             </thead>
             <tbody>
@@ -198,7 +198,7 @@ const TopicManagementPageContent = ({
                   <p>Số lượng đề tài</p>
                   <p>{queriedWithSemester ? "trong học kỳ" : "cả năm"}</p>
                 </th>
-                <th className="border p-1">Danh sách đề tài</th>
+                <th className="border p-1">Danh sách đề tài đã tạo</th>
               </tr>
             </thead>
             <tbody>

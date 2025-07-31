@@ -13,6 +13,7 @@ import AddingStudentField from "./student/AddingStudentField";
 import dayjs from "dayjs";
 import SuccessPopup from "../../component/SuccessPopup";
 import ConfirmationPopup from "../../component/ConfirmationPopup";
+import Tooltip from "@mui/material/Tooltip";
 
 const TopicSuggestionPage = ({
   handleFormToggle = () => {},
@@ -107,8 +108,7 @@ const TopicSuggestionPage = ({
     if (initialData) {
       setFormData({
         ...initialData,
-        fundingSource:
-          initialData.funding?.split("Nguồn ")[1]?.trim() || "",
+        fundingSource: initialData.funding?.split("Nguồn ")[1]?.trim() || "",
         formId: initialData.form.formId,
       });
       setForms([initialData.form]);
@@ -277,7 +277,7 @@ const TopicSuggestionPage = ({
         setDisplaySuccessPopup(true);
       } catch (error) {
         // console.error("Error submitting topic form:", error);
-        if (error.response.data.code === "1023"){
+        if (error.response.data.code === "1023") {
           alert("Sinh viên bạn chọn đang thực hiện 1 đề tài khác!");
         }
       }
@@ -331,18 +331,18 @@ const TopicSuggestionPage = ({
                 showLabel={false}
                 disabled={!!initialData}
               ></SelectField>
-              <button
-                type="button"
-                tooltip="Xem pdf tương ứng"
-                className="ml-2 bg-lightBlue text-white rounded-full w-8 h-8 flex items-center justify-center text-xl shadow hover:bg-blue-600"
-                title="Xem danh sách thiết kế"
-                onClick={() => {
-                  setShowDesignWindow(true);
-                  console.log("formData.formId", formData.formId);
-                }}
-              >
-                +
-              </button>
+              <Tooltip title="Xem danh sách thiết kế" arrow placement="top">
+                <button
+                  type="button"
+                  className="ml-2 bg-lightBlue text-white rounded-full w-8 h-8 flex items-center justify-center text-xl shadow hover:bg-blue-600"
+                  onClick={() => {
+                    setShowDesignWindow(true);
+                    console.log("formData.formId", formData.formId);
+                  }}
+                >
+                  +
+                </button>
+              </Tooltip>
             </div>
           </div>
           <div className="relative text-start font-textFont text-lg m-8 px-10">
