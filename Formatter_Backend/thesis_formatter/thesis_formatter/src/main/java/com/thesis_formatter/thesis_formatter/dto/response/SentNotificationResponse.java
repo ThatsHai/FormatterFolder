@@ -1,9 +1,9 @@
-package com.thesis_formatter.thesis_formatter.dto.request;
+package com.thesis_formatter.thesis_formatter.dto.response;
 
-import jakarta.annotation.Nullable;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -11,9 +11,10 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class NotificationRequest {
+public class SentNotificationResponse {
+    String notificationId;
     String title;
     String message;
-    String senderId;
-    List<String> recipientIds;
+    LocalDateTime createdAt;
+    List<String> recipientNames;
 }

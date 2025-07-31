@@ -174,7 +174,7 @@ public class FormRecordService {
         updateStatus(formRecordId, "WAITING");
 
         notificationService.createSystemNotification(NotificationRequest.builder()
-                .senderId(formRecord.getStudent().getUserId())
+                .senderId(null)
                 .recipientIds(formRecord.getTopic().getTeachers().stream().map(Teacher::getUserId).collect(Collectors.toList()))
                 .title("Bản ghi đề cương mới")
                 .message(formRecord.getStudent().getName() + " đã gửi 1 bản ghi đề cương cho đề tài " + formRecord.getTopic().getTitle() + " và đang chờ bạn duyệt.")

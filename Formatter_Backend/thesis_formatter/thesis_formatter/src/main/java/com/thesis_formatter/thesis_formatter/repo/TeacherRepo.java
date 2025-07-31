@@ -18,6 +18,7 @@ import java.util.Optional;
 @Repository
 public interface TeacherRepo extends JpaRepository<Teacher, String>, JpaSpecificationExecutor<Teacher> {
     Teacher findByUserId(String userId);
+
     List<Teacher> findByUserIdIn(List<String> userIds);
 
     Teacher findByAcId(String acId);
@@ -32,4 +33,5 @@ public interface TeacherRepo extends JpaRepository<Teacher, String>, JpaSpecific
 
     Page<Teacher> findAllByNameContainingIgnoreCase(String name, Pageable pageable);
 
+    List<Teacher> findAllByDepartment(Department department);
 }
