@@ -40,28 +40,58 @@ const TopicInfoButtons = ({ topic, onUpdated = () => {} }) => {
   // };
 
   const deleteTopic = async () => {
-    // await api.delete(`/formRecords/delete/${formRecord.formRecordId}`);
+    try {
+      await api.delete(`/topics/${topic.topicId}/delete`);
 
-    setShowSuccessPopup(true);
-    setShowConfirmPopup(false);
-  };
-
-  const publicTopic = async () => {
-    // await api.delete(`/formRecords/delete/${formRecord.formRecordId}`);
-
-    setShowSuccessPopup(true);
-    setShowConfirmPopup(false);
-  };
-
-  const handlePublicTopic = () => {
-    if (topic.status === "PUBLISHED") {
-      alert("Đề tài đã được công khai trước đó");
-      return;
+      setShowSuccessPopup(true);
+    } catch (error) {
+      alert(error.response.data.message);
     }
+    setShowConfirmPopup(false);
+  };
+
+  const publishTopic = async () => {
+    try {
+      await api.put(`/topics/${topic.topicId}/publish`);
+
+      setShowSuccessPopup(true);
+    } catch (error) {
+      alert(error.response.data.message);
+    }
+    setShowConfirmPopup(false);
+  };
+
+  const unPublishTopic = async () => {
+    try {
+      await api.put(`/topics/${topic.topicId}/unPublish`);
+
+      setShowSuccessPopup(true);
+    } catch (error) {
+      alert(error.response.data.message);
+    }
+    setShowConfirmPopup(false);
+  };
+
+
+  const handlePublishTopic = () => {
+    // if (topic.status === "PUBLISHED") {
+    //   alert("Đề tài đã được công khai trước đó");
+    //   return;
+    // }
     setShowConfirmPopup(true);
     setText("Bạn chắc chắn muốn công khai đề tài");
     setSuccessPopupText("Đã công khai đề tài!");
-    setConfirmAction("public");
+    setConfirmAction("publish");
+  };
+   const handleUnPublishTopic = () => {
+    // if (topic.status === "UNPUBLISHED") {
+    //   alert("Đề tài đã được công khai trước đó");
+    //   return;
+    // }
+    setShowConfirmPopup(true);
+    setText("Bạn chắc chắn muốn huỷ công khai đề tài");
+    setSuccessPopupText("Đã huỷ công khai đề tài!");
+    setConfirmAction("unpublish");
   };
   const handleDeleteTopic = async () => {
     setShowConfirmPopup(true);
@@ -96,12 +126,21 @@ const TopicInfoButtons = ({ topic, onUpdated = () => {} }) => {
         >
           Xoá
         </button>
-        <button
-          className="border p-2 rounded-md px-5 bg-white"
-          onClick={handlePublicTopic}
-        >
-          Công khai
-        </button>
+        {topic.status === "UNPUBLISHED" ? (
+          <button
+            className="border p-2 rounded-md px-5 bg-white"
+            onClick={handlePublishTopic}
+          >
+            Công khai
+          </button>
+        ) : (
+          <button
+            className="border p-2 rounded-md px-5 bg-white"
+            onClick={handleUnPublishTopic}
+          >
+            Huỷ công khai
+          </button>
+        )}
         {openTopicForm && (
           <TopicSuggestionPage
             initialData={topic}
@@ -117,10 +156,12 @@ const TopicInfoButtons = ({ topic, onUpdated = () => {} }) => {
           isOpen={showConfirmPopup}
           text={text}
           onConfirm={() => {
-            if (confirmAction === "public") {
-              publicTopic();
+            if (confirmAction === "publish") {
+              publishTopic();
             } else if (confirmAction === "delete") {
               deleteTopic();
+            }else if (confirmAction === "unpublish") {
+              unPublishTopic();
             }
           }}
           onDecline={() => setShowConfirmPopup(false)}

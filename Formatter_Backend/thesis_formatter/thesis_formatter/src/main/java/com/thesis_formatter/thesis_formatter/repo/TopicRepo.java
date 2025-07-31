@@ -20,7 +20,8 @@ public interface TopicRepo extends JpaRepository<Topic, String> {
 
     List<Topic> findTopicsByForm_FormIdAndStatusIs(String formId, TopicStatus status);
 
-    List<Topic> findTopicsByTeachers_AcId(String AcId);
+
+    List<Topic> findTopicsByTeachers_AcIdAndStatusIsNot(String AcId, TopicStatus status);
 
     @Query("SELECT t2.userId, t2.name, t1 " +
             "FROM Topic t1 " +
@@ -54,4 +55,9 @@ public interface TopicRepo extends JpaRepository<Topic, String> {
 
     @Query("SELECT t from Topic t JOIN t.students s where s.userId = :studentId AND t.status = com.thesis_formatter.thesis_formatter.enums.TopicStatus.PUBLISHED")
     Optional<Topic> findPublishedTopicsByStudent(@Param("studentId") String studentId);
+
+    @Query("SELECT t FROM Topic t JOIN t.teachers teacher WHERE teacher = :teacher AND t.semester = :semester AND t.year = :year and t.status = com.thesis_formatter.thesis_formatter.enums.TopicStatus.PUBLISHED")
+    List<Topic> findPublishedTopicsByTeacherAndSemesterAndYear(@Param("teacher") Teacher teacher,
+                                                      @Param("semester") Semester semester,
+                                                      @Param("year") String year);
 }

@@ -50,17 +50,25 @@ public class TeacherTopicLimitService {
                 .build();
     }
 
-    public APIResponse<TeacherTopicWithLimitResponse> getByTeacherId(String teacherAcId, String semester, String year) {
+    public TeacherTopicWithLimitResponse getLimitTopicByTeacherId(String teacherAcId, String semester, String year) {
         TeacherTopicLimitId id = new TeacherTopicLimitId();
         id.setTeacherId(teacherAcId);
         id.setSemester(Semester.valueOf(semester.toUpperCase()));
         id.setSchoolYear(year);
         TeacherTopicLimit teacherTopicLimit = teacherTopicLimitRepo.findTeacherTopicLimitById(id);
+        if (teacherTopicLimit == null) {
+            throw new RuntimeException("Chưa có giới hạn số lượng đề tài cho giảng viên trong kỳ này!");
+        }
         TeacherTopicWithLimitResponse response = TeacherTopicWithLimitResponse.builder()
                 .userId(teacherTopicLimit.getTeacher().getUserId())
                 .name(teacherTopicLimit.getTeacher().getName())
                 .maxTopics(teacherTopicLimit.getMaxTopics())
                 .build();
+        return response;
+    }
+
+    public APIResponse<TeacherTopicWithLimitResponse> getByTeacherId(String teacherAcId, String semester, String year) {
+        TeacherTopicWithLimitResponse response = getLimitTopicByTeacherId(teacherAcId, semester, year);
         return APIResponse.<TeacherTopicWithLimitResponse>builder()
                 .code("200")
                 .result(response)

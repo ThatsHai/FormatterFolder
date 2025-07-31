@@ -85,4 +85,14 @@ public class TopicController {
     public APIResponse<Void> deleteTopic(@PathVariable String id) {
         return topicService.deleteTopic(id);
     }
+
+    @PutMapping("topics/{topicId}/publish")
+    public APIResponse<Void> publishTopic(@PathVariable String topicId) throws MessagingException {
+        return topicService.setPublishedTopic(topicId);
+    }
+
+    @PutMapping("topics/{topicId}/unPublish")
+    public APIResponse<Void> unPublishTopic(@PathVariable String topicId) throws MessagingException {
+        return topicService.setUnPublishedTopic(topicId);
+    }
 }
