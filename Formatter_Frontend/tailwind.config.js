@@ -13,6 +13,7 @@ export default {
         redError: "#ef4444",
         greenCorrect: "#22c55e",
         darkGray: "#383838",
+        bgGray: "#e0e0e0"
       },
       fontFamily: {
         headerFont: ["CustomFont_Baloo2", "cursive"],

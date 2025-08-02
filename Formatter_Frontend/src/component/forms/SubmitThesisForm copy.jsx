@@ -6,21 +6,12 @@ import DisabledField from "./SubmitThesisFormComponents/DisabledField";
 import AddTeacherTable from "./SubmitThesisFormComponents/AddTeacherTable";
 import api from "../../services/api";
 
-const SubmitThesisForm = ({ handleFormToggle = () => {}, onSuccess = () => {} }) => {
+const SubmitThesisForm = ({
+  handleFormToggle = () => {},
+  onSuccess = () => {},
+}) => {
   const currentYear = new Date().getFullYear();
-  const [formData, setFormData] = useState({
-    title: "Khóa luận tốt nghiệp 2025",
-    introduction: "Đề tài về trí tuệ nhân tạo ứng dụng trong giáo dục.",
-    student: {
-      stId: "STU2025A01",
-    },
-    teachers: [
-      {
-        tcId: "TC001",
-      },
-    ],
-    status: "WAITING",
-  });
+  const [formData, setFormData] = useState({});
   const [openAddTeacherTable, setOpenAddTeacherTable] = useState(false);
 
   // Handle form field changes

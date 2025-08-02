@@ -488,6 +488,36 @@ public class TopicService {
     }
 
 
+    public APIResponse<PaginationResponse<TopicResponse>> getTopicsWithYearAndTeachers(String acId, String year, String semester, String p, String numberOfRecords) {
+        Pageable pageable = PageRequest.of(Integer.parseInt(p), Integer.parseInt(numberOfRecords));
+        PaginationResponse<TopicResponse> paginationResponse = new PaginationResponse<>();
+
+        Page<Topic> topicPage;
+
+        if ("Cả năm".equals(semester)) {
+            // Query all topics by year
+            topicPage = topicRepo.findTopicsByAcIdAndYear(acId, year, pageable);
+        } else {
+            // Convert string to enum safely
+            Semester semesterEnum = Semester.valueOf(semester); // "HK1", "HK2", "HK3"
+            topicPage = topicRepo.findTopicsByAcIdAndSemesterAndYear(acId, semesterEnum, year, pageable);
+        }
+
+        List<TopicResponse> topicResponses = topicPage.getContent()
+                .stream()
+                .map(topicMapper::toTopicResponse)
+                .collect(Collectors.toList());
+
+        paginationResponse.setCurrentPage(topicPage.getNumber());
+        paginationResponse.setTotalPages(topicPage.getTotalPages());
+        paginationResponse.setTotalElements(topicPage.getTotalElements());
+        paginationResponse.setContent(topicResponses);
+
+        return APIResponse.<PaginationResponse<TopicResponse>>builder()
+                .code("200")
+                .result(paginationResponse)
+                .build();
+    }
 }
 
 
