@@ -24,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -43,6 +44,7 @@ public class TopicService {
     FormRecordService formRecordService;
     FormRecordRepo formRecordRepo;
     private final NotificationService notificationService;
+    private final TeacherTopicLimitService teacherTopicLimitService;
 
     public APIResponse<List<TopicResponse>> getAll() {
         List<Topic> topics = topicRepo.findAll();
@@ -134,6 +136,7 @@ public class TopicService {
         // Cập nhật sinh viên và FormRecord tương ứng
 
         updateStudentsAndFormRecords(topic, request.getStudentIds());
+
         if (topic.getStudents() != null && !topic.getStudents().isEmpty()) {
             topic.setStatus(TopicStatus.PUBLISHED);
         }
@@ -285,7 +288,7 @@ public class TopicService {
     }
 
     public APIResponse<List<TopicResponse>> getTopicByTeacher_AcId(String acId) {
-        List<Topic> topics = topicRepo.findTopicsByTeachers_AcId(acId);
+        List<Topic> topics = topicRepo.findTopicsByTeachers_AcIdAndStatusIsNot(acId, TopicStatus.DELETED);
         List<TopicResponse> topicResponses = topicMapper.toTopicResponses(topics);
 
         return APIResponse.<List<TopicResponse>>builder()
@@ -487,6 +490,50 @@ public class TopicService {
         return buildSuccessResponse(paginationResponse);
     }
 
+    public APIResponse<Void> setPublishedTopic(String topicId) {
+
+        Topic topic = topicRepo.findById(topicId).orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOT_FOUND));
+
+        topic.setStatus(TopicStatus.PUBLISHED);
+        int month = LocalDate.now().getMonth().getValue();
+        String hk = month < 5 ? "HK2" : month < 9 ? "HK3" : "HK1";
+        String year = String.valueOf(LocalDate.now().getYear());
+
+        //check limit topic
+        for (Teacher teacher : topic.getTeachers()) {
+            System.out.println("Teacher: " + teacher.getAcId() + "hk: " + hk + "year: " + year);
+            TeacherTopicWithLimitResponse limitResponse = teacherTopicLimitService.getLimitTopicByTeacherId(teacher.getAcId(), hk, year);
+            if (limitResponse == null) {
+                throw new RuntimeException("Chưa có giới hạn số lượng đề tài trong kỳ này!");
+            } else {
+                List<Topic> topics = topicRepo.findPublishedTopicsByTeacherAndSemesterAndYear(teacher, Semester.valueOf(hk.toUpperCase()), year);
+                if (topics.size() >= limitResponse.getMaxTopics()) {
+                    throw new RuntimeException("Số lượng đề tài công khai trong kỳ này của giảng viên " + teacher.getName() + " đã đạt giới hạn!");
+                }
+            }
+        }
+
+        topic.setYear(year);
+        topic.setSemester(Semester.valueOf(hk.toUpperCase()));
+        topicRepo.save(topic);
+
+        return APIResponse.<Void>builder()
+                .code("200")
+                .message("Set published topic successfully")
+                .build();
+    }
+
+    public APIResponse<Void> setUnPublishedTopic(String topicId) {
+
+        Topic topic = topicRepo.findById(topicId).orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOT_FOUND));
+        topic.setStatus(TopicStatus.UNPUBLISHED);
+        topicRepo.save(topic);
+
+        return APIResponse.<Void>builder()
+                .code("200")
+                .message("Set unpublished topic successfully")
+                .build();
+    }
 
     public APIResponse<PaginationResponse<TopicResponse>> getTopicsWithYearAndTeachers(String acId, String year, String semester, String p, String numberOfRecords) {
         Pageable pageable = PageRequest.of(Integer.parseInt(p), Integer.parseInt(numberOfRecords));

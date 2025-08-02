@@ -3,6 +3,7 @@ package com.thesis_formatter.thesis_formatter.controller;
 import com.thesis_formatter.thesis_formatter.dto.request.AddTeacherTopicLimitRequest;
 import com.thesis_formatter.thesis_formatter.dto.request.TeacherTopicLimitRequest;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
+import com.thesis_formatter.thesis_formatter.dto.response.TeacherTopicWithLimitResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.TeacherTopicsResponse;
 import com.thesis_formatter.thesis_formatter.entity.TeacherTopicLimit;
 import com.thesis_formatter.thesis_formatter.service.TeacherTopicLimitService;
@@ -22,9 +23,15 @@ public class TeacherTopicLimitController {
     TeacherTopicLimitService teacherTopicLimitService;
 
     @GetMapping("/teacherTopicLimit/getAll")
-    public APIResponse<List<TeacherTopicLimit>> getAllTeacherTopicLimit() {
+    public APIResponse<List<TeacherTopicWithLimitResponse>> getAllTeacherTopicLimit() {
         return teacherTopicLimitService.getAll();
     }
+
+    @GetMapping("/teacherTopicLimit")
+    public APIResponse<TeacherTopicWithLimitResponse> getAllTeacherTopicLimit(@RequestParam String teacher_AcId, String semester, String year) {
+        return teacherTopicLimitService.getByTeacherId(teacher_AcId, semester, year);
+    }
+
 
 //    @GetMapping("/teacherTopicLimit")
 //    public APIResponse<String> getTeacherTopicLimit(@RequestParam String teacherId) {
@@ -40,4 +47,6 @@ public class TeacherTopicLimitController {
     public APIResponse<List<AddTeacherTopicLimitRequest>> addWithUserId(@RequestBody List<AddTeacherTopicLimitRequest> addTeacherTopicLimitRequestList) {
         return teacherTopicLimitService.addTeacherTopicLimitWithId(addTeacherTopicLimitRequestList);
     }
+
+
 }

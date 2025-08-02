@@ -166,6 +166,9 @@ public class NotificationService {
         String year = String.valueOf(LocalDate.now().getYear());
 
         List<Student> students = studentRepo.findGuidedStudentsByTeacherId(request.getSenderId(), semester, year);
+        if (students.isEmpty()) {
+            throw new RuntimeException("Không có sinh viên  đang hướng dẫn!");
+        }
         request.setRecipientIds(students.stream().map(student -> student.getUserId()).collect(Collectors.toList()));
         return createUserNotification(request);
 

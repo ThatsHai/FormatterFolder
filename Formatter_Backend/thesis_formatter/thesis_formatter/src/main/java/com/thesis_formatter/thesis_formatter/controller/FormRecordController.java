@@ -90,6 +90,11 @@ public class FormRecordController {
         return formRecordService.searchAccecptedByTeacherIdAndTime(teacherId, semester, year, page, numberOfRecords);
     }
 
+    @GetMapping("/formRecords/teacher/group")
+    public APIResponse<List<TeacherFormRecordResponse>> searchFormRecordsGroupByTeacher(@RequestParam String semester, @RequestParam String year, @RequestParam("p") String page, @RequestParam("n") String numberOfRecords) {
+        return formRecordService.getAcceptedFromRecordsGroupByTeacherWithTime(semester, year, page, numberOfRecords);
+    }
+
 
     @GetMapping("/formRecords/{id}")
     public APIResponse<FormRecordResponse> getFormRecord(@PathVariable String id, @RequestParam(required = false) String version) {

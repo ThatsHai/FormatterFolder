@@ -26,20 +26,21 @@ const MailList = ({
   const [mailList, setMailList] = useState([]);
   const [totalPages, setTotalPage] = useState(0);
 
-  const fetchMail = async () => {
+  const fetchMail = async (page = currentPage) => {
     let result = {};
     if (mailUrl === "received") {
       result = await api.get(
-        `/notifications?userId=${userId}&page=${currentPage}&number=8`
+        `/notifications?userId=${userId}&page=${page}&number=8`
       );
       setMailList(result.data.result.content);
       setTotalPage(result.data.result.totalPages);
     } else if (mailUrl == "sent") {
       result = await api.get(
-        `/notifications/sent?userId=${userId}&page=${currentPage}&number=8`
+        `/notifications/sent?userId=${userId}&page=${page}&number=8`
       );
       setMailList(result.data.result.content);
       setTotalPage(result.data.result.totalPages);
+
       console.log(result.data.result.totalPages);
     }
   };
@@ -187,6 +188,7 @@ const Composer = ({
         console.log(payload);
         setConfirmSend(false);
         await api.post("/notifications/user", payload);
+        handleCloseComposer();
         alert("Gửi thành công.");
       } catch (error) {
         console.log(error);
@@ -206,6 +208,7 @@ const Composer = ({
         console.log(payload);
         setConfirmSend(false);
         await api.post("/notifications/user/guidedStudent", payload);
+         handleCloseComposer();
       } catch (error) {
         console.log(error);
         if (error.response.data.code == 400) {
@@ -402,7 +405,7 @@ const MailDetail = ({
                   </Typography>
 
                   <Typography variant="caption" className="text-gray-400">
-                    {new Date(selectedMail.createdAt).toLocaleDateString(
+                    {new Date(selectedMail.createdAt).toLocaleString(
                       "vi-VN"
                     )}
                   </Typography>
@@ -419,7 +422,7 @@ const MailDetail = ({
             )}
             {mailUrl === "received" && (
               <p className="text-xs text-gray-400">
-                {new Date(selectedMail.createdAt).toLocaleDateString("vi-VN")}
+                {new Date(selectedMail.createdAt).toLocaleString("vi-VN")}
               </p>
             )}
           </div>

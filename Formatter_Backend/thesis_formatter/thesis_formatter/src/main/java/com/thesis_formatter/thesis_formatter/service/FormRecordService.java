@@ -300,7 +300,7 @@ public class FormRecordService {
     }
 
     public APIResponse<PaginationResponse<FormRecordResponse>> searchAccecptedByTeacherIdAndTime(String teacherId, String semester, String year, String page, String numberOfRecords) {
-        Teacher teacher = teacherRepo.findByAcId(teacherId);
+        Teacher teacher = teacherRepo.findByUserId(teacherId);
         if (teacher == null) {
             throw new AppException(ErrorCode.USER_NOT_EXISTED);
         }
@@ -604,6 +604,41 @@ public class FormRecordService {
                 .formRecordFields(newRecordFields)
                 .build());
 
+    }
+
+    public APIResponse<List<TeacherFormRecordResponse>> getAcceptedFromRecordsGroupByTeacherWithTime(
+            String semester, String year, String page, String numberOfRecords) {
+//        Pageable pageable = PageRequest.of(Integer.parseInt(page), Integer.parseInt(numberOfRecords));
+        Semester semesterEnum;
+        try {
+            semesterEnum = Semester.valueOf(semester.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new AppException(ErrorCode.INVALID_ARGUMENT);
+        }
+        List<FormRecord> records = formRecordRepo.findAcceptedRecordsByGroupByTeacher(semesterEnum, year);
+        Map<String, TeacherFormRecordResponse> grouped = new HashMap<>();
+        for (FormRecord record : records) {
+            for (Teacher teacher : record.getTopic().getTeachers()) {
+                String userId = teacher.getUserId();
+                TeacherFormRecordResponse response = grouped.computeIfAbsent(userId, id -> TeacherFormRecordResponse.builder()
+                        .userId(userId)
+                        .teacherName(teacher.getName())
+                        .formRecordSchedules(new ArrayList<>())
+                        .build());
+                response.getFormRecordSchedules().add(
+                        FormRecordScheduleResponse.builder()
+                                .formRecordId(record.getFormRecordId())
+                                .studentId(record.getStudent().getUserId())
+                                .studentName(record.getStudent().getName())
+                                .topicName(record.getTopic().getTitle())
+                                .build()
+                );
+            }
+        }
+        return APIResponse.<List<TeacherFormRecordResponse>>builder()
+                .code("200")
+                .result(new ArrayList<>(grouped.values()))
+                .build();
     }
 
     @Transactional

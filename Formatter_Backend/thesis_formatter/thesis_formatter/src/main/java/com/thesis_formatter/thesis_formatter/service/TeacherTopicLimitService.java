@@ -5,10 +5,12 @@ import com.thesis_formatter.thesis_formatter.dto.request.AddTeacherTopicLimitReq
 import com.thesis_formatter.thesis_formatter.dto.request.TeacherTopicLimitRequest;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.TeacherDTO;
+import com.thesis_formatter.thesis_formatter.dto.response.TeacherTopicWithLimitResponse;
 import com.thesis_formatter.thesis_formatter.entity.Teacher;
 import com.thesis_formatter.thesis_formatter.entity.TeacherTopicLimit;
 import com.thesis_formatter.thesis_formatter.entity.id.TeacherTopicLimitId;
 import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
+import com.thesis_formatter.thesis_formatter.enums.Semester;
 import com.thesis_formatter.thesis_formatter.exception.AppException;
 import com.thesis_formatter.thesis_formatter.mapper.TeacherMapper;
 import com.thesis_formatter.thesis_formatter.repo.TeacherRepo;
@@ -31,22 +33,48 @@ public class TeacherTopicLimitService {
     TeacherRepo teacherRepo;
     TeacherMapper teacherMapper;
 
-    public APIResponse<List<TeacherTopicLimit>> getAll() {
+    public APIResponse<List<TeacherTopicWithLimitResponse>> getAll() {
         List<TeacherTopicLimit> results = teacherTopicLimitRepo.findAll();
-        return APIResponse.<List<TeacherTopicLimit>>builder()
+        List<TeacherTopicWithLimitResponse> responses = new ArrayList<>();
+        for (TeacherTopicLimit teacherTopicLimit : results) {
+            responses.add(TeacherTopicWithLimitResponse.builder()
+                    .userId(teacherTopicLimit.getId().getTeacherId())
+                    .maxTopics(teacherTopicLimit.getMaxTopics())
+                    .name(teacherTopicLimit.getTeacher().getName())
+                    .topicResponses(new ArrayList<>())
+                    .build());
+        }
+        return APIResponse.<List<TeacherTopicWithLimitResponse>>builder()
                 .code("200")
-                .result(results)
+                .result(responses)
                 .build();
     }
 
-//    public APIResponse<String> getByTeacherId(String teacherId) {
-//        TeacherTopicLimit teacherTopicLimit = teacherTopicLimitRepo.findById(teacherId).orElseThrow(() -> new AppException(ErrorCode.ENTITY_NOT_FOUND));
-//        return APIResponse.<String>builder()
-//                .code("200")
-//                .result(Integer.toString(teacherTopicLimit.getMaxTopics()))
-//                .build();
-//    }
+    public TeacherTopicWithLimitResponse getLimitTopicByTeacherId(String teacherAcId, String semester, String year) {
+        TeacherTopicLimitId id = new TeacherTopicLimitId();
+        id.setTeacherId(teacherAcId);
+        id.setSemester(Semester.valueOf(semester.toUpperCase()));
+        id.setSchoolYear(year);
+        TeacherTopicLimit teacherTopicLimit = teacherTopicLimitRepo.findTeacherTopicLimitById(id);
+        if (teacherTopicLimit == null) {
+            throw new RuntimeException("Chưa có giới hạn số lượng đề tài cho giảng viên trong kỳ này!");
+        }
+        TeacherTopicWithLimitResponse response = TeacherTopicWithLimitResponse.builder()
+                .userId(teacherTopicLimit.getTeacher().getUserId())
+                .name(teacherTopicLimit.getTeacher().getName())
+                .maxTopics(teacherTopicLimit.getMaxTopics())
+                .build();
+        return response;
+    }
 
+    public APIResponse<TeacherTopicWithLimitResponse> getByTeacherId(String teacherAcId, String semester, String year) {
+        TeacherTopicWithLimitResponse response = getLimitTopicByTeacherId(teacherAcId, semester, year);
+        return APIResponse.<TeacherTopicWithLimitResponse>builder()
+                .code("200")
+                .result(response)
+                .build();
+    }
+//
 //    private TeacherTopicLimitResponse toDTO(TeacherTopicLimit teacherTopicLimit) {
 //        TeacherTopicLimitResponse teacherTopicLimitResponse = new TeacherTopicLimitResponse();
 //
