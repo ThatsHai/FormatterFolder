@@ -17,13 +17,6 @@ const TeacherHomePage = () => {
   if (loading) return null;
 
   const handleFormToggle = async () => {
-    // const result = await api.get("/myInfo");
-    // const userId = result.data.result.useId;
-    // console.log(result.data.result.userId);
-    // if (userId === "") {
-    //   alert("Phiên đăng nhập hết hạn");
-    //   navigate("/login");
-    // }
     setIsThesisFormOpen((prev) => !prev);
   };
 

@@ -21,12 +21,14 @@ const Header = () => {
           </IconButton>
         </Link>
 
-        <IconButton
-          aria-label="account"
-          style={{ color: "white", padding: "0px" }}
-        >
-          <AccountCircleIcon style={{ height: "28px", width: "28px" }} />
-        </IconButton>
+        <Link to={"/profile"}>
+          <IconButton
+            aria-label="account"
+            style={{ color: "white", padding: "0px" }}
+          >
+            <AccountCircleIcon style={{ height: "28px", width: "28px" }} />
+          </IconButton>
+        </Link>
       </div>
     </div>
   );

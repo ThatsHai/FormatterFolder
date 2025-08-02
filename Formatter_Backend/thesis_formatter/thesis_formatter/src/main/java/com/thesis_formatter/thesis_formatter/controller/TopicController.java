@@ -81,6 +81,11 @@ public class TopicController {
         return topicService.getTopicsGroupByTeacherWithLimit(semester, year, teacherQueryName, p, n);
     }
 
+    @GetMapping("/topics/getBySemesterAndYear")
+    public APIResponse<PaginationResponse<TopicResponse>> getTopicsBySemesterAndYear(@RequestParam String acId, @RequestParam String year, @RequestParam String semester, @RequestParam String p, @RequestParam String numberOfRecords) {
+        return topicService.getTopicsWithYearAndTeachers(acId, year, semester, p, numberOfRecords);
+    }
+
     @DeleteMapping("topics/{id}/delete")
     public APIResponse<Void> deleteTopic(@PathVariable String id) {
         return topicService.deleteTopic(id);

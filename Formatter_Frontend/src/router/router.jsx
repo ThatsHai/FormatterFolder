@@ -25,6 +25,7 @@ import DiffViewerPage from "../component/pageComponents/thesisInfoPage/DiffViewe
 import TopicContent from "../pages/teacherPages/topic/TopicContent";
 import NotificationPage from "../pages/adminPages/NotificationPage";
 import TeacherNotificationPage from "../pages/teacherPages/TeacherNotificationPage";
+import ProfilePage from "../pages/ProfilePage";
 
 const Router = createBrowserRouter([
   {
@@ -153,6 +154,14 @@ const Router = createBrowserRouter([
     element: (
       <DefaultLayout>
         <TeacherNotificationPage />
+      </DefaultLayout>
+    ),
+  },
+  {
+    path: "/profile",
+    element: (
+      <DefaultLayout>
+        <ProfilePage />
       </DefaultLayout>
     ),
   },

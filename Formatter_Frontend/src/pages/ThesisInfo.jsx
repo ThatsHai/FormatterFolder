@@ -1,4 +1,3 @@
-import React from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { IconButton } from "@mui/material";
@@ -8,18 +7,16 @@ import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
 import { useEffect } from "react";
 import api from "../services/api";
-import PageNumberFooter from "../component/PageNumberFooter";
-import FormRecordFieldsPaginated from "../component/forms/SubmitThesisFormComponents/FormRecordFieldsPaginated";
 
 const ThesisInfo = ({ onDecline = () => {} }) => {
-  const currentYear = new Date().getFullYear();
+  // const currentYear = new Date().getFullYear();
   const { formRecordId } = useParams();
   const [formRecord, setFormRecord] = useState(null);
   console.log("recordid:", formRecordId);
   const [formData, setFormData] = useState(null);
 
-  const [fieldPages, setFieldPages] = useState(0);
-  const [currentPage, setCurrentPage] = useState(0); // 0 = trang thông tin chung
+  // const [fieldPages, setFieldPages] = useState(0);
+  // const [currentPage, setCurrentPage] = useState(0); // 0 = trang thông tin chung
   const [refreshCounter, setRefreshCounter] = useState(0);
   const [showStudentInfo, setShowStudentInfo] = useState(false);
   const [showTopicInfo, setShowTopicInfo] = useState(false);
@@ -60,12 +57,14 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
               {formRecord.topic.form.title}
             </h1>
             {/* Title */}
-            <div className="relative text-start w-full font-textFont text-lg px-10 w-full grid grid-cols-3 items-center mb-3">
+            <div className="relative text-start font-textFont text-lg px-10 w-full grid grid-cols-3 items-center mb-3">
               <h3 className="text-black font-semibold">1. ĐỀ TÀI</h3>
-              <p className="rounded-md col-span-2 bg-[#e4e4e4] px-6 py-1">{formData.title}</p>
+              <p className="rounded-md col-span-2 bg-[#e4e4e4] px-6 py-1">
+                {formData.title}
+              </p>
             </div>
             {/* Teacher Information */}
-            <div className="relative text-start w-full font-textFont text-lg px-10 w-full grid grid-cols-3 items-center">
+            <div className="relative text-start font-textFont text-lg px-10 w-full grid grid-cols-3 items-center">
               <p className="text-black font-semibold">2. CÁN BỘ HƯỚNG DẪN</p>
               {formData.topic.teachers.length > 1 ? (
                 <div className="rounded-md col-span-2 bg-[#e4e4e4] px-4 py-1">
@@ -83,7 +82,8 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
                 </div>
               ) : (
                 <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
-                  {formData.topic.teachers[0].name} - {formData.topic.teachers[0].email}
+                  {formData.topic.teachers[0].name} -{" "}
+                  {formData.topic.teachers[0].email}
                 </p>
               )}
             </div>
@@ -115,7 +115,7 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
                   </p>
                 </div>
                 <div className="w-full grid grid-cols-3 items-center mb-3">
-                  <p>Ngành</p>  
+                  <p>Ngành</p>
                   <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
                     {formData.student.major}
                   </p>
@@ -151,92 +151,91 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
             {showTopicInfo && (
               <div className="relative text-start w-full font-textFont text-lg mb-8 px-10">
                 <div className="w-full grid grid-cols-3 items-center mb-3">
-                <p>Giới thiệu</p>
-                <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
-                  {formData.topic.description || "Bỏ trống"}
-                </p>
-              </div>
-              <div className="w-full grid grid-cols-3 items-center mb-3">
-                <p>Nội dung nghiên cứu</p>
-                <p className="col-span-2 rounded-md px-6 py-1 bg-[#e4e4e4]">
-                  {formData.topic.researchContent}
-                </p>
-              </div>
-              <div className="w-full grid grid-cols-3 items-center mb-3">
-                <p>Mục tiêu tổng quát</p>
-                <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
-                  {formData.topic.objective || "Bỏ trống"}
-                </p>
-              </div>
-              <div className="w-full grid grid-cols-3 items-center mb-3">
-                <p>Mục tiêu cụ thể</p>
-                <div
-                  className="col-span-2 bg-[#e4e4e4] rounded-md min-h-[40px] text-lg rounded-md px-3 py-1 prose prose-sm max-w-none
-                    prose-ul:list-disc prose-ol:list-decimal prose-li:ml-1 text-black  prose-li:marker:text-black"
-                  dangerouslySetInnerHTML={{
-                    __html: formData.topic.objectiveDetails,
-                  }}
-                ></div>
-              </div>
-              <div className="w-full grid grid-cols-3 items-center mb-3">
-                <p>Kinh phí</p>
-                <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
-                  {formData.topic.funding || "Bỏ trống"}
-                </p>
-              </div>
-              <div className="w-full grid grid-cols-3 items-center mb-3">
-                <p>Thời gian thực hiện</p>
-                <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
-                  {formData.topic.time} - Bắt đầu từ {formData.topic.implementationTime}
-                </p>
-              </div>
-
-              <div className="w-full grid grid-cols-3 items-center mb-3">
-                <p>Thông tin liên hệ về đề tài</p>
-                <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
-                  {formData.topic.contactInfo}
-                </p>
-              </div>
-              <div className="w-full grid grid-cols-3 items-center mb-3">
-                <p className="">Dành cho sinh viên ngành</p>
-                {formData.topic.majors.length > 1 ? (
-                  <div className="rounded-md bg-[#e4e4e4] px-4 py-1 col-span-2">
-                    {formData.topic.majors.map((major, index) => (
-                      <div
-                        key={index}
-                        className="grid grid-cols-[1.5rem_auto] gap-2"
-                      >
-                        <span className="text-right">{index + 1}.</span>
-                        <span>{major.majorName}</span>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="col-span-2 bg-[#e4e4e4] rounded-md px-6 py-1 ">
-                    {formData.topic.majors[0].majorName}
+                  <p>Giới thiệu</p>
+                  <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
+                    {formData.topic.description || "Bỏ trống"}
                   </p>
-                )}
-              </div>
+                </div>
+                <div className="w-full grid grid-cols-3 items-center mb-3">
+                  <p>Nội dung nghiên cứu</p>
+                  <p className="col-span-2 rounded-md px-6 py-1 bg-[#e4e4e4]">
+                    {formData.topic.researchContent}
+                  </p>
+                </div>
+                <div className="w-full grid grid-cols-3 items-center mb-3">
+                  <p>Mục tiêu tổng quát</p>
+                  <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
+                    {formData.topic.objective || "Bỏ trống"}
+                  </p>
+                </div>
+                <div className="w-full grid grid-cols-3 items-center mb-3">
+                  <p>Mục tiêu cụ thể</p>
+                  <div
+                    className="col-span-2 bg-[#e4e4e4] min-h-[40px] text-lg rounded-md px-3 py-1 prose prose-sm max-w-none
+                    prose-ul:list-disc prose-ol:list-decimal prose-li:ml-1 text-black  prose-li:marker:text-black"
+                    dangerouslySetInnerHTML={{
+                      __html: formData.topic.objectiveDetails,
+                    }}
+                  ></div>
+                </div>
+                <div className="w-full grid grid-cols-3 items-center mb-3">
+                  <p>Kinh phí</p>
+                  <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
+                    {formData.topic.funding || "Bỏ trống"}
+                  </p>
+                </div>
+                <div className="w-full grid grid-cols-3 items-center mb-3">
+                  <p>Thời gian thực hiện</p>
+                  <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
+                    {formData.topic.time} - Bắt đầu từ{" "}
+                    {formData.topic.implementationTime}
+                  </p>
+                </div>
+
+                <div className="w-full grid grid-cols-3 items-center mb-3">
+                  <p>Thông tin liên hệ về đề tài</p>
+                  <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">
+                    {formData.topic.contactInfo}
+                  </p>
+                </div>
+                <div className="w-full grid grid-cols-3 items-center mb-3">
+                  <p className="">Dành cho sinh viên ngành</p>
+                  {formData.topic.majors.length > 1 ? (
+                    <div className="rounded-md bg-[#e4e4e4] px-4 py-1 col-span-2">
+                      {formData.topic.majors.map((major, index) => (
+                        <div
+                          key={index}
+                          className="grid grid-cols-[1.5rem_auto] gap-2"
+                        >
+                          <span className="text-right">{index + 1}.</span>
+                          <span>{major.majorName}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="col-span-2 bg-[#e4e4e4] rounded-md px-6 py-1 ">
+                      {formData.topic.majors[0].majorName}
+                    </p>
+                  )}
+                </div>
               </div>
             )}
             {/* Form Record Fields */}
             <h2 className="text-3xl font-headerFont text-darkBlue font-bold text-center mb-6">
               Thông tin đã điền
             </h2>
-             {formRecord.formRecordFields
-            .sort((a, b) => a.formField.position - b.formField.position)
-            .map((field, index) => (
-              <div className="flex items-center font-textFont text-lg mb-8 px-10">
-                <h3 className="w-1/3 text-black font-semibold">
-                  {index + 1}. {field.formField.fieldName}
-                </h3>
+            {formRecord.formRecordFields
+              .sort((a, b) => a.formField.position - b.formField.position)
+              .map((field, index) => (
+                <div className="flex items-center font-textFont text-lg mb-8 px-10" key={index}>
+                  <h3 className="w-1/3 text-black font-semibold">
+                    {index + 1}. {field.formField.fieldName}
+                  </h3>
 
-                <p className="w-2/3 rounded-md px-6 py-1">{field.value}</p>
-              </div>
-            ))}
+                  <p className="w-2/3 rounded-md px-6 py-1">{field.value}</p>
+                </div>
+              ))}
           </div>
-
-         
         </div>
         <div>
           {/* Buttons */}
