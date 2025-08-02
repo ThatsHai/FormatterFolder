@@ -205,7 +205,6 @@ public class AuthenticationService {
         tokenEntity.setRevoked(true);
         refreshTokenRepo.save(tokenEntity);
 
-
 //        InvalidatedToken invalidatedToken = InvalidatedToken.builder()
 //                .id(jit)
 //                .expiryTime(expiryTime)

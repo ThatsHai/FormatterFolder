@@ -38,6 +38,9 @@ public enum ErrorCode {
     STUDENT_ALREADY_IN_OTHER_TOPIC("1023", "Student already in other topic", HttpStatus.BAD_REQUEST),
     DUPLICATE_NAME("1024", "Duplicate name", HttpStatus.CONFLICT),
     NOTIFICATION_RECEIVER_NOT_FOUND("1025", "Notification receiver not found", HttpStatus.NOT_FOUND),
+    PROGRESS_NOT_FOUND("1026", "Progress not found", HttpStatus.NOT_FOUND),
+    MILESTONE_NOT_FOUND("1027", "Milestone not found", HttpStatus.NOT_FOUND),
+
     ;
 
     private String code;
