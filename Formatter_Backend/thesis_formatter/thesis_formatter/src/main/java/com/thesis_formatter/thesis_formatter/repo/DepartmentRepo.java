@@ -11,4 +11,9 @@ public interface DepartmentRepo extends JpaRepository<Department, String> {
     Department findByDepartmentId(String departmentId);
 
     List<Department> findByFacultyFacultyId(String facultyId);
+
+    List<Department> findByDepartmentName(String departmentName);
+
+    List<Department> findByDepartmentNameContainingIgnoreCase(String departmentName);
+
 }

@@ -23,9 +23,9 @@ import PDFViewer from "../component/forms/SubmitThesisFormComponents/PDFViewer";
 import TopicInfo from "../pages/teacherPages/topic/TopicInfo";
 import DiffViewerPage from "../component/pageComponents/thesisInfoPage/DiffViewerPage";
 import TopicContent from "../pages/teacherPages/topic/TopicContent";
-import NotificationPage from "../pages/adminPages/NotificationPage";
-import TeacherNotificationPage from "../pages/teacherPages/TeacherNotificationPage";
+import NotificationPage from "../pages/NotificationPage";
 import ProfilePage from "../pages/ProfilePage";
+import AdminNotificationPage from "../pages/adminPages/AdminNotificationPage";
 
 const Router = createBrowserRouter([
   {
@@ -150,10 +150,18 @@ const Router = createBrowserRouter([
     ),
   },
   {
+    path: "/admin/notifications",
+    element: (
+      <AdminLayout>
+        <AdminNotificationPage />
+      </AdminLayout>
+    ),
+  },
+  {
     path: "/notifications",
     element: (
       <DefaultLayout>
-        <TeacherNotificationPage />
+        <NotificationPage />
       </DefaultLayout>
     ),
   },

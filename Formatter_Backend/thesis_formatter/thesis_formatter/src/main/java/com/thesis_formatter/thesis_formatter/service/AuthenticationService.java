@@ -5,10 +5,8 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import com.thesis_formatter.thesis_formatter.dto.request.AuthenticationRequest;
-import com.thesis_formatter.thesis_formatter.dto.request.IntrospectRequest;
-import com.thesis_formatter.thesis_formatter.dto.request.LogoutRequest;
-import com.thesis_formatter.thesis_formatter.dto.request.RefreshRequest;
+import com.thesis_formatter.thesis_formatter.dto.request.*;
+import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.AuthenticationResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.IntrospectResponse;
 import com.thesis_formatter.thesis_formatter.entity.Account;
@@ -32,9 +30,7 @@ import org.springframework.util.CollectionUtils;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.StringJoiner;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -243,5 +239,21 @@ public class AuthenticationService {
 //        }
 
         return signedJWT;
+    }
+
+    public APIResponse<Map<String, Object>> changePassword(ChangePasswordRequest request) {
+        Account user = accountRepo.findByUserId(request.getUserId()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        boolean isOlePasswordValid = passwordEncoder.matches(request.getOldPassword(), user.getPassword());
+        if (!isOlePasswordValid) {
+            throw new AppException(ErrorCode.INCORRECT_PASSWORD);
+        }
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        accountRepo.save(user);
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("success", true);
+        return APIResponse.<Map<String, Object>>builder()
+                .result(result)
+                .code("200")
+                .build();
     }
 }

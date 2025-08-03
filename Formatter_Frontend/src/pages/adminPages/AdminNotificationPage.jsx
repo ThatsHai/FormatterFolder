@@ -7,6 +7,8 @@ import PageNumberFooter from "../../component/PageNumberFooter";
 import api from "../../services/api";
 import { Collapse, Typography } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"; // from MUI
+import useBootstrapUser from "../../hook/useBootstrapUser";
+import { useSelector } from "react-redux";
 
 const truncateWords = (str, charLimit, end = "…") => {
   if (!str) return "";
@@ -154,11 +156,41 @@ const Composer = ({
 }) => {
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
-
   const [recipientIdsList, setRecipientIdsList] = useState("");
-  const [sendToGuidedStudents, setSendToGuidedStudents] = useState(false);
+  const [sendToDepartment, setSendToDepartMent] = useState(false);
   const [confirmSend, setConfirmSend] = useState(false);
   const [confirmSendText, setConfirmSendText] = useState("");
+  // const [openQueryWindow, setOpenQueryWindow] = useState(false);
+  // const [inputText, setInputText] = useState(""); // current search or selected dept name
+  // const [selectedDepartment, setSelectedDepartment] = useState(null);
+  // const [departmentList, setDepartmentList] = useState([]);
+  const [inputText, setInputText] = useState("");
+  const [selectedDepartments, setSelectedDepartments] = useState([]); // Array of dept objects
+  const [departmentList, setDepartmentList] = useState([]);
+  const [openQueryWindow, setOpenQueryWindow] = useState(false);
+
+  useEffect(() => {
+    const delay = setTimeout(() => {
+      if (inputText.trim() !== "") {
+        fetchDepartments(inputText);
+      }
+    }, 300);
+
+    return () => clearTimeout(delay);
+  }, [inputText]);
+
+  const fetchDepartments = async () => {
+    try {
+      const response = await api.get(
+        `/departments?departmentName=${inputText}`
+      );
+      setDepartmentList(response.data.result);
+    } catch (error) {
+      if (error.response.data.code === "1018") {
+        setDepartmentList([]);
+      }
+    }
+  };
 
   const titleOrMessageIsNull = () => {
     if (
@@ -175,7 +207,7 @@ const Composer = ({
   const handleSend = async () => {
     let recipientIds = recipientIdsList.split(" ");
 
-    if (!sendToGuidedStudents) {
+    if (!sendToDepartment) {
       try {
         let payload = {
           title: title,
@@ -197,20 +229,24 @@ const Composer = ({
         }
       }
     } else {
+      //Temporary convert object to list
+      const departmentIdList = selectedDepartments.map(
+        (department) => department.departmentId
+      );
       try {
         let payload = {
           title: title,
           message: message,
           senderId: userId,
+          recipientIds: departmentIdList,
         };
-        console.log(payload);
         setConfirmSend(false);
-        await api.post("/notifications/user/guidedStudent", payload);
+        await api.post("/notifications/admin/department", payload);
         handleCloseComposer();
       } catch (error) {
         console.log(error);
         if (error.response.data.code == 400) {
-          alert("Không có sinh viên đang hướng dẫn!");
+          alert("Không có khoa đang tìm!");
         } else {
           alert("Lỗi không gửi được thư, vui lòng thử lại sau.");
         }
@@ -221,13 +257,13 @@ const Composer = ({
   const handleCloseComposer = () => {
     setTitle("");
     setMessage("");
-    setSendToGuidedStudents(false);
+    setSendToDepartMent(false);
     setRecipientIdsList("");
     setIsComposerOpen(1);
   };
 
   const validateEmail = async () => {
-    if (!recipientIdsList.trim() && sendToGuidedStudents === false) {
+    if (!recipientIdsList.trim() && sendToDepartment === false) {
       alert("Vui lòng nhập id người nhận.");
       return;
     }
@@ -285,39 +321,152 @@ const Composer = ({
           </div>
           <div className="px-3 pt-2">
             <div className="flex items-end gap-2 mb-2">
-              <input
-                type="email"
-                placeholder="Đến MSSV (Ngăn cách bằng dấu cách)"
-                className="flex-1 p-2 border-b border-lightGray text-sm focus:outline-none disabled:opacity-50"
-                value={recipientIdsList}
-                disabled={sendToGuidedStudents}
-                onChange={(e) => setRecipientIdsList(e.target.value)}
-              />
+              {/* Left side */}
+              <div className="flex items-end gap-1">
+                {!sendToDepartment && (
+                  <input
+                    type="email"
+                    placeholder="Đến MSCB (Ngăn cách bằng dấu cách)"
+                    className="p-2 border-b border-lightGray text-sm focus:outline-none disabled:opacity-50 w-[280px]"
+                    value={recipientIdsList}
+                    disabled={sendToDepartment}
+                    onChange={(e) => setRecipientIdsList(e.target.value)}
+                  />
+                )}
+              </div>
+
+              {/* Center text */}
               <span>Hoặc</span>
-              <Tooltip
-                title="Gửi đến các sinh viên đang được hướng dẫn"
-                arrow
-                placement="top"
-                enterDelay={200}
-              >
-                <div className="flex items-end gap-1">
-                  <Checkbox
-                    size="small"
-                    checked={sendToGuidedStudents}
+              <div className="flex flex-col items-center leading-none">
+                <span className="text-[12px] mb-1">Gửi nhanh</span>
+                <Checkbox
+                  size="small"
+                  checked={sendToDepartment}
+                  onChange={(e) => {
+                    const isChecked = e.target.checked;
+                    if (isChecked && recipientIdsList?.trim().length > 0) {
+                      alert("Không thể gửi nhanh nếu mục đến MSCB có MSCB");
+                      return;
+                    }
+                    setSendToDepartMent(isChecked);
+                  }}
+                  sx={{ padding: 0 }}
+                />
+              </div>
+
+              {/* Right side */}
+              {/* {sendToDepartment && (
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    placeholder="Gửi đến khoa"
+                    className="w-full p-2 border-b border-lightGray text-sm focus:outline-none"
+                    value={inputText}
                     onChange={(e) => {
-                      const isChecked = e.target.checked;
-                      if (isChecked && recipientIdsList?.trim().length > 0) {
-                        alert("Không thể gửi nhanh nếu mục đến MSSV có MSSV");
-                        return;
-                      }
-                      setSendToGuidedStudents(isChecked);
+                      setInputText(e.target.value);
+                      setSelectedDepartment(null); // reset selection when typing
                     }}
-                    sx={{ padding: 0 }}
+                    onFocus={() => setOpenQueryWindow(true)}
+                    onBlur={() =>
+                      setTimeout(() => setOpenQueryWindow(false), 150)
+                    }
                   />
 
-                  <span className="text-[12px]">Gửi nhanh</span>
+                  {openQueryWindow && departmentList.length > 0 && (
+                    <div className="absolute z-10 mt-1 w-full bg-white shadow-md border border-lightGray max-h-60 overflow-y-auto rounded-sm">
+                      {departmentList.map((dept) => (
+                        <div
+                          key={dept.departmentId}
+                          className="px-4 py-2 hover:bg-lightGray cursor-pointer text-sm"
+                          onMouseDown={() => {
+                            setSelectedDepartment(dept);
+                            setInputText(dept.departmentName);
+                            setOpenQueryWindow(false);
+                          }}
+                        >
+                          {dept.departmentName}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              </Tooltip>
+              )} */}
+              {sendToDepartment && (
+                <div className="relative flex-1">
+                  <div
+                    className="w-full p-2 border-b border-lightGray text-sm focus-within:outline-none flex flex-wrap items-center gap-1 min-h-[42px]"
+                    onClick={() => setOpenQueryWindow(true)}
+                  >
+                    {/* Selected tags */}
+                    {selectedDepartments.map((dept) => (
+                      <span
+                        key={dept.departmentId}
+                        className="bg-lightGray text-gray-800 text-xs px-2 py-1 rounded-full flex items-center gap-1 border"
+                      >
+                        {dept.departmentName}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedDepartments((prev) =>
+                              prev.filter(
+                                (d) => d.departmentId !== dept.departmentId
+                              )
+                            );
+                          }}
+                          className="text-xs text-red-500 hover:text-red-700"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+
+                    {/* Search input */}
+                    <input
+                      type="text"
+                      className="flex-grow outline-none min-w-[80px]"
+                      value={inputText}
+                      onChange={(e) => {
+                        setInputText(e.target.value);
+                        setOpenQueryWindow(true);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Backspace" && inputText === "") {
+                          setSelectedDepartments((prev) => prev.slice(0, -1));
+                        }
+                      }}
+                      onFocus={() => setOpenQueryWindow(true)}
+                      onBlur={() =>
+                        setTimeout(() => setOpenQueryWindow(false), 150)
+                      }
+                    />
+                  </div>
+
+                  {/* Dropdown */}
+                  {openQueryWindow && departmentList.length > 0 && (
+                    <div className="absolute z-10 mt-1 w-full bg-white shadow-md border border-lightGray max-h-60 overflow-y-auto rounded-sm">
+                      {departmentList.map((dept) => (
+                        <div
+                          key={dept.departmentId}
+                          className="px-4 py-2 hover:bg-lightGray cursor-pointer text-sm"
+                          onMouseDown={() => {
+                            if (
+                              !selectedDepartments.some(
+                                (d) => d.departmentId === dept.departmentId
+                              )
+                            ) {
+                              setSelectedDepartments((prev) => [...prev, dept]);
+                            }
+                            setInputText("");
+                            setOpenQueryWindow(false);
+                          }}
+                        >
+                          {dept.departmentName}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <input
@@ -433,21 +582,21 @@ const MailDetail = ({
   );
 };
 
-const TeacherNotificationPage = ({ userData }) => {
+const AdminNotificationPage = () => {
   const [isComposerOpen, setIsComposerOpen] = useState(1); //1 == none, 2 == minimize, 3 == yes
   const [selectedMail, setSelectedMail] = useState({});
   const [mailUrl, setMailUrl] = useState("received");
   const [currentPage, setCurrentPage] = useState(0);
-  // const { loading } = useBootstrapUser(); // hydrates redux on mount
-  const user = userData;
+  const { loading } = useBootstrapUser(); // hydrates redux on mount
+  const user = useSelector((state) => state.auth.user);
   const role = user?.role; // safe access
-
-  // if (loading) return null;
+  console.log(user);
+  if (loading) return null;
   if (!role) return null;
   if (!user.userId) return null;
 
   return (
-    <div className="flex bg-bgGray pt-6">
+    <div className="flex pt-2">
       {/* Sidebar */}
       <Sidebar
         setIsComposerOpen={setIsComposerOpen}
@@ -484,8 +633,6 @@ const TeacherNotificationPage = ({ userData }) => {
   );
 };
 
-TeacherNotificationPage.propTypes = { userData: PropTypes.object };
-
 MailList.propTypes = {
   userId: PropTypes.string,
   setSelectedMail: PropTypes.func,
@@ -513,4 +660,4 @@ Sidebar.propTypes = {
   setSelectedMail: PropTypes.func,
 };
 
-export default TeacherNotificationPage;
+export default AdminNotificationPage;

@@ -93,4 +93,15 @@ public class DepartmentService {
                 .result(existedDepartment)
                 .build();
     }
+
+    public APIResponse<List<Department>> getDepartmentByName(String departmentName) {
+        List<Department> department = departmentRepo.findByDepartmentNameContainingIgnoreCase(departmentName);
+        if (department.isEmpty()) {
+            throw new AppException(ErrorCode.DEPARTMENT_NOT_FOUND);
+        }
+        return APIResponse.<List<Department>>builder()
+                .result(department)
+                .code("200")
+                .build();
+    }
 }

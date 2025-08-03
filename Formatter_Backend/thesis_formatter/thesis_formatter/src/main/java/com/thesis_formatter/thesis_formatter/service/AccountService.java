@@ -3,10 +3,13 @@ package com.thesis_formatter.thesis_formatter.service;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.StudentDTO;
 import com.thesis_formatter.thesis_formatter.dto.response.TeacherDTO;
+import com.thesis_formatter.thesis_formatter.entity.Role;
 import com.thesis_formatter.thesis_formatter.entity.Student;
 import com.thesis_formatter.thesis_formatter.entity.Teacher;
 import com.thesis_formatter.thesis_formatter.mapper.StudentMapperImpl;
 import com.thesis_formatter.thesis_formatter.mapper.TeacherMapperImpl;
+import com.thesis_formatter.thesis_formatter.repo.AccountRepo;
+import com.thesis_formatter.thesis_formatter.repo.RoleRepo;
 import com.thesis_formatter.thesis_formatter.repo.StudentRepo;
 import com.thesis_formatter.thesis_formatter.repo.TeacherRepo;
 import lombok.AccessLevel;
@@ -27,6 +30,8 @@ public class AccountService {
     TeacherMapperImpl teacherMapperImpl;
     StudentRepo studentRepo;
     TeacherRepo teacherRepo;
+    private final RoleRepo roleRepo;
+    private final AccountRepo accountRepo;
 
     public APIResponse<?> getMyInfo(Authentication auth) {
         if (auth instanceof JwtAuthenticationToken jwtAuth) {
@@ -35,10 +40,13 @@ public class AccountService {
             boolean isStudent = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_STUDENT"));
             boolean isTeacher = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_TEACHER"));
             if (isAdmin) {
-                Map<String, String> result = new LinkedHashMap<>();
+                Map<String, Object> result = new LinkedHashMap<>();
                 result.put("name", "ADMIN");
                 result.put("username", "ADMIN");
-                result.put("password", "ADMIN123");
+                //                result.put("password", "ADMIN123");
+                result.put("userId", "admin");
+                Role role = roleRepo.findByName("ADMIN");
+                result.put("role", role);
                 return APIResponse.builder().code("200").result(result).build();
             } else {
                 String userId = jwtAuth.getName();

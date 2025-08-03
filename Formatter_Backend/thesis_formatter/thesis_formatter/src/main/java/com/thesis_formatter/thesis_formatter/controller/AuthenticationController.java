@@ -1,10 +1,7 @@
 package com.thesis_formatter.thesis_formatter.controller;
 
 import com.nimbusds.jose.JOSEException;
-import com.thesis_formatter.thesis_formatter.dto.request.AuthenticationRequest;
-import com.thesis_formatter.thesis_formatter.dto.request.IntrospectRequest;
-import com.thesis_formatter.thesis_formatter.dto.request.LogoutRequest;
-import com.thesis_formatter.thesis_formatter.dto.request.RefreshRequest;
+import com.thesis_formatter.thesis_formatter.dto.request.*;
 import com.thesis_formatter.thesis_formatter.dto.response.AuthenticationResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.IntrospectResponse;
@@ -21,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -91,5 +89,10 @@ public class AuthenticationController {
                         .authenticated(true)
                         .build())
                 .build();
+    }
+
+    @PostMapping("/changePassword")
+    public APIResponse<Map<String, Object>> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
+        return authenticationService.changePassword(changePasswordRequest);
     }
 }

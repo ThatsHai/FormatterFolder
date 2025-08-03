@@ -184,8 +184,7 @@ const ManagementTabs = ({ selectedTab, setSelectedTab }) => {
 };
 
 const AccountManagementPage = () => {
-  // const [selectedTab, setSelectedTab] = useState("teacher");
-  const [selectedTab, setSelectedTab] = useState("addTeacher");
+  const [selectedTab, setSelectedTab] = useState("teacher");
 
   return (
     <div className="flex">

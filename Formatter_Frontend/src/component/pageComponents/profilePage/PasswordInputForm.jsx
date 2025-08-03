@@ -2,9 +2,11 @@ import PropTypes from "prop-types";
 import { useState } from "react";
 import ConfirmationPopup from "../../ConfirmationPopup";
 import SuccessPopup from "../../SuccessPopup";
+import api from "../../../services/api";
 
 const PasswordInputForm = ({
   handleFormToggle = () => {},
+  userData,
   onSuccess = () => {},
 }) => {
   const [formData, setFormData] = useState({
@@ -55,17 +57,37 @@ const PasswordInputForm = ({
     setShowConfirmPopup(true);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     setShowConfirmPopup(false);
     console.log("Submitted passwords:", formData);
     // Make API call here if needed
-    setDisplaySuccessPopup(true);
+
+    const changePasswordRequest = {
+      userId: userData.userId,
+      newPassword: formData.newPassword,
+      oldPassword: formData.oldPassword,
+    };
+
+    try {
+      await api.post("/auth/changePassword", changePasswordRequest);
+      alert("Đổi mật khẩu thành công.");
+    } catch (error) {
+      if (error.response.data.code === "1008") {
+        alert("Mật khẩu sai.");
+      } else {
+        alert("Đổi mật khẩu thất bại.");
+      }
+      console.log(error);
+    }
+    // setDisplaySuccessPopup(true);
   };
 
   const handleClosePopup = () => {
     setDisplaySuccessPopup(false);
     onSuccess();
   };
+
+  if (!userData) return null;
 
   return (
     <div className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-black bg-opacity-50 p-6">
@@ -183,4 +205,5 @@ export default PasswordInputForm;
 PasswordInputForm.propTypes = {
   handleFormToggle: PropTypes.func,
   onSuccess: PropTypes.func,
+  userData: PropTypes.object.isRequired,
 };

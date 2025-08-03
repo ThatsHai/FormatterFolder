@@ -35,13 +35,16 @@ public class DepartmentController {
 //        return departmentService.getDepartmentsByFacultyId(facultyId);
 //    }
     @GetMapping("/departments")
-    public APIResponse<List<Department>> getDepartments(@RequestParam(required = false) String facultyId, @RequestParam(required = false) String departmentId) {
-        if (facultyId == null && departmentId == null) {
-            return departmentService.getAll();
-        } else if (departmentId != null) {
+    public APIResponse<List<Department>> getDepartments(@RequestParam(required = false) String facultyId, @RequestParam(required = false) String departmentId,
+                                                        @RequestParam(required = false) String departmentName) {
+        if (departmentId != null) {
             return departmentService.getDepartmentById(departmentId);
-        } else {
+        } else if (departmentName != null) {
+            return departmentService.getDepartmentByName(departmentName);
+        } else if (facultyId != null) {
             return departmentService.getDepartmentsByFacultyId(facultyId);
+        } else {
+            return departmentService.getAll();
         }
     }
 

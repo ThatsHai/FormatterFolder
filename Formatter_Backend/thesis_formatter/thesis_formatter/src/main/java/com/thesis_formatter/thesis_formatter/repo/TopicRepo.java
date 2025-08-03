@@ -83,5 +83,4 @@ public interface TopicRepo extends JpaRepository<Topic, String> {
         List<Topic> findPublishedTopicsByTeacherAndSemesterAndYear(@Param("teacher") Teacher teacher,
                         @Param("semester") Semester semester,
                         @Param("year") String year);
-
 }
