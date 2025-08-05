@@ -13,7 +13,6 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProgressResponse {
     String progressId;
-    FormRecordResponse formRecordResponse;
-    List<MilestoneResponse> milestoneResponses;
-
+    FormRecordResponse formRecord;
+    List<MilestoneResponse> milestones;
 }

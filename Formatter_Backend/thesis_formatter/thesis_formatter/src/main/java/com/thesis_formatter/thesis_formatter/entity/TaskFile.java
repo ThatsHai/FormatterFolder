@@ -1,10 +1,9 @@
 package com.thesis_formatter.thesis_formatter.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.List;
 
 @Entity
 @Data
@@ -12,15 +11,16 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Progress {
-
+public class TaskFile {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    String progressId;
+    String id;
 
-    @OneToOne
-    FormRecord formRecord;
+    @ManyToOne
+    @JoinColumn(name = "taskId")
+    @JsonIgnore
+    Task task;
 
-    @OneToMany(mappedBy = "progress", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<Milestone> milestones;
+    String filename;
+    String filePath;
 }

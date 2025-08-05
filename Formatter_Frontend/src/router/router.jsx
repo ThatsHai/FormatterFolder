@@ -26,6 +26,9 @@ import TopicContent from "../pages/teacherPages/topic/TopicContent";
 import NotificationPage from "../pages/NotificationPage";
 import ProfilePage from "../pages/ProfilePage";
 import AdminNotificationPage from "../pages/adminPages/AdminNotificationPage";
+import ProgressPage from "../pages/teacherPages/progress/ProgressPage";
+import ProgressDetailPage from "../pages/teacherPages/progress/ProgressDetailPage";
+import ProgressPageStudent from "../pages/studentPages/progress/ProgressDetailPage";
 
 const Router = createBrowserRouter([
   {
@@ -57,6 +60,14 @@ const Router = createBrowserRouter([
     element: (
       <DefaultLayout>
         <StudentHomePage />
+      </DefaultLayout>
+    ),
+  },
+  {
+    path: "/student/progresses",
+    element: (
+      <DefaultLayout>
+        <ProgressPageStudent />
       </DefaultLayout>
     ),
   },
@@ -186,6 +197,22 @@ const Router = createBrowserRouter([
     element: (
       <DefaultLayout>
         <TopicContent />
+      </DefaultLayout>
+    ),
+  },
+  {
+    path: "/teacher/progresses",
+    element: (
+      <DefaultLayout>
+        <ProgressPage />
+      </DefaultLayout>
+    ),
+  },
+  {
+    path: "/teacher/progresses/:progressId",
+    element: (
+      <DefaultLayout>
+        <ProgressDetailPage />
       </DefaultLayout>
     ),
   },

@@ -6,6 +6,7 @@ import com.thesis_formatter.thesis_formatter.entity.*;
 import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
 import com.thesis_formatter.thesis_formatter.enums.FormStatus;
 import com.thesis_formatter.thesis_formatter.enums.Semester;
+import com.thesis_formatter.thesis_formatter.enums.TopicStatus;
 import com.thesis_formatter.thesis_formatter.exception.AppException;
 import com.thesis_formatter.thesis_formatter.mapper.FormRecordMapper;
 import com.thesis_formatter.thesis_formatter.repo.*;
@@ -51,6 +52,7 @@ public class FormRecordService {
     private final TeacherRepo teacherRepo;
     private final RestoredVersionRepo restoredVersionRepo;
     private final NotificationService notificationService;
+    private final ProgressService progressService;
 
     public APIResponse<FormRecordResponse> create(AddFormRecordRequest request) {
         FormRecord savedFormRecord = createFormRecord(request);
@@ -188,15 +190,22 @@ public class FormRecordService {
 
     public APIResponse<Void> approveRecord(String formRecordId) throws MessagingException {
         FormRecord formRecord = formRecordRepo.findById(formRecordId).orElseThrow(() -> new AppException(ErrorCode.FormRecord_NOT_FOUND));
-        updateStatus(formRecordId, "ACCEPTED");
-
         Topic topic = formRecord.getTopic();
         Student student = formRecord.getStudent();
+
+        Optional<Topic> otherTopic = topicRepo.findByStudents_AcIdAndStatusIs(student.getAcId(), TopicStatus.PUBLISHED);
+        if (otherTopic.isPresent()) {
+            throw new AppException(ErrorCode.STUDENT_ALREADY_IN_OTHER_TOPIC);
+        }
 
         if (topic.getStudents() == null || topic.getStudents().isEmpty()) {
             topic.getStudents().add(student);
             topicRepo.save(topic);
         }
+
+        updateStatus(formRecordId, "ACCEPTED");
+
+        progressService.autoGenerateProgress(formRecordId);
 
         notificationService.createSystemNotification(NotificationRequest.builder()
                 .senderId(null)

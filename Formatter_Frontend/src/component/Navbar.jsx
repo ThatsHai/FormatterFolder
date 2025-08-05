@@ -36,7 +36,9 @@ const Navbar = () => {
       >
         Đề cương
       </button>
-      <button className="hover:bg-gray border border-transparent hover:border-black p-2 px-4 my-1 rounded-lg">
+      <button className="hover:bg-gray border border-transparent hover:border-black p-2 px-4 my-1 rounded-lg"
+        onClick={() => handleClick("/progresses")}
+      >
         Tiến độ
       </button>
       {user.role.name && user.role.name !== "STUDENT" && (

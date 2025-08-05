@@ -18,5 +18,7 @@ public class MilestoneResponse {
     String name;
     Boolean completed;
     LocalDate dueDate;
+    int position;
+
     List<TaskResponse> tasks;
 }
