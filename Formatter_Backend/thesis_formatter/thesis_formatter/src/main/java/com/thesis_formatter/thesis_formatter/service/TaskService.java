@@ -7,6 +7,7 @@ import com.thesis_formatter.thesis_formatter.dto.response.TaskResponse;
 import com.thesis_formatter.thesis_formatter.entity.Milestone;
 import com.thesis_formatter.thesis_formatter.entity.Task;
 import com.thesis_formatter.thesis_formatter.entity.TaskFile;
+import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
 import com.thesis_formatter.thesis_formatter.exception.AppException;
 import com.thesis_formatter.thesis_formatter.mapper.TaskMapper;
 import com.thesis_formatter.thesis_formatter.repo.MilestoneRepo;
@@ -87,7 +88,7 @@ public class TaskService {
                 .orElseThrow(() -> new RuntimeException("Task not found"));
 
         if (task.isRequireFile() && !task.isFileSubmitted()) {
-            throw new RuntimeException("Task requires a file to be submitted before completion.");
+            throw new RuntimeException("Yêu cầu nộp file trước khi đánh dấu hoàn tất công việc này!");
         }
 
         task.setCompleted(true);

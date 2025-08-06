@@ -5,6 +5,7 @@ import com.thesis_formatter.thesis_formatter.dto.request.RoleRequest;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.PermissionResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.RoleResponse;
+import com.thesis_formatter.thesis_formatter.entity.Role;
 import com.thesis_formatter.thesis_formatter.service.PermissionService;
 import com.thesis_formatter.thesis_formatter.service.RoleService;
 import lombok.AccessLevel;
@@ -22,8 +23,8 @@ public class RoleController {
     RoleService roleService;
 
     @PostMapping
-    APIResponse<RoleResponse> create(@RequestBody RoleRequest request) {
-        return APIResponse.<RoleResponse>builder()
+    APIResponse<Role> create(@RequestBody RoleRequest request) {
+        return APIResponse.<Role>builder()
                 .code("200")
                 .result(roleService.create(request))
                 .build();

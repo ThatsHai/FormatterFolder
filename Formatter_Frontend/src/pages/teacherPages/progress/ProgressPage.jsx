@@ -2,18 +2,23 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import api from "../../../services/api";
 import { useNavigate } from "react-router";
+import ProgressCard from "../../studentPages/progress/ProgressCard";
+import PageNumberFooter from "../../../component/PageNumberFooter";
 
 const ProgressPage = () => {
   const user = useSelector((state) => state.auth.user);
   const navigate = useNavigate();
+   const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
 
   const [progresses, setProgresses] = useState([]);
   useEffect(() => {
     const fetchProgress = async () => {
       const result = await api.get(
-        `/progresses/list?teacherId=${user.userId}&page=0&size=10`
+        `/progresses/list?teacherId=${user.userId}&page=${currentPage}&size=4`
       );
-      setProgresses(result.data.result.content || "");
+      setProgresses(result.data.result.content || []);
+      setTotalPages(result.data.result.totalPages || 1);
     };
     fetchProgress();
   }, [user]);
@@ -23,26 +28,25 @@ const ProgressPage = () => {
   }
   if (!progresses) return;
 
-  return (
-    <div className="bg-lightGray m-5 p-6 rounded-md min-h-[500px]">
-      <p className="text-center font-semibold text-lg">
-        DANH SÁCH TIẾN ĐỘ CỦA SINH VIÊN TRONG HỌC KỲ NÀY
+   return (
+      <div className="bg-lightGray m-5 p-6 rounded-md">
+        <p className="text-2xl">
+         DANH SÁCH TIẾN ĐỘ CỦA SINH VIÊN TRONG HỌC KỲ NÀY
       </p>
-      {progresses.map((progress) => {
-        return (
-          <div className="max-w-5xl mx-auto bg-sky-200 p-6 rounded-lg shadow mt-5" onClick={()=>handleClick(progress.progressId)}>
-            <div className="flex items-center">
-              <p className="font-semibold text-lg flex-1">
-                {progress.formRecord.topic.title}
-              </p>
-              <button className="text-red-500">Xem tiến độ</button>
-            </div>
-            <p className="mt-2">Người thực hiện: {progress.formRecord.student.name}</p>
-          </div>
-        );
-      })}
-    </div>
-  );
+        <div className="min-h-[300px] mt-5 rounded-md grid grid-cols-2 md:grid-cols-4 gap-3 mb-0">
+          {progresses.map((progress, index) => (
+            <ProgressCard
+              progress={progress}
+            />
+          ))}
+        </div>
+        <PageNumberFooter
+          totalPages={totalPages}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+        />
+      </div>
+    );
 };
 
 export default ProgressPage;

@@ -55,11 +55,12 @@ public class NotificationService {
                 .message(request.getMessage())
                 .sender(sender)
                 .build();
-
-//        List<Account> receivers = accountRepo.findByUserIdIn(request.getRecipientIds());
         List<Account> receivers = new ArrayList<>();
         for (String recieverId : request.getRecipientIds()) {
             Account receiver = accountRepo.findByUserId(recieverId).orElseThrow(() -> new RuntimeException("Không tồn tại người dùng có mã số " + recieverId));
+            if (sender.getRole().getName().equals("ADMIN") && receiver.getRole().getName().equals("STUDENT")) {
+                throw new RuntimeException("Không thể gửi thông báo cho sinh viên! Mã số sau là của sinh viên: " + recieverId);
+            }
             receivers.add(receiver);
         }
         List<NotificationReceiver> receiverList = receivers.stream()

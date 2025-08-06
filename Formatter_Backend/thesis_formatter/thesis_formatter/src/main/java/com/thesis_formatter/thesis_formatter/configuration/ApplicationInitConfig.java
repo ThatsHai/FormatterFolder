@@ -1,10 +1,12 @@
 package com.thesis_formatter.thesis_formatter.configuration;
 
+import com.thesis_formatter.thesis_formatter.dto.request.RoleRequest;
 import com.thesis_formatter.thesis_formatter.entity.Account;
 import com.thesis_formatter.thesis_formatter.entity.Role;
 import com.thesis_formatter.thesis_formatter.entity.Student;
 import com.thesis_formatter.thesis_formatter.repo.AccountRepo;
 import com.thesis_formatter.thesis_formatter.repo.RoleRepo;
+import com.thesis_formatter.thesis_formatter.service.RoleService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -14,6 +16,9 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Configuration
 @RequiredArgsConstructor
@@ -31,7 +36,7 @@ public class ApplicationInitConfig {
     static final String ADMIN_PASSWORD = "admin123";
 
     @Bean
-    ApplicationRunner applicationRunner(AccountRepo accountRepo) {
+    ApplicationRunner applicationRunner(AccountRepo accountRepo, RoleService roleService) {
         return args -> {
             if (accountRepo.findByUserId(ADMIN_USER_NAME).isEmpty()) {
                 roleRepository.save(Role.builder()
@@ -39,15 +44,33 @@ public class ApplicationInitConfig {
                         .description("Student role")
                         .build());
 
-                roleRepository.save(Role.builder()
-                        .name("TEACHER")
-                        .description("Teacher role")
-                        .build());
+                Set<String> teacherSet = new HashSet<>();
+                teacherSet.add("PROGRESS");
+                teacherSet.add("NOTIFICATION");
+                teacherSet.add("FORM_RECORD");
 
-                Role adminRole = roleRepository.save(Role.builder()
-                        .name("ADMIN")
-                        .description("Admin role")
-                        .build());
+                Role teacherRole = roleService.create(
+                        RoleRequest.builder()
+                                .name("TEACHER")
+                                .description("Teacher role")
+                                .permissions(teacherSet)
+                                .build()
+                );
+
+                roleRepository.save(teacherRole);
+
+                Set<String> adminSet = new HashSet<>();
+                teacherSet.add("NOTIFICATION");
+
+                Role adminRole = roleService.create(
+                        RoleRequest.builder()
+                                .name("ADMIN")
+                                .description("admin role")
+                                .permissions(adminSet)
+                                .build()
+                );
+
+                roleRepository.save(adminRole);
 
 
                 Account account = Account.builder()
