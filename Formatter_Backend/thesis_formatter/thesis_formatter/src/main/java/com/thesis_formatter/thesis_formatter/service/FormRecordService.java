@@ -194,7 +194,7 @@ public class FormRecordService {
         Student student = formRecord.getStudent();
 
         Optional<Topic> otherTopic = topicRepo.findByStudents_AcIdAndStatusIs(student.getAcId(), TopicStatus.PUBLISHED);
-        if (otherTopic.isPresent()) {
+        if (otherTopic.isPresent() && otherTopic.get().getTopicId() != topic.getTopicId()) {
             throw new AppException(ErrorCode.STUDENT_ALREADY_IN_OTHER_TOPIC);
         }
 
@@ -222,6 +222,11 @@ public class FormRecordService {
 
     public APIResponse<Void> denyRecord(String formRecordId) throws MessagingException {
         FormRecord formRecord = formRecordRepo.findById(formRecordId).orElseThrow(() -> new AppException(ErrorCode.FormRecord_NOT_FOUND));
+        Student student = formRecord.getStudent();
+        Topic topic = formRecord.getTopic();
+        topic.getStudents().remove(student);
+        topicRepo.save(topic);
+
         updateStatus(formRecordId, "DENIED");
 
         notificationService.createSystemNotification(NotificationRequest.builder()

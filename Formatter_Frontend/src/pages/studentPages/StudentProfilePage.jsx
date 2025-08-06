@@ -119,7 +119,7 @@ const StudentProfile = ({ userData }) => {
                     <th className="border p-1">STT</th>
                     <th className="border p-1">Tiêu đề</th>
                     <th className="border p-1">Mô tả</th>
-                    <th className="border p-1">Học kỳ</th>
+                    <th className="border p-1">GVHD</th>
                     <th className="border p-1">Năm</th>
                   </tr>
                 </thead>

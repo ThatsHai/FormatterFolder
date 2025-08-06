@@ -62,7 +62,7 @@ const AddTaskPage = ({
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Nhập tên task"
+          placeholder="Nhập tên công việc"
           className="w-full border-b border-blue-300 focus:outline-none py-1"
         />
       </div>

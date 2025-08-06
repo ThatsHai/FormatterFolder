@@ -123,8 +123,8 @@ const ProgressDetailPage = () => {
   const currentPhaseIndex = sortedMilestones.findIndex(
     (milestone) =>
       !milestone.completedDate ||
-      dayjs(milestone.dueDate).isSameOrAfter(dayjs(), "day") ||
-      milestone.tasks.some((task) => task.completed)
+      dayjs(milestone.dueDate).isSameOrAfter(dayjs(), "day") 
+      || milestone.tasks.some((task) => task.completed) 
   );
 
   return (

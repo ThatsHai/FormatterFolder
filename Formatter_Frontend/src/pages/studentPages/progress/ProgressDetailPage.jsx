@@ -291,7 +291,7 @@ const ProgressDetailPage = () => {
                                         </button>
                                       ) : (
                                         <button
-                                          className="p-2 rounded-md text-white bg-lightBlue text-sm flex items-center justify-center gap-1 hover:bg-darkBlue"
+                                          className="p-2 rounded-md w-[100px] text-white bg-lightBlue text-sm flex items-center justify-center gap-1 hover:bg-darkBlue"
                                           onClick={() => handleUploadFile(task)}
                                         >
                                           <AddIcon fontSize="small" />
@@ -300,7 +300,7 @@ const ProgressDetailPage = () => {
                                       ))}
                                     {!task.completed && (
                                       <button
-                                        className="p-2 rounded-md text-white bg-green-500 text-sm flex items-center justify-center gap-1 hover:bg-green-600"
+                                        className="p-2 rounded-md w-[100px] text-white bg-green-500 text-sm flex items-center justify-center gap-1 hover:bg-green-600"
                                         onClick={() =>
                                           handleMarkAsDone(task.id)
                                         }
