@@ -119,95 +119,108 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
   if (!formRecord) return <div>Đang tải</div>;
   console.log("record truyền vào:", formRecord);
   return (
-    <div className="flex w-full justify-end my-5 gap-5">
-      <button
-        className="p-2 rounded-md px-5 bg-lightBlue text-white hover:bg-darkBlue"
-        onClick={handleCardClick}
-      >
-        Xuất file PDF
-      </button>
-      {user.role.name === "STUDENT" ? (
-        <>
-          <button
-            className="p-2 rounded-md px-5 bg-lightBlue text-white hover:bg-darkBlue"
-            onClick={() => navigate(`/diff-viewer/${formRecord.formRecordId}`)}
-          >
-            Xem lịch sử sửa
-          </button>
-          <button
-            className="p-2 rounded-md px-5 bg-lightBlue text-white hover:bg-darkBlue"
-            onClick={handleFormToggle}
-          >
-            Chỉnh sửa
-          </button>
-          <button
-            className="p-2 rounded-md px-5 bg-lightBlue text-white hover:bg-darkBlue"
-            onClick={handleDeleteRecord}
-          >
-            Xoá
-          </button>
-          <button
-            className="p-2 rounded-md px-5 bg-lightBlue text-white hover:bg-darkBlue"
-            onClick={handleSendRecord}
-          >
-            Gửi bài
-          </button>
-        </>
-      ) : (
-        <>
-          <button
-            className="p-2 rounded-md px-5 bg-lightBlue text-white hover:bg-darkBlue"
-            onClick={handleApproveRecord}
-          >
-            Phê duyệt
-          </button>
-          <button
-            className="p-2 rounded-md px-5 bg-lightBlue text-white hover:bg-darkBlue"
-            onClick={handleDenyRecord}
-          >
-            Từ chối
-          </button>
-        </>
-      )}
-      {showDesignWindow && (
-        <DesignsListWindow
-          formId={formRecord.topic.form.formId}
-          formRecordId={formRecord.formRecordId}
-          onDecline={() => setShowDesignWindow(false)}
-        ></DesignsListWindow>
-      )}
-      {openThesisForm && (
-        <SubmitThesisForm
-          initialData={formRecord}
-          handleFormToggle={handleFormToggle}
-          onSuccess={() => {
-            handleFormToggle();
-            onUpdated();
-          }}
-        />
-      )}
+    <div className="flex w-full justify-end my-5 gap-10">
+      <div>
+        <button
+          className="p-2 mx-1 rounded-md text-white bg-lightBlue tx-lg gap-2 hover:bg-darkBlue"
+          onClick={handleCardClick}
+        >
+          Xuất file PDF
+        </button>
+        {user.role.name === "STUDENT" ? (
+          <>
+            <button
+              className="p-2 mx-1 rounded-md text-white bg-lightBlue tx-lg gap-1 hover:bg-darkBlue"
+              onClick={() =>
+                navigate(`/diff-viewer/${formRecord.formRecordId}`)
+              }
+            >
+              Xem lịch sử sửa
+            </button>
+            <button
+              className="p-2 mx-1 rounded-md text-white bg-lightBlue tx-lg gap-1 hover:bg-darkBlue"
+              onClick={handleFormToggle}
+            >
+              Chỉnh sửa
+            </button>
+            {formRecord.status != "ACCEPTED" && (
+              <button
+                className="p-2 mx-1 rounded-md text-white bg-lightBlue tx-lg gap-1 hover:bg-darkBlue"
+                onClick={handleDeleteRecord}
+              >
+                Xoá
+              </button>
+            )}
+            {formRecord.status == "PENDING" && (
+              <button
+                className="p-2 mx-1 rounded-md text-white bg-green-500 tx-lg gap-1 hover:bg-green-600"
+                onClick={handleSendRecord}
+              >
+                Gửi bài
+              </button>
+            )}
+          </>
+        ) : (
+          formRecord.status === "WAITING" ||
+          (formRecord.status === "DENIED" && (
+            <>
+              <button
+                className="p-2 mx-1 rounded-md text-white bg-green-500 tx-lg gap-1 hover:bg-green-600"
+                onClick={handleApproveRecord}
+              >
+                Phê duyệt
+              </button>
+              {formRecord.status === "WAITING" && (
+                <button
+                  className="p-2 mx-1 rounded-md text-white bg-red-400 tx-lg gap-1 hover:bg-red-500"
+                  onClick={handleDenyRecord}
+                >
+                  Từ chối
+                </button>
+              )}
+            </>
+          ))
+        )}
+        {showDesignWindow && (
+          <DesignsListWindow
+            formId={formRecord.topic.form.formId}
+            formRecordId={formRecord.formRecordId}
+            onDecline={() => setShowDesignWindow(false)}
+          ></DesignsListWindow>
+        )}
+        {openThesisForm && (
+          <SubmitThesisForm
+            initialData={formRecord}
+            handleFormToggle={handleFormToggle}
+            onSuccess={() => {
+              handleFormToggle();
+              onUpdated();
+            }}
+          />
+        )}
 
-      <ConfirmationPopup
-        isOpen={showConfirmPopup}
-        text={text}
-        onConfirm={() => {
-          if (confirmAction === "send") {
-            sendRecord();
-          } else if (confirmAction === "delete") {
-            deleteRecord();
-          } else if (confirmAction === "approve") {
-            approveRecord();
-          } else if (confirmAction === "deny") {
-            denyRecord();
-          }
-        }}
-        onDecline={() => setShowConfirmPopup(false)}
-      />
-      <SuccessPopup
-        isOpen={showSuccessPopup}
-        successPopupText={successPopupText}
-        onClose={onSuccessPopupClosed}
-      />
+        <ConfirmationPopup
+          isOpen={showConfirmPopup}
+          text={text}
+          onConfirm={() => {
+            if (confirmAction === "send") {
+              sendRecord();
+            } else if (confirmAction === "delete") {
+              deleteRecord();
+            } else if (confirmAction === "approve") {
+              approveRecord();
+            } else if (confirmAction === "deny") {
+              denyRecord();
+            }
+          }}
+          onDecline={() => setShowConfirmPopup(false)}
+        />
+        <SuccessPopup
+          isOpen={showSuccessPopup}
+          successPopupText={successPopupText}
+          onClose={onSuccessPopupClosed}
+        />
+      </div>
     </div>
   );
 };

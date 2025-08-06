@@ -19,16 +19,18 @@ public class Milestone {
     String id;
 
     String name;
-    Boolean completed;
+    Boolean completed = false;
     Date dueDate;
+    @Column(nullable = false)
+    int position;
 
     @ManyToOne
     Progress progress;
 
     @OneToMany(mappedBy = "milestone", cascade = CascadeType.ALL)
     List<Task> tasks;
-
-    public boolean isCompleted() {
+    public boolean allTasksAreCompleted() {
         return tasks != null && tasks.stream().allMatch(Task::isCompleted);
     }
+
 }

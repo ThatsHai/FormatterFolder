@@ -57,4 +57,5 @@ public interface FormRecordRepo extends JpaRepository<FormRecord, String> {
     List<FormRecord> findAcceptedRecordsByGroupByTeacher(@Param("semester") Semester semester, @Param("year") String year);
 
     FormRecord findFormRecordByFormRecordId(String id);
+
 }

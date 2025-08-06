@@ -115,27 +115,27 @@ const TopicInfoButtons = ({ topic, onUpdated = () => {} }) => {
     <div className="flex w-full justify-end my-5 gap-5">
       <div>
         <button
-          className="border p-2 rounded-md px-5 bg-white"
+          className="p-2 mx-1 rounded-md text-white bg-lightBlue tx-lg gap-1 hover:bg-darkBlue"
           onClick={handleFormToggle}
         >
           Chỉnh sửa
         </button>
         <button
-          className="border p-2 rounded-md px-5 bg-white"
+          className="p-2 mx-1 rounded-md text-white bg-lightBlue tx-lg gap-1 hover:bg-darkBlue"
           onClick={handleDeleteTopic}
         >
           Xoá
         </button>
         {topic.status === "UNPUBLISHED" ? (
           <button
-            className="border p-2 rounded-md px-5 bg-white"
+            className="p-2 mx-1 rounded-md text-white bg-lightBlue tx-lg gap-1 hover:bg-darkBlue"
             onClick={handlePublishTopic}
           >
             Công khai
           </button>
         ) : (
           <button
-            className="border p-2 rounded-md px-5 bg-white"
+            className="p-2 mx-1 rounded-md text-white bg-lightBlue tx-lg gap-1 hover:bg-darkBlue"
             onClick={handleUnPublishTopic}
           >
             Huỷ công khai

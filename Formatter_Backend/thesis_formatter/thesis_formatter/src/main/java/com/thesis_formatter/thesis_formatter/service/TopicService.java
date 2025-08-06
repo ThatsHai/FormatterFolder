@@ -95,6 +95,21 @@ public class TopicService {
             }
             topic.setStudents(students);
 
+            int month = LocalDate.now().getMonth().getValue();
+            String hk = month < 5 ? "HK2" : month < 9 ? "HK3" : "HK1";
+            String year = String.valueOf(LocalDate.now().getYear());
+            for (Teacher teacher : topic.getTeachers()) {
+                TeacherTopicWithLimitResponse limitResponse = teacherTopicLimitService.getLimitTopicByTeacherId(teacher.getAcId(), hk, year);
+                if (limitResponse == null) {
+                    throw new RuntimeException("Chưa có giới hạn số lượng đề tài trong kỳ này!");
+                } else {
+                    List<Topic> topics = topicRepo.findPublishedTopicsByTeacherAndSemesterAndYear(teacher, Semester.valueOf(hk.toUpperCase()), year);
+                    if (topics.size() >= limitResponse.getMaxTopics()) {
+                        throw new RuntimeException("Số lượng đề tài công khai trong kỳ này của giảng viên " + teacher.getName() + " đã đạt giới hạn!");
+                    }
+                }
+            }
+
             topic.setStatus(TopicStatus.PUBLISHED);
         }
 
@@ -138,6 +153,20 @@ public class TopicService {
         updateStudentsAndFormRecords(topic, request.getStudentIds());
 
         if (topic.getStudents() != null && !topic.getStudents().isEmpty()) {
+            int month = LocalDate.now().getMonth().getValue();
+            String hk = month < 5 ? "HK2" : month < 9 ? "HK3" : "HK1";
+            String year = String.valueOf(LocalDate.now().getYear());
+            for (Teacher teacher : topic.getTeachers()) {
+                TeacherTopicWithLimitResponse limitResponse = teacherTopicLimitService.getLimitTopicByTeacherId(teacher.getAcId(), hk, year);
+                if (limitResponse == null) {
+                    throw new RuntimeException("Chưa có giới hạn số lượng đề tài trong kỳ này!");
+                } else {
+                    List<Topic> topics = topicRepo.findPublishedTopicsByTeacherAndSemesterAndYear(teacher, Semester.valueOf(hk.toUpperCase()), year);
+                    if (topics.size() >= limitResponse.getMaxTopics()) {
+                        throw new RuntimeException("Số lượng đề tài công khai trong kỳ này của giảng viên " + teacher.getName() + " đã đạt giới hạn!");
+                    }
+                }
+            }
             topic.setStatus(TopicStatus.PUBLISHED);
         }
 

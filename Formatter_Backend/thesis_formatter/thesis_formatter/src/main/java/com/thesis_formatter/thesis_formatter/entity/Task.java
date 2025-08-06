@@ -6,7 +6,9 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Data
@@ -19,7 +21,10 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
+    @Column(columnDefinition = "TEXT")
     String name;
+
+    @Column(columnDefinition = "TEXT")
     String description;
 
     boolean completed = false;
@@ -27,13 +32,16 @@ public class Task {
     Date completedDate;
 
     boolean requireFile = false;
+    int maxNumberOfFiles = 10;
 
-    String filePath;
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    List<TaskFile> files = new ArrayList<>();
 
     @ManyToOne
     Milestone milestone;
 
     public boolean isFileSubmitted() {
-        return !requireFile || (filePath != null && !filePath.isBlank());
+        return !requireFile || (!files.isEmpty());
     }
 }

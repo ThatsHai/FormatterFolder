@@ -2,6 +2,7 @@ package com.thesis_formatter.thesis_formatter.controller;
 
 import com.thesis_formatter.thesis_formatter.dto.request.AddMileStoneRequest;
 import com.thesis_formatter.thesis_formatter.dto.request.AddTaskRequest;
+import com.thesis_formatter.thesis_formatter.dto.request.SetDueDateOfMileStoneRequest;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.MilestoneResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.TaskResponse;
@@ -38,8 +39,13 @@ public class MileStoneController {
     }
 
     @DeleteMapping("/{milestoneId}")
-    public APIResponse<Void> deleteTask(@PathVariable String milestoneId) {
+    public APIResponse<Void> deleteMilestone(@PathVariable String milestoneId) {
         return milestoneService.delete(milestoneId);
+    }
+
+    @PutMapping("/setDueDate")
+    public APIResponse<Void> setDueDate(@RequestBody SetDueDateOfMileStoneRequest request) throws MalformedURLException {
+        return milestoneService.setDueDate(request);
     }
 
 }
