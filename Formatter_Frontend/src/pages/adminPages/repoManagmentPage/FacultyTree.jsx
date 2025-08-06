@@ -131,7 +131,7 @@ const FacultyTree = ({
         </Button>
       </div>
       <span className="font-bold text-black hover:cursor-pointer text-lg p-1">
-        Khoa/Trường
+        Trường/Viện/Khoa
       </span>
       {faculties.map((faculty) => (
         <div key={faculty.facultyId} className="">
@@ -174,7 +174,7 @@ const FacultyTree = ({
             departmentsByFaculty[faculty.facultyId] &&
             departmentsByFaculty[faculty.facultyId].length > 0 && (
               <span className="font-semibold text-black hover:cursor-pointer text-lg p-1 ml-8">
-                Bộ môn
+                Khoa/Bộ môn
               </span>
             )}
           {expanded[faculty.facultyId] &&

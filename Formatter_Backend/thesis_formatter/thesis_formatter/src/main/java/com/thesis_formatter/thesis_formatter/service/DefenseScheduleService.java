@@ -1,6 +1,7 @@
 package com.thesis_formatter.thesis_formatter.service;
 
 import com.thesis_formatter.thesis_formatter.dto.request.AddDefenseScheduleRequest;
+import com.thesis_formatter.thesis_formatter.dto.request.SchedulePDFRequest;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.DefenseScheduleResponse;
 import com.thesis_formatter.thesis_formatter.entity.*;
@@ -11,11 +12,20 @@ import com.thesis_formatter.thesis_formatter.repo.DefenseScheduleRepo;
 import com.thesis_formatter.thesis_formatter.repo.FormRecordRepo;
 import com.thesis_formatter.thesis_formatter.repo.TeacherRepo;
 import com.thesis_formatter.thesis_formatter.repo.TopicRepo;
+import com.thesis_formatter.thesis_formatter.utils.DefenseScheduleToPDF;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,6 +82,23 @@ public class DefenseScheduleService {
                 .result(responses)
                 .build();
 
+    }
+
+    public ResponseEntity<Resource> getPDF(List<SchedulePDFRequest> schedulePDFRequests) throws Exception {
+        String filename = "schedule_" + ".pdf";
+        File tempFile = File.createTempFile(filename, null);
+
+        // 2. Generate the PDF using your utility
+        DefenseScheduleToPDF.generateStudentTopicPdf(tempFile.getAbsolutePath(), schedulePDFRequests);
+
+        // 3. Return the PDF as a download
+        InputStreamResource resource = new InputStreamResource(new FileInputStream(tempFile));
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                .contentType(MediaType.APPLICATION_PDF)
+                .contentLength(tempFile.length())
+                .body(resource);
     }
 }
 

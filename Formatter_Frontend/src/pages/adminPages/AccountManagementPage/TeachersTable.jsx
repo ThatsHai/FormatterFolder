@@ -22,7 +22,7 @@ const TeachersTable = ({ teachers }) => {
               className="border border-gray py-1 bg-lightBlue bg-opacity-70"
               colSpan="2"
             >
-              Bộ môn
+              Khoa/Bộ môn
             </th>
             <th className="border border-gray py-1 bg-lightBlue bg-opacity-70">
               Chọn
@@ -39,7 +39,7 @@ const TeachersTable = ({ teachers }) => {
                   {teacher.name || "N/A"}
                 </td>
                 <td className="border border-gray py-1" colSpan="2">
-                  {teacher.department?.faculty?.name || "N/A"}
+                  {teacher.department?.departmentName || "N/A"}
                 </td>
 
                 <td className="border border-gray py-1">

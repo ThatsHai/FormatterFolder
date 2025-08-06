@@ -62,9 +62,11 @@ const AdminNavbar = () => {
           Phân số lượng đề tài
         </button>
       </Link>
-      <button className="hover:bg-gray border border-transparent hover:border-black p-2 px-4 my-1 rounded-lg">
-        Sắp xếp lịch bảo vệ đề tài
-      </button>
+      <Link to={"/admin/defenseSchedules"}>
+        <button className="hover:bg-gray border border-transparent hover:border-black p-2 px-4 my-1 rounded-lg">
+          Sắp xếp lịch bảo vệ đề tài
+        </button>
+      </Link>
     </div>
   );
 };

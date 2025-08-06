@@ -26,6 +26,8 @@ import TopicContent from "../pages/teacherPages/topic/TopicContent";
 import NotificationPage from "../pages/NotificationPage";
 import ProfilePage from "../pages/ProfilePage";
 import AdminNotificationPage from "../pages/adminPages/AdminNotificationPage";
+import AdminDefendThesisPage from "../pages/adminPages/AdminDefendThesisPage";
+import FormRecordReviewPage from "../pages/FormRecordReviewPage";
 
 const Router = createBrowserRouter([
   {
@@ -73,6 +75,14 @@ const Router = createBrowserRouter([
     element: (
       <ThesisInfoLayout>
         <ThesisInfo />
+      </ThesisInfoLayout>
+    ),
+  },
+  {
+    path: "/formRecordReview/:formRecordId",
+    element: (
+      <ThesisInfoLayout>
+        <FormRecordReviewPage />
       </ThesisInfoLayout>
     ),
   },
@@ -154,6 +164,14 @@ const Router = createBrowserRouter([
     element: (
       <AdminLayout>
         <AdminNotificationPage />
+      </AdminLayout>
+    ),
+  },
+  {
+    path: "/admin/defenseSchedules",
+    element: (
+      <AdminLayout>
+        <AdminDefendThesisPage />
       </AdminLayout>
     ),
   },

@@ -429,6 +429,7 @@ const Composer = ({
                         setInputText(e.target.value);
                         setOpenQueryWindow(true);
                       }}
+                      placeholder="Tên khoa"
                       onKeyDown={(e) => {
                         if (e.key === "Backspace" && inputText === "") {
                           setSelectedDepartments((prev) => prev.slice(0, -1));

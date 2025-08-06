@@ -2,13 +2,12 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { IconButton } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import ThesisInfoButtons from "../component/pageComponents/thesisInfoPage/ThesisInfoButtons";
 import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
 import { useEffect } from "react";
 import api from "../services/api";
 
-const ThesisInfo = ({ onDecline = () => {} }) => {
+const FormRecordReviewPage = ({ onDecline = () => {} }) => {
   // const currentYear = new Date().getFullYear();
   const { formRecordId } = useParams();
   const [formRecord, setFormRecord] = useState(null);
@@ -238,20 +237,15 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
           </div>
         </div>
         <div>
-          {/* Buttons */}
-          <ThesisInfoButtons
-            formRecord={formRecord}
-            onUpdated={() => setRefreshCounter((prev) => prev + 1)}
-          ></ThesisInfoButtons>
         </div>
       </div>
     </div>
   );
 };
 
-export default ThesisInfo;
+export default FormRecordReviewPage;
 
-ThesisInfo.prototype = {
+FormRecordReviewPage.prototype = {
   formRecord: PropTypes.object,
   onDecline: PropTypes.func,
 };

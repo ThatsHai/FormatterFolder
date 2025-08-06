@@ -16,6 +16,7 @@ public interface DefenseScheduleMapper {
     @Mapping(target = "studentId", source = "student.userId")
     @Mapping(target = "studentName", source = "student.name")
     @Mapping(target = "topicName", source = "formRecord.topic.title")
+    @Mapping(target = "formRecordId", source = "formRecord.formRecordId")
     @Mapping(target = "guideNames", expression = "java(mapGuideTeachers(entity.getFormRecord().getTopic().getTeachers()))")
     @Mapping(target = "teacherNames", expression = "java(mapTeacherNames(entity.getTeachers()))")
     DefenseScheduleResponse toResponse(DefenseSchedule entity);

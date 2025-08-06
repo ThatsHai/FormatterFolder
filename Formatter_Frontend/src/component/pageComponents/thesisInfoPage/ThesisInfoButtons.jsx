@@ -35,32 +35,25 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
   };
 
   const sendRecord = async () => {
-    await api.put(
-      `/formRecords/${formRecord.formRecordId}/send`,
-    );
+    await api.put(`/formRecords/${formRecord.formRecordId}/send`);
 
     setShowSuccessPopup(true);
     setShowConfirmPopup(false);
   };
 
   const approveRecord = async () => {
-    await api.put(
-      `/formRecords/${formRecord.formRecordId}/approve`,
-    );
+    await api.put(`/formRecords/${formRecord.formRecordId}/approve`);
 
     setShowSuccessPopup(true);
     setShowConfirmPopup(false);
   };
 
   const denyRecord = async () => {
-    await api.put(
-      `/formRecords/${formRecord.formRecordId}/deny`,
-    );
+    await api.put(`/formRecords/${formRecord.formRecordId}/deny`);
 
     setShowSuccessPopup(true);
     setShowConfirmPopup(false);
   };
-
 
   const deleteRecord = async () => {
     await api.delete(`/formRecords/delete/${formRecord.formRecordId}`);
@@ -75,7 +68,9 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
       return;
     }
     setShowConfirmPopup(true);
-    setText("Bạn chắc chắn muốn gửi bản ghi cho giảng viên? (Mọi thay đổi sau này sẽ tự động cập nhật cho giảng viên xem!)");
+    setText(
+      "Bạn chắc chắn muốn gửi bản ghi cho giảng viên? (Mọi thay đổi sau này sẽ tự động cập nhật cho giảng viên xem!)"
+    );
     setSuccessPopupText("Đã gửi bản ghi cho giảng viên!");
     setConfirmAction("send");
   };
@@ -86,7 +81,9 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
       return;
     }
     setShowConfirmPopup(true);
-    setText("Bạn chắc chắn muốn duyệt đề cương này? Thông báo duyệt sẽ được gửi đến sinh viên!");
+    setText(
+      "Bạn chắc chắn muốn duyệt đề cương này? Thông báo duyệt sẽ được gửi đến sinh viên!"
+    );
     setSuccessPopupText("Đã duyệt!");
     setConfirmAction("approve");
   };
@@ -96,7 +93,9 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
       return;
     }
     setShowConfirmPopup(true);
-    setText("Bạn chắc chắn muốn từ chối đề cương này? Thông báo từ chối sẽ được gửi đến sinh viên!");
+    setText(
+      "Bạn chắc chắn muốn từ chối đề cương này? Thông báo từ chối sẽ được gửi đến sinh viên!"
+    );
     setSuccessPopupText("Đã từ chối!");
     setConfirmAction("deny");
   };
@@ -111,102 +110,104 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
     setShowConfirmPopup(false);
     setShowSuccessPopup(false);
     if (confirmAction === "delete") {
-    navigate("/student");
-  } else {
-    onUpdated();
-  }
+      navigate("/student");
+    } else {
+      onUpdated();
+    }
   };
 
   if (!formRecord) return <div>Đang tải</div>;
   console.log("record truyền vào:", formRecord);
   return (
     <div className="flex w-full justify-end my-5 gap-5">
-      <div>
-        <button
-          className="border p-2 rounded-md px-5 bg-white"
-          onClick={handleCardClick}
-        >
-          Xuất file PDF
-        </button>
-        {user.role.name === "STUDENT" ? (
-          <>
-            <button
-              className="border p-2 rounded-md px-5 bg-white"
-              onClick={() =>
-                navigate(`/diff-viewer/${formRecord.formRecordId}`)
-              }
-            >
-              Xem lịch sử sửa
-            </button>
-            <button
-              className="border p-2 rounded-md px-5 bg-white"
-              onClick={handleFormToggle}
-            >
-              Chỉnh sửa
-            </button>
-            <button
-              className="border p-2 rounded-md px-5 bg-white"
-              onClick={handleDeleteRecord}
-            >
-              Xoá
-            </button>
-            <button
-              className="border p-2 rounded-md px-5 bg-white"
-              onClick={handleSendRecord}
-            >
-              Gửi bài
-            </button>
-          </>
-        ) : (
-          <>
-            <button className="border p-2 rounded-md px-5 bg-white" onClick={handleApproveRecord}>
-              Phê duyệt
-            </button>
-            <button className="border p-2 rounded-md px-5 bg-white" onClick={handleDenyRecord}>
-              Từ chối
-            </button>
-          </>
-        )}
-        {showDesignWindow && (
-          <DesignsListWindow
-            formId={formRecord.topic.form.formId}
-            formRecordId={formRecord.formRecordId}
-            onDecline={() => setShowDesignWindow(false)}
-          ></DesignsListWindow>
-        )}
-        {openThesisForm && (
-          <SubmitThesisForm
-            initialData={formRecord}
-            handleFormToggle={handleFormToggle}
-            onSuccess={() => {
-              handleFormToggle();
-              onUpdated();
-            }}
-          />
-        )}
-
-        <ConfirmationPopup
-          isOpen={showConfirmPopup}
-          text={text}
-          onConfirm={() => {
-            if (confirmAction === "send") {
-              sendRecord();
-            } else if (confirmAction === "delete") {
-              deleteRecord();
-            } else if (confirmAction === "approve") {
-              approveRecord();
-            } else if (confirmAction === "deny") {
-              denyRecord();
-            }
+      <button
+        className="p-2 rounded-md px-5 bg-lightBlue text-white hover:bg-darkBlue"
+        onClick={handleCardClick}
+      >
+        Xuất file PDF
+      </button>
+      {user.role.name === "STUDENT" ? (
+        <>
+          <button
+            className="p-2 rounded-md px-5 bg-lightBlue text-white hover:bg-darkBlue"
+            onClick={() => navigate(`/diff-viewer/${formRecord.formRecordId}`)}
+          >
+            Xem lịch sử sửa
+          </button>
+          <button
+            className="p-2 rounded-md px-5 bg-lightBlue text-white hover:bg-darkBlue"
+            onClick={handleFormToggle}
+          >
+            Chỉnh sửa
+          </button>
+          <button
+            className="p-2 rounded-md px-5 bg-lightBlue text-white hover:bg-darkBlue"
+            onClick={handleDeleteRecord}
+          >
+            Xoá
+          </button>
+          <button
+            className="p-2 rounded-md px-5 bg-lightBlue text-white hover:bg-darkBlue"
+            onClick={handleSendRecord}
+          >
+            Gửi bài
+          </button>
+        </>
+      ) : (
+        <>
+          <button
+            className="p-2 rounded-md px-5 bg-lightBlue text-white hover:bg-darkBlue"
+            onClick={handleApproveRecord}
+          >
+            Phê duyệt
+          </button>
+          <button
+            className="p-2 rounded-md px-5 bg-lightBlue text-white hover:bg-darkBlue"
+            onClick={handleDenyRecord}
+          >
+            Từ chối
+          </button>
+        </>
+      )}
+      {showDesignWindow && (
+        <DesignsListWindow
+          formId={formRecord.topic.form.formId}
+          formRecordId={formRecord.formRecordId}
+          onDecline={() => setShowDesignWindow(false)}
+        ></DesignsListWindow>
+      )}
+      {openThesisForm && (
+        <SubmitThesisForm
+          initialData={formRecord}
+          handleFormToggle={handleFormToggle}
+          onSuccess={() => {
+            handleFormToggle();
+            onUpdated();
           }}
-          onDecline={() => setShowConfirmPopup(false)}
         />
-        <SuccessPopup
-          isOpen={showSuccessPopup}
-          successPopupText={successPopupText}
-          onClose={onSuccessPopupClosed}
-        />
-      </div>
+      )}
+
+      <ConfirmationPopup
+        isOpen={showConfirmPopup}
+        text={text}
+        onConfirm={() => {
+          if (confirmAction === "send") {
+            sendRecord();
+          } else if (confirmAction === "delete") {
+            deleteRecord();
+          } else if (confirmAction === "approve") {
+            approveRecord();
+          } else if (confirmAction === "deny") {
+            denyRecord();
+          }
+        }}
+        onDecline={() => setShowConfirmPopup(false)}
+      />
+      <SuccessPopup
+        isOpen={showSuccessPopup}
+        successPopupText={successPopupText}
+        onClose={onSuccessPopupClosed}
+      />
     </div>
   );
 };

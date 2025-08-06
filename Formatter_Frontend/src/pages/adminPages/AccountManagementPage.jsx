@@ -160,7 +160,7 @@ const ManagementTabs = ({ selectedTab, setSelectedTab }) => {
               selectedTab === "student"
                 ? "bg-lightBlue text-white"
                 : "bg-lightGray text-black"
-            } p-5 rounded-b-md w-full`}
+            } p-5 w-full`}
             onClick={() => setSelectedTab("student")}
           >
             Tài khoản sinh viên
