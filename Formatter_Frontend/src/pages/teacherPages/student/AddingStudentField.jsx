@@ -11,6 +11,7 @@ const AddingStudentField = ({
   setOpenAddStudentModal,
   className = "",
   maxStudents = 1,
+  disable = false,
 }) => {
   return (
     <>

@@ -403,21 +403,27 @@ const ProgressDetailPage = () => {
                         <CalendarMonthIcon fontSize="small" />
                         {milestone.dueDate ? "Sửa" : "Đặt"}
                       </button>
-
-                      <button
-                        className="p-2 rounded-md text-white bg-lightBlue text-sm flex items-center justify-center gap-1 hover:bg-darkBlue"
-                        onClick={() => handleAddTaskToggle(milestone)}
-                      >
-                        <AddIcon fontSize="small" />
-                        Công việc
-                      </button>
-                      <button
-                        className="p-2 rounded-md text-white bg-red-400 text-sm flex items-center justify-center gap-1 hover:bg-red-500"
-                        onClick={() => handleDeleteMilestone(milestone)}
-                      >
-                        <DeleteIcon fontSize="small" className="text-white" />{" "}
-                        Giai đoạn
-                      </button>
+                      {i >= currentPhaseIndex && (
+                        <>
+                          <button
+                            className="p-2 rounded-md text-white bg-lightBlue text-sm flex items-center justify-center gap-1 hover:bg-darkBlue"
+                            onClick={() => handleAddTaskToggle(milestone)}
+                          >
+                            <AddIcon fontSize="small" />
+                            Công việc
+                          </button>
+                          <button
+                            className="p-2 rounded-md text-white bg-red-400 text-sm flex items-center justify-center gap-1 hover:bg-red-500"
+                            onClick={() => handleDeleteMilestone(milestone)}
+                          >
+                            <DeleteIcon
+                              fontSize="small"
+                              className="text-white"
+                            />{" "}
+                            Giai đoạn
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>

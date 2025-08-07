@@ -54,7 +54,7 @@ const AddDueDate = ({
       console.log("due:"+payload);
       setDisplaySuccessPopup(true);
     } catch (e) {
-      console.log(e);
+      alert("Bạn chưa chọn ngày hết hạn!");
     }
 
     setShowConfirmPopup(false);
@@ -92,7 +92,7 @@ const AddDueDate = ({
       </button>
       <div className="relative z-10 w-full max-w-2xl bg-white rounded ">
         <h2 className="text-2xl font-bold text-center text-blue-800 mb-6">
-          Đặt ngày hết hạn
+           {!initialData ? "Đặt ngày hết hạn" : "Sửa ngày hết hạn"}
         </h2>
 
         <div className="m-4">
@@ -181,7 +181,7 @@ const AddDueDate = ({
             onClick={handleSubmit}
             className="bg-darkBlue text-white px-6 py-2 rounded hover:bg-lightBlue"
           >
-            Đặt ngày hết hạn
+            {!initialData ? "Đặt ngày hết hạn" : "Sửa ngày hết hạn"}
           </button>
         </div>
       </div>

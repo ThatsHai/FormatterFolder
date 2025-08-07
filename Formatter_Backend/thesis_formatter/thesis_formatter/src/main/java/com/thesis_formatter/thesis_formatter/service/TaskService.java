@@ -2,6 +2,7 @@ package com.thesis_formatter.thesis_formatter.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thesis_formatter.thesis_formatter.dto.request.AddTaskRequest;
+import com.thesis_formatter.thesis_formatter.dto.request.NotificationRequest;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.TaskResponse;
 import com.thesis_formatter.thesis_formatter.entity.Milestone;
@@ -13,6 +14,7 @@ import com.thesis_formatter.thesis_formatter.mapper.TaskMapper;
 import com.thesis_formatter.thesis_formatter.repo.MilestoneRepo;
 import com.thesis_formatter.thesis_formatter.repo.TaskFileRepo;
 import com.thesis_formatter.thesis_formatter.repo.TaskRepo;
+import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -30,6 +32,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -47,8 +50,9 @@ public class TaskService {
     private final MilestoneRepo milestoneRepo;
     private final TaskMapper taskMapper;
     private final TaskFileRepo taskFileRepo;
+    private final NotificationService notificationService;
 
-    public APIResponse<TaskResponse> createTask(AddTaskRequest request) throws AppException {
+    public APIResponse<TaskResponse> createTask(AddTaskRequest request) throws AppException, MessagingException {
         String milestoneId = request.getMilestoneId();
         Milestone milestone = milestoneRepo.findById(milestoneId)
                 .orElseThrow(() -> new RuntimeException("Milestone not found"));
@@ -65,6 +69,12 @@ public class TaskService {
                 .requireFile(requiredFile)
                 .maxNumberOfFiles(request.getMaxNumberOfFiles())
                 .build();
+        notificationService.createSystemNotification(NotificationRequest.builder()
+                .senderId(null)
+                .recipientIds(new ArrayList<>(List.of(milestone.getProgress().getFormRecord().getStudent().getUserId())))
+                .title("Công việc mới")
+                .message("Giảng viên vừa thêm bài tập mới " + task.getName() +". Truy cập để xem chi tiết!")
+                .build());
         TaskResponse response = taskMapper.taskToTaskResponse(taskRepo.save(task));
         return APIResponse.<TaskResponse>builder()
                 .code("200")
