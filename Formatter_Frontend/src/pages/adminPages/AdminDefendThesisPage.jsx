@@ -5,6 +5,7 @@ import api from "../../services/api";
 
 const StudentTopicTable = () => {
   const [data, setData] = useState([]);
+  const [sortedData, setSortedData] = useState([]);
 
   useEffect(() => {
     fetchData();
@@ -14,6 +15,19 @@ const StudentTopicTable = () => {
     try {
       const response = await api.get("/defenseSchedules");
       setData(response.data.result);
+      //Sort by place -> date -> time
+      const sorted = [...response.data.result].sort((a, b) => {
+        const placeCompare = a.place.localeCompare(b.place);
+        if (placeCompare !== 0) return placeCompare;
+
+        const dateA = new Date(a.startTime).toISOString().split("T")[0];
+        const dateB = new Date(b.startTime).toISOString().split("T")[0];
+        const dateCompare = dateA.localeCompare(dateB);
+        if (dateCompare !== 0) return dateCompare;
+
+        return new Date(a.startTime) - new Date(b.startTime);
+      });
+      setSortedData(sorted);
     } catch (error) {
       alert("Không thể lấy kết quả.");
       console.log(error);
@@ -72,9 +86,9 @@ const StudentTopicTable = () => {
         </thead>
 
         <tbody>
-          {data.map((record, index) => (
+          {sortedData.map((record, index) => (
             <tr key={index}>
-              <td className="border px-2 py-1 text-center">{record.stt}</td>
+              <td className="border px-2 py-1 text-center">{index + 1}</td>
               <td className="border px-2 py-1 text-center hidden md:table-cell">
                 {record.studentId}
               </td>

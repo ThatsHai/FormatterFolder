@@ -131,7 +131,7 @@ const EachTeacherTopics = ({ teacher }) => {
     return { valid: true };
   };
 
-  const handleSave = (formRecordId, index) => {
+  const handleSave = async (formRecordId) => {
     const edit = edits[formRecordId];
     if (!edit) return;
     if (
@@ -156,7 +156,7 @@ const EachTeacherTopics = ({ teacher }) => {
 
     const payload = [
       {
-        stt: (index + 1).toString().padStart(2, "0"),
+        // stt: (index + 1).toString().padStart(2, "0"),
         formRecordId,
         teacherIds: edit.councilTeachers?.filter((t) => t.trim() !== "") || [],
         startTime: isoString,
@@ -165,6 +165,8 @@ const EachTeacherTopics = ({ teacher }) => {
     ];
 
     console.log("Payload to send:", payload);
+    const response = await api.post("/defenseSchedules", payload);
+    console.log(response);
   };
 
   return (
@@ -312,7 +314,7 @@ const EachTeacherTopics = ({ teacher }) => {
                         {edits[recordId] && (
                           <button
                             className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                            onClick={() => handleSave(recordId, index)}
+                            onClick={() => handleSave(recordId)}
                           >
                             Lưu
                           </button>

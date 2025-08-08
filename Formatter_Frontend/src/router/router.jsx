@@ -31,7 +31,7 @@ import FormRecordReviewPage from "../pages/FormRecordReviewPage";
 import ProgressPage from "../pages/teacherPages/progress/ProgressPage";
 import ProgressDetailPage from "../pages/teacherPages/progress/ProgressDetailPage";
 import ProgressPageStudent from "../pages/studentPages/progress/ProgressDetailPage";
-import ArrangeCalendar from "../pages/adminPages/ArrangeCalendar";
+import ArrangeCalendarPage from "../pages/adminPages/ArrangeCalendarPage";
 
 const Router = createBrowserRouter([
   {
@@ -191,7 +191,7 @@ const Router = createBrowserRouter([
     path: "/admin/defenseSchedules/create",
     element: (
       <AdminLayout>
-        <ArrangeCalendar />
+        <ArrangeCalendarPage />
       </AdminLayout>
     ),
   },

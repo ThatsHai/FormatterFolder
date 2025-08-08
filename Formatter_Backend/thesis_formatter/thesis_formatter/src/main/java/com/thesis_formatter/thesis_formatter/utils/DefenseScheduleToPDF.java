@@ -46,7 +46,6 @@ public class DefenseScheduleToPDF {
         addCell(table, "Địa điểm", boldFont, Element.ALIGN_CENTER);
 
         for (SchedulePDFRequest request : requests) {
-            String stt = request.getStt();
             String studentId = request.getStudentId();
             String studentName = request.getStudentName();
             String topicName = request.getTopicName();
@@ -60,7 +59,6 @@ public class DefenseScheduleToPDF {
             String date = splitTime[1];
             String timeDisplay = hour + "\n" + date;
 
-            addCell(table, stt, normalFont, Element.ALIGN_CENTER);
             addCell(table, studentId, normalFont, Element.ALIGN_CENTER);
             addCell(table, studentName, normalFont, Element.ALIGN_LEFT);
             addCell(table, topicName, normalFont, Element.ALIGN_LEFT);
