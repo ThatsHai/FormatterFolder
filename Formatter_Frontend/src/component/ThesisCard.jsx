@@ -1,6 +1,12 @@
 import PropTypes from "prop-types";
 import { Link, useNavigate } from "react-router-dom";
 
+const truncateWords = (str, charLimit, end = "…") => {
+  if (!str) return "";
+  if (charLimit <= 0) return end;
+  return str.length > charLimit ? str.slice(0, charLimit) + end : str;
+};
+
 const ThesisCard = ({ formRecord }) => {
   const navigate = useNavigate();
   return (
@@ -10,9 +16,9 @@ const ThesisCard = ({ formRecord }) => {
       onClick={() => navigate(`/thesis/${formRecord.formRecordId}`)}
     >
       <p className="font-headerFont text-2xl font-bold">
-        {formRecord.topic.title}
+        {truncateWords(formRecord.topic.title, 30)}
       </p>
-      <p className="py-3">{formRecord.topic.description}</p>
+      <p className="py-3">{truncateWords(formRecord.topic.description, 20)}</p>
       <p className="py-3">Người thực hiện: {formRecord.student.name}</p>
       <div className="flex items-end w-full justify-end absolute right-4 bottom-4 cursor-pointer">
         <button

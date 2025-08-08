@@ -15,7 +15,7 @@ const FormCard = ({ form }) => {
               form.status == "Đã duyệt" ? "text-greenCorrect" : "text-redError"
             }`}
           >
-            {form.status + " > "}
+            {/* {form.status + " > "} */}
           </button>
         </div>
       </div>
