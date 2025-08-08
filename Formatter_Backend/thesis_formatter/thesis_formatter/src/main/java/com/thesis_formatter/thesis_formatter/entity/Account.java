@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.util.List;
 
@@ -20,13 +21,19 @@ public class Account {
     String acId;
     @Column(unique = true, nullable = false)
     String userId;
+    @Column(nullable = false)
     String password;
+    @Column(nullable = false)
     String name;
+    @Column(nullable = false)
     String dateOfBirth;
+    @Column(nullable = false)
     String gender;
+    @Column(nullable = false)
     String phoneNumber;
+    @Column(nullable = false)
     String email;
-    String avatar;
+    @Column(nullable = false)
     String status;
 
     @ManyToOne

@@ -46,7 +46,6 @@ public class DefenseScheduleService {
         DefenseSchedule defenseSchedule = DefenseSchedule.builder()
                 .stt(request.getStt())
                 .formRecord(formRecord)
-                .student(student)
                 .teachers(teachers)
                 .startTime(request.getStartTime())
                 .place(request.getPlace())

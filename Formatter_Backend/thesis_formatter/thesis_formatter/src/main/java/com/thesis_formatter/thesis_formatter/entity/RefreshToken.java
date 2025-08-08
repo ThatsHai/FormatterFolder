@@ -1,10 +1,9 @@
 package com.thesis_formatter.thesis_formatter.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.apache.catalina.User;
 
 import java.util.Date;
 
@@ -17,8 +16,10 @@ import java.util.Date;
 public class RefreshToken {
     @Id
     String jti;
-    @Column(nullable = false)
-    private String userId;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "userId")
+    Account account;
 
     @Column(nullable = false)
     private Date expiryTime;

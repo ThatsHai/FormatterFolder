@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring")
 public interface DefenseScheduleMapper {
 
-    @Mapping(target = "studentId", source = "student.userId")
-    @Mapping(target = "studentName", source = "student.name")
+    @Mapping(target = "studentId", source = "formRecord.student.userId")
+    @Mapping(target = "studentName", source = "formRecord.student.name")
     @Mapping(target = "topicName", source = "formRecord.topic.title")
     @Mapping(target = "formRecordId", source = "formRecord.formRecordId")
     @Mapping(target = "guideNames", expression = "java(mapGuideTeachers(entity.getFormRecord().getTopic().getTeachers()))")

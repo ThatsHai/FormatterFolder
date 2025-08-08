@@ -137,7 +137,7 @@ public class AuthenticationService {
             jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
             refreshTokenRepo.save(RefreshToken.builder()
                     .jti(jti)
-                    .userId(account.getUserId())
+                    .account(account)
                     .issuedAt(new Date())
                     .expiryTime(expiryTime)
                     .revoked(false)

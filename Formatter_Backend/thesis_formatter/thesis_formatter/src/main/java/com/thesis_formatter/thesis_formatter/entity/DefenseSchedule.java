@@ -20,10 +20,7 @@ public class DefenseSchedule {
     String id;
 
     String stt;
-    @OneToOne
-    @JoinColumn(name = "studentId", unique = true)
-    Student student;
-
+    
     @OneToOne
     @JoinColumn(name = "formRecordId", unique = true)
     FormRecord formRecord;

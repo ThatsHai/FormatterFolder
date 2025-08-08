@@ -14,10 +14,9 @@ public interface StudentMapper {
     @Mapping(source = "userId", target = "userId")
     @Mapping(target = "acId", ignore = true)
     @Mapping(target = "email", ignore = true)
-    @Mapping(target = "avatar", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "role", ignore = true)
     Student toStudent(AddStudentRequest addStudentRequest);
-    
+
 
 }
