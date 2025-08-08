@@ -23,7 +23,6 @@ public class StudentDTO {
     String dateOfBirth;
     String phoneNumber;
     String email;
-    String avatar;
     Role role;
     EducationLevel educationLevel;
     StudentClass studentClass;

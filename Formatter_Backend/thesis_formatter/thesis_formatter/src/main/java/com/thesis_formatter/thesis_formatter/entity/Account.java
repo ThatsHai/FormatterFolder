@@ -23,17 +23,17 @@ public class Account {
     String userId;
     @Column(nullable = false)
     String password;
-    @Column(nullable = false)
+
     String name;
-    @Column(nullable = false)
+
     String dateOfBirth;
-    @Column(nullable = false)
+
     String gender;
-    @Column(nullable = false)
+
     String phoneNumber;
-    @Column(nullable = false)
+
     String email;
-    @Column(nullable = false)
+
     String status;
 
     @ManyToOne

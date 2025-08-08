@@ -12,6 +12,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,6 +62,8 @@ public class FormRecordController {
     @PreAuthorize("hasRole('TEACHER')")
     @PutMapping("/formRecords/{formRecordId}/approve")
     public APIResponse<Void> approveRecord(@PathVariable String formRecordId) throws MessagingException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Authorities: " + auth.getAuthorities());
         return formRecordService.approveRecord(formRecordId);
     }
 

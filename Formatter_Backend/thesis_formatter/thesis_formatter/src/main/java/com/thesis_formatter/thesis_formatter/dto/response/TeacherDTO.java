@@ -20,7 +20,6 @@ public class TeacherDTO {
     String dateOfBirth;
     String phoneNumber;
     String email;
-    String avatar;
     Role role;
     Department department;
     String degree;
