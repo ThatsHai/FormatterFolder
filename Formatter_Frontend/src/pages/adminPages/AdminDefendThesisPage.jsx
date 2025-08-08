@@ -1,27 +1,24 @@
 import dayjs from "dayjs";
 import { Link } from "react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import api from "../../services/api";
 
-const response = {
-  code: "200",
-  result: [
-    {
-      stt: "01",
-      studentId: "B2103542",
-      studentName: "Huỳnh Giao",
-      topicName: "De tai test",
-      guideNames: ["Nguyen Van GV 1"],
-      formRecordId: "92b216f8-411e-49bb-842c-2c163decd025",
-      startTime: "2025-08-01T08:00:00",
-      place: "Phòng 101",
-      teacherNames: ["Nguyen Van GV 1", "Nguyen Van GV 1"],
-    },
-  ],
-};
-
 const StudentTopicTable = () => {
-  const [data, setData] = useState(response.result);
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await api.get("/defenseSchedules");
+      setData(response.data.result);
+    } catch (error) {
+      alert("Không thể lấy kết quả.");
+      console.log(error);
+    }
+  };
 
   const handleGetPDF = async () => {
     const updated = data.map((item) => ({
@@ -47,6 +44,10 @@ const StudentTopicTable = () => {
       console.error(error);
     }
   };
+
+  if(!data || data.length == 0){
+    return <p>Đang tải</p>
+  }
 
   return (
     <div className="p-4 font-textFont">
@@ -80,7 +81,7 @@ const StudentTopicTable = () => {
               <td className="border px-2 py-1 hidden md:table-cell">
                 {record.studentName}
               </td>
-              <td className="border border-black px-2 py-1 hover:text-darkBlue hover:bg-lightGray">
+              <td className="border border-black px-2 py-1 hover:text-darkBlue hover:bg-lightGray underline text-lightBlue">
                 <Link to={`/formRecordReview/${record.formRecordId}`}>
                   {record.topicName}
                 </Link>

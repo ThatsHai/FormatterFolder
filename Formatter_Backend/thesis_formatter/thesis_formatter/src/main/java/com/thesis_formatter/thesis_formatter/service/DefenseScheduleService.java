@@ -100,5 +100,34 @@ public class DefenseScheduleService {
                 .contentLength(tempFile.length())
                 .body(resource);
     }
+
+    public APIResponse<List<DefenseScheduleResponse>> getByFormRecordIds(List<String> formRecordIds) {
+        List<DefenseScheduleResponse> responseList = new ArrayList<>();
+
+        for (String formRecordId : formRecordIds) {
+            FormRecord formRecord = formRecordRepo.findById(formRecordId)
+                    .orElseThrow(() -> new AppException(ErrorCode.FormRecord_NOT_FOUND));
+
+            DefenseSchedule defenseSchedule = defenseScheduleRepo.findDefenseScheduleByFormRecord_FormRecordId(formRecordId);
+
+            if (defenseSchedule == null) {
+                // Optional: create a placeholder response
+                DefenseScheduleResponse placeholder = new DefenseScheduleResponse();
+                placeholder.setFormRecordId(formRecordId);
+                placeholder.setStartTime(null);
+                placeholder.setPlace(null);
+                responseList.add(placeholder);
+            } else {
+                DefenseScheduleResponse response = defenseScheduleMapper.toResponse(defenseSchedule);
+                responseList.add(response);
+            }
+        }
+
+        return APIResponse.<List<DefenseScheduleResponse>>builder()
+                .result(responseList)
+                .code("200")
+                .build();
+    }
+
 }
 

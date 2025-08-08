@@ -13,7 +13,7 @@ const TopicManagementPageContent = ({
   //This array state should include teacherTopicLimit too
   const [topicsGroupByTeacher, setTopicsGroupByTeacher] = useState([]);
   const [semester, setSemester] = useState("HK1");
-  const [schoolYear, setSchoolYear] = useState(2025);
+  const [schoolYear, setSchoolYear] = useState(new Date().getFullYear());
   const [expandedTeachers, setExpandedTeachers] = useState({});
   const [teacherName, setTeacherName] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
@@ -216,12 +216,6 @@ const TopicManagementPageContent = ({
                         <td className="p-1 border px-2">{teacher.name}</td>
                         <td className="p-1 border">
                           <div className="flex justify-center rounded-md">
-                            {/* <input
-                            className="border rounded w-1/4 px-1"
-                            type="number"
-                            max={20}
-                            min={0}
-                          /> */}
                             <NumberInput
                               min={0}
                               max={20}
