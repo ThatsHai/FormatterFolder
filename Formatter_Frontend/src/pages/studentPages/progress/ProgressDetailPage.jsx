@@ -9,6 +9,7 @@ import api from "../../../services/api";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 
 import SuccessPopup from "../../../component/SuccessPopup";
 import ConfirmationPopup from "../../../component/ConfirmationPopup";
@@ -17,6 +18,7 @@ import { useSelector } from "react-redux";
 import FileUpload from "./FileUpload";
 
 dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
 
 const ProgressDetailPage = () => {
   const user = useSelector((state) => state.auth.user);
@@ -57,7 +59,7 @@ const ProgressDetailPage = () => {
       const response = await api.put(`/tasks/${taskId}/markTaskComplete`);
       setDisplaySuccessPopup(true);
     } catch (e) {
-      console.log(e);
+      alert(e.response.data.message);
     }
     setShowConfirmPopup(false);
   };
@@ -93,10 +95,23 @@ const ProgressDetailPage = () => {
   // Tìm index của milestone hiện tại
   const currentPhaseIndex = sortedMilestones.findIndex(
     (milestone) =>
-      !milestone.completedDate ||
-      dayjs(milestone.dueDate).isSameOrAfter(dayjs(), "day") ||
-      milestone.tasks.some((task) => task.completed)
+      !milestone.dueDate ||
+      dayjs(milestone.dueDate).isSameOrAfter(dayjs(), "day")
   );
+
+  const getLatestCompletedDate = (milestone) => {
+    if (!milestone.tasks || milestone.tasks.length === 0) return null;
+
+    const completedDates = milestone.tasks
+      .map((task) => task.completedDate)
+      .filter(Boolean); // bỏ null hoặc undefined
+
+    if (completedDates.length === 0) return null;
+
+    return completedDates.reduce((latest, current) =>
+      dayjs(current).isAfter(dayjs(latest)) ? current : latest
+    );
+  };
 
   return (
     <div className="">
@@ -154,10 +169,16 @@ const ProgressDetailPage = () => {
                         title={
                           index < currentPhaseIndex
                             ? milestone.completed
-                              ? "Đã hoàn thành mốc này"
-                              : "Mốc này chưa hoàn thành"
+                              ? dayjs(
+                                  getLatestCompletedDate(milestone)
+                                ).isSameOrBefore(milestone.dueDate)
+                                ? "Hoàn thành đúng hạn"
+                                : "Hoàn thành trễ hạn"
+                              : "Mốc quá hạn chưa hoàn thành"
                             : index === currentPhaseIndex
-                            ? "Mốc hiện tại"
+                            ? milestone.completed
+                              ? "Mốc hiện tại - đã hoàn thành"
+                              : "Mốc hiện tại - đang thực hiện"
                             : "Mốc chưa đến"
                         }
                         arrow
@@ -166,15 +187,21 @@ const ProgressDetailPage = () => {
                         <div className="z-10 bg-white rounded-full w-7 h-7 flex items-center justify-center">
                           {index < currentPhaseIndex ? (
                             milestone.completed ? (
-                              <CheckCircleIcon
-                                className="text-green-500"
-                                fontSize="large"
-                              />
+                              dayjs(
+                                getLatestCompletedDate(milestone)
+                              ).isSameOrBefore(milestone.dueDate) ? (
+                                <CheckCircleIcon
+                                  className="text-green-500"
+                                  fontSize="large"
+                                />
+                              ) : (
+                                <CheckCircleIcon
+                                  className="text-red-500"
+                                  fontSize="large"
+                                />
+                              )
                             ) : (
-                              <CheckCircleIcon
-                                className="text-red-500"
-                                fontSize="large"
-                              />
+                              <div className="w-7 h-7 rounded-full border-2 border-red-500 bg-white" />
                             )
                           ) : index === currentPhaseIndex ? (
                             milestone.completed ? (
@@ -280,7 +307,8 @@ const ProgressDetailPage = () => {
                                       )}
                                   </div>
                                   <div className="flex justify-end gap-2">
-                                    {task.requireFile && !task.completed &&
+                                    {task.requireFile &&
+                                      !task.completed &&
                                       (task.fileSubmitted ? (
                                         <button
                                           className="p-2 rounded-md text-white bg-lightBlue text-sm flex items-center justify-center gap-1 hover:bg-darkBlue"

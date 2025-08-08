@@ -80,6 +80,10 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
       alert("Bản ghi đã được duyệt trước đó, không thể duyệt lại");
       return;
     }
+    if (formRecord.topic.students!=null){
+      alert("Bạn đã duyệt đề cương duyệt đề tài này cho sinh viên khác! Không thể duyệt!");
+      return;
+    }
     setShowConfirmPopup(true);
     setText(
       "Bạn chắc chắn muốn duyệt đề cương này? Thông báo duyệt sẽ được gửi đến sinh viên!"
@@ -161,8 +165,7 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
             )}
           </>
         ) : (
-          formRecord.status === "WAITING" ||
-          (formRecord.status === "DENIED" && (
+          (formRecord.status === "WAITING" || formRecord.status === "DENIED") && (
             <>
               <button
                 className="p-2 mx-1 rounded-md text-white bg-green-500 tx-lg gap-1 hover:bg-green-600"
@@ -179,7 +182,7 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
                 </button>
               )}
             </>
-          ))
+          )
         )}
         {showDesignWindow && (
           <DesignsListWindow

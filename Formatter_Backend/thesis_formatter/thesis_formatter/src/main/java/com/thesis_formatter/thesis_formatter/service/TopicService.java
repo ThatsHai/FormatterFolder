@@ -89,7 +89,7 @@ public class TopicService {
             List<Student> students = studentRepo.findByUserIdIn(studentIds);
             for (Student student : students) {
                 Optional<Topic> existedTopic = topicRepo.findPublishedTopicsByStudent(student.getUserId());
-                if (existedTopic.isPresent()) {
+                if (existedTopic.isPresent() && !existedTopic.get().getTopicId().equals(topic.getTopicId())) {
                     throw new RuntimeException("Sinh viên " + student.getName() + " đang thực hiện 1 đề tài khác!");
                 }
             }
@@ -229,7 +229,7 @@ public class TopicService {
         for (Student student : updatedStudents) {
             Optional<Topic> existedTopic = topicRepo.findPublishedTopicsByStudent(student.getUserId());
             if (existedTopic.isPresent() && !existedTopic.get().getTopicId().equals(topic.getTopicId())) {
-                throw new AppException(ErrorCode.STUDENT_ALREADY_IN_OTHER_TOPIC);
+                throw new RuntimeException("Sinh viên " + student.getName() + " đang thực hiện 1 đề tài khác!");
             }
         }
         topic.setStudents(updatedStudents);
@@ -270,24 +270,25 @@ public class TopicService {
         List<AddFormRecordFieldRequest> fieldRequests = form.getFormFields().stream()
                 .map(field -> AddFormRecordFieldRequest.builder()
                         .formFieldId(field.getFormFieldId())
+                        .value(new String())
                         .build())
                 .collect(Collectors.toList());
 
         for (String studentId : studentIds) {
-            Optional<FormRecord> deletedRecordOpt = formRecordRepo
-                    .findDeletedByStudentAndTopic(studentId, topic.getTopicId());
-
-            if (deletedRecordOpt.isPresent()) {
-                FormRecord deletedRecord = deletedRecordOpt.get();
-                deletedRecord.setStatus(FormStatus.PENDING);
-                formRecordRepo.save(deletedRecord);
-            } else {
-                formRecordService.createFormRecord(AddFormRecordRequest.builder()
-                        .studentId(studentId)
-                        .topicId(topic.getTopicId())
-                        .formRecordFields(fieldRequests)
-                        .build());
-            }
+//            Optional<FormRecord> deletedRecordOpt = formRecordRepo
+//                    .findDeletedByStudentAndTopic(studentId, topic.getTopicId());
+//
+//            if (deletedRecordOpt.isPresent()) {
+//                FormRecord deletedRecord = deletedRecordOpt.get();
+//                deletedRecord.setStatus(FormStatus.PENDING);
+//                formRecordRepo.save(deletedRecord);
+//            } else {
+            formRecordService.createFormRecord(AddFormRecordRequest.builder()
+                    .studentId(studentId)
+                    .topicId(topic.getTopicId())
+                    .formRecordFields(fieldRequests)
+                    .build());
+            //}
         }
         notificationService.createSystemNotification(NotificationRequest.builder()
                 .senderId(null)

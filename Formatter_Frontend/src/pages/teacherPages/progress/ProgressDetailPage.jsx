@@ -18,8 +18,10 @@ import PropTypes from "prop-types";
 import { Link, useParams } from "react-router";
 import { Today } from "@mui/icons-material";
 import Tooltip from "@mui/material/Tooltip";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 
 dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
 
 const ProgressDetailPage = () => {
   const { progressId } = useParams();
@@ -122,10 +124,23 @@ const ProgressDetailPage = () => {
   // Tìm index của milestone hiện tại
   const currentPhaseIndex = sortedMilestones.findIndex(
     (milestone) =>
-      !milestone.completedDate ||
-      dayjs(milestone.dueDate).isSameOrAfter(dayjs(), "day") 
-      || milestone.tasks.some((task) => task.completed) 
+      !milestone.dueDate ||
+      dayjs(milestone.dueDate).isSameOrAfter(dayjs(), "day")
   );
+
+  const getLatestCompletedDate = (milestone) => {
+    if (!milestone.tasks || milestone.tasks.length === 0) return null;
+
+    const completedDates = milestone.tasks
+      .map((task) => task.completedDate)
+      .filter(Boolean); // bỏ null hoặc undefined
+
+    if (completedDates.length === 0) return null;
+
+    return completedDates.reduce((latest, current) =>
+      dayjs(current).isAfter(dayjs(latest)) ? current : latest
+    );
+  };
 
   return (
     <div className="">
@@ -201,10 +216,16 @@ const ProgressDetailPage = () => {
                       title={
                         index < currentPhaseIndex
                           ? milestone.completed
-                            ? "Đã hoàn thành mốc này"
-                            : "Mốc này chưa hoàn thành"
+                            ? dayjs(
+                                getLatestCompletedDate(milestone)
+                              ).isSameOrBefore(milestone.dueDate)
+                              ? "Hoàn thành đúng hạn"
+                              : "Hoàn thành trễ hạn"
+                            : "Mốc quá hạn chưa hoàn thành"
                           : index === currentPhaseIndex
-                          ? "Mốc hiện tại"
+                          ? milestone.completed
+                            ? "Mốc hiện tại - đã hoàn thành"
+                            : "Mốc hiện tại - đang thực hiện"
                           : "Mốc chưa đến"
                       }
                       arrow
@@ -213,18 +234,31 @@ const ProgressDetailPage = () => {
                       <div className="z-10 bg-white rounded-full w-7 h-7 flex items-center justify-center">
                         {index < currentPhaseIndex ? (
                           milestone.completed ? (
+                            dayjs(
+                              getLatestCompletedDate(milestone)
+                            ).isSameOrBefore(milestone.dueDate) ? (
+                              <CheckCircleIcon
+                                className="text-green-500"
+                                fontSize="large"
+                              />
+                            ) : (
+                              <CheckCircleIcon
+                                className="text-red-500"
+                                fontSize="large"
+                              />
+                            )
+                          ) : (
+                            <div className="w-7 h-7 rounded-full border-2 border-red-500 bg-white" />
+                          )
+                        ) : index === currentPhaseIndex ? (
+                          milestone.completed ? (
                             <CheckCircleIcon
                               className="text-green-500"
                               fontSize="large"
                             />
                           ) : (
-                            <CheckCircleIcon
-                              className="text-red-500"
-                              fontSize="large"
-                            />
+                            <div className="w-7 h-7 rounded-full border-2 border-green-500 bg-white" />
                           )
-                        ) : index === currentPhaseIndex ? (
-                          <div className="w-7 h-7 rounded-full border-2 border-green-500 bg-white" />
                         ) : (
                           <div className="w-7 h-7 rounded-full bg-lightGray flex items-center justify-center">
                             <RadioButtonUncheckedIcon
@@ -303,8 +337,13 @@ const ProgressDetailPage = () => {
                                       Chưa hoàn tất
                                     </p>
                                   )}
-                                  <p className="text-sm mt-1">Mô tả: {task.description||"Không có"}</p>
-                                  <p className="text-sm mt-1">File đính kèm: {task.requireFile?"Có":"Không"}</p>
+                                  <p className="text-sm mt-1">
+                                    Mô tả: {task.description || "Không có"}
+                                  </p>
+                                  <p className="text-sm mt-1">
+                                    File đính kèm:{" "}
+                                    {task.requireFile ? "Có" : "Không"}
+                                  </p>
                                   {task.taskFiles &&
                                     task.taskFiles.length > 0 && (
                                       <div className="mt-1">
@@ -327,8 +366,6 @@ const ProgressDetailPage = () => {
                                         })}
                                       </div>
                                     )}
-
-                                  
                                 </div>
                                 <div className="flex justify-end gap-2">
                                   <button
@@ -339,7 +376,6 @@ const ProgressDetailPage = () => {
                                       fontSize="small"
                                       className="text-white"
                                     />{" "}
-                                   
                                   </button>
                                 </div>
                               </div>
@@ -365,26 +401,29 @@ const ProgressDetailPage = () => {
                         onClick={() => handleSetDueDate(milestone)}
                       >
                         <CalendarMonthIcon fontSize="small" />
-                        {milestone.dueDate
-                          ? "Sửa"
-                          : "Đặt"}
+                        {milestone.dueDate ? "Sửa" : "Đặt"}
                       </button>
-
-                      <button
-                        className="p-2 rounded-md text-white bg-lightBlue text-sm flex items-center justify-center gap-1 hover:bg-darkBlue"
-                        onClick={() => handleAddTaskToggle(milestone)}
-                      >
-                        <AddIcon fontSize="small" />
-                        Công việc
-                      </button>
-                      <button
-                        className="p-2 rounded-md text-white bg-red-400 text-sm flex items-center justify-center gap-1 hover:bg-red-500"
-                        onClick={() => handleDeleteMilestone(milestone)}
-                      >
-                        <DeleteIcon fontSize="small" className="text-white" />{" "}
-                        Giai đoạn
-                        
-                      </button>
+                      {i >= currentPhaseIndex && (
+                        <>
+                          <button
+                            className="p-2 rounded-md text-white bg-lightBlue text-sm flex items-center justify-center gap-1 hover:bg-darkBlue"
+                            onClick={() => handleAddTaskToggle(milestone)}
+                          >
+                            <AddIcon fontSize="small" />
+                            Công việc
+                          </button>
+                          <button
+                            className="p-2 rounded-md text-white bg-red-400 text-sm flex items-center justify-center gap-1 hover:bg-red-500"
+                            onClick={() => handleDeleteMilestone(milestone)}
+                          >
+                            <DeleteIcon
+                              fontSize="small"
+                              className="text-white"
+                            />{" "}
+                            Giai đoạn
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>

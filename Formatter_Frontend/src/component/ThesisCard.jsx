@@ -13,6 +13,7 @@ const ThesisCard = ({ formRecord }) => {
         {formRecord.topic.form.title}
       </p>
       <p className="py-3">{formRecord.topic.title}</p>
+      <p className="py-3">Người thực hiện: {formRecord.student.name}</p>
       <div className="flex items-end w-full justify-end absolute right-4 bottom-4 cursor-pointer">
         <button
           className={`text-end align-bottom font-semibold bg-white border-none text-base px-3 py-1 rounded-md  ${

@@ -120,15 +120,18 @@ const TopicInfoButtons = ({ topic, onUpdated = () => {} }) => {
         >
           Chỉnh sửa
         </button>
-        <button
-          className="p-2 mx-1 rounded-md text-white bg-lightBlue tx-lg gap-1 hover:bg-darkBlue"
+        {topic.status != "PUBLISHED" &&(
+          <button
+          className="p-2 mx-1 rounded-md text-white bg-red-400 tx-lg gap-1 hover:bg-red-500"
           onClick={handleDeleteTopic}
         >
           Xoá
         </button>
+        )}
+        
         {topic.status === "UNPUBLISHED" ? (
           <button
-            className="p-2 mx-1 rounded-md text-white bg-lightBlue tx-lg gap-1 hover:bg-darkBlue"
+            className="p-2 mx-1 rounded-md text-white bg-green-500 tx-lg gap-1 hover:bg-green-600"
             onClick={handlePublishTopic}
           >
             Công khai

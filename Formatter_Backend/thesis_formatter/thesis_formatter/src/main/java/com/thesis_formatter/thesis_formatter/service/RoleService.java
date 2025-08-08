@@ -24,14 +24,14 @@ public class RoleService {
     RoleMapper roleMapper;
     PermissionRepo permissionRepo;
 
-    public RoleResponse create(RoleRequest request) {
+    public Role create(RoleRequest request) {
         var role = roleMapper.toRole(request);
 
         var permissions = permissionRepo.findAllById(request.getPermissions());
         role.setPermissions(new HashSet<>(permissions));
 
         role = roleRepo.save(role);
-        return roleMapper.toRoleResponse(role);
+        return role;
     }
 
     public List<RoleResponse> getAll() {

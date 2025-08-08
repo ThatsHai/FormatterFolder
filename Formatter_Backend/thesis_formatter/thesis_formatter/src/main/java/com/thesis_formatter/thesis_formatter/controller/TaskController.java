@@ -3,6 +3,7 @@ package com.thesis_formatter.thesis_formatter.controller;
 import com.thesis_formatter.thesis_formatter.dto.request.AddTaskRequest;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.TaskResponse;
+import jakarta.mail.MessagingException;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import com.thesis_formatter.thesis_formatter.service.TaskService;
@@ -31,7 +32,7 @@ public class TaskController {
     TaskService taskService;
 
     @PostMapping
-    public APIResponse<TaskResponse> createTask(@RequestBody AddTaskRequest request) throws MalformedURLException {
+    public APIResponse<TaskResponse> createTask(@RequestBody AddTaskRequest request) throws MalformedURLException, MessagingException {
         return taskService.createTask(request);
     }
 
@@ -76,7 +77,6 @@ public class TaskController {
     ) {
         return taskService.uploadFile(taskId, files, deletedFileNamesJson);
     }
-
 
 
     @DeleteMapping("/{taskId}")

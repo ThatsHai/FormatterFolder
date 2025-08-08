@@ -276,10 +276,7 @@ const TopicSuggestionPage = ({
         }
         setDisplaySuccessPopup(true);
       } catch (error) {
-        // console.error("Error submitting topic form:", error);
-        if (error.response.data.code === "1023") {
-          alert("Sinh viên bạn chọn đang thực hiện 1 đề tài khác!");
-        }
+        alert(error.response.data.message);
       }
     };
     result();
