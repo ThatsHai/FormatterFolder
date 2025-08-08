@@ -69,4 +69,9 @@ public class TeacherController {
             return teacherService.getTeachersWithTopicsAndLimits(semester, year, teacherQueryName, p, n);
         } else return teacherService.getTeachersWithTopicsAndLimits(year, teacherQueryName, p, n);
     }
+
+    @PostMapping("/teachers/getListId")
+    public APIResponse<List<TeacherDTO>> getListTeachersByIds(@RequestBody List<String> teacherIds) {
+        return teacherService.getListTeachersByIds(teacherIds);
+    }
 }

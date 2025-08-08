@@ -38,4 +38,8 @@ public class DefenseScheduleController {
         return defenseScheduleService.getPDF(schedulePDFRequests);
     }
 
+    @PostMapping("/getByFormRecordIds")
+    public APIResponse<List<DefenseScheduleResponse>> getDefenseScheduleByFormRecordIds(@RequestBody List<String> formRecordIds) {
+        return defenseScheduleService.getByFormRecordIds(formRecordIds);
+    }
 }

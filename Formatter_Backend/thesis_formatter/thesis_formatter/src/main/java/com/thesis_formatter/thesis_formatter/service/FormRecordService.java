@@ -620,18 +620,26 @@ public class FormRecordService {
 
     }
 
-    public APIResponse<List<TeacherFormRecordResponse>> getAcceptedFromRecordsGroupByTeacherWithTime(
+    public APIResponse<PaginationResponse<TeacherFormRecordResponse>> getAcceptedFromRecordsGroupByTeacherWithTime(
             String semester, String year, String page, String numberOfRecords) {
-//        Pageable pageable = PageRequest.of(Integer.parseInt(page), Integer.parseInt(numberOfRecords));
+
         Semester semesterEnum;
         try {
             semesterEnum = Semester.valueOf(semester.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new AppException(ErrorCode.INVALID_ARGUMENT);
         }
-        List<FormRecord> records = formRecordRepo.findAcceptedRecordsByGroupByTeacher(semesterEnum, year);
+
+        int pageNumber = Integer.parseInt(page);
+        int pageSize = Integer.parseInt(numberOfRecords);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+
+        Page<FormRecord> recordPage = formRecordRepo.findAcceptedRecordsByGroupByTeacher(semesterEnum, year, pageable);
+
+        // Step 1: Group by teacher
         Map<String, TeacherFormRecordResponse> grouped = new HashMap<>();
-        for (FormRecord record : records) {
+
+        for (FormRecord record : recordPage.getContent()) {
             for (Teacher teacher : record.getTopic().getTeachers()) {
                 String userId = teacher.getUserId();
                 TeacherFormRecordResponse response = grouped.computeIfAbsent(userId, id -> TeacherFormRecordResponse.builder()
@@ -639,6 +647,7 @@ public class FormRecordService {
                         .teacherName(teacher.getName())
                         .formRecordSchedules(new ArrayList<>())
                         .build());
+
                 response.getFormRecordSchedules().add(
                         FormRecordScheduleResponse.builder()
                                 .formRecordId(record.getFormRecordId())
@@ -649,11 +658,22 @@ public class FormRecordService {
                 );
             }
         }
-        return APIResponse.<List<TeacherFormRecordResponse>>builder()
+
+        // Step 2: Prepare pagination response
+        List<TeacherFormRecordResponse> paginatedList = new ArrayList<>(grouped.values());
+
+        PaginationResponse<TeacherFormRecordResponse> pageResponse = new PaginationResponse<>();
+        pageResponse.setCurrentPage(recordPage.getNumber());
+        pageResponse.setTotalPages(recordPage.getTotalPages());
+        pageResponse.setTotalElements(recordPage.getTotalElements());
+        pageResponse.setContent(paginatedList);
+
+        return APIResponse.<PaginationResponse<TeacherFormRecordResponse>>builder()
                 .code("200")
-                .result(new ArrayList<>(grouped.values()))
+                .result(pageResponse)
                 .build();
     }
+
 
     @Transactional
     public APIResponse<FormRecord> deleteFormRecord(String formRecordId) {
@@ -759,6 +779,5 @@ public class FormRecordService {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
     }
-
 
 }

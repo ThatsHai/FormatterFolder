@@ -12,7 +12,6 @@ import java.util.List;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SchedulePDFRequest {
-    String stt;
     String studentId;
     String studentName;
     String topicName;

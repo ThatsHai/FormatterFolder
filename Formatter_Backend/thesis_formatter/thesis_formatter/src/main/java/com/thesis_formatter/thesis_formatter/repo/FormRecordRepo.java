@@ -7,6 +7,7 @@ import com.thesis_formatter.thesis_formatter.enums.FormStatus;
 import com.thesis_formatter.thesis_formatter.enums.Semester;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -49,12 +50,13 @@ public interface FormRecordRepo extends JpaRepository<FormRecord, String> {
 
     @Query("""
                 select fr from FormRecord fr
-                join fetch fr.topic t
-                join fetch t.teachers teacher
                 where fr.status = com.thesis_formatter.thesis_formatter.enums.FormStatus.ACCEPTED
-                    and t.semester = :semester and t.year = :year
+                and fr.topic.semester = :semester and fr.topic.year = :year
             """)
-    List<FormRecord> findAcceptedRecordsByGroupByTeacher(@Param("semester") Semester semester, @Param("year") String year);
+    Page<FormRecord> findAcceptedRecordsByGroupByTeacher(@Param("semester") Semester semester,
+                                                         @Param("year") String year,
+                                                         Pageable pageable);
+
 
     FormRecord findFormRecordByFormRecordId(String id);
 

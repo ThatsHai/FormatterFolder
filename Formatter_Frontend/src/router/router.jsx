@@ -31,6 +31,7 @@ import FormRecordReviewPage from "../pages/FormRecordReviewPage";
 import ProgressPage from "../pages/teacherPages/progress/ProgressPage";
 import ProgressDetailPage from "../pages/teacherPages/progress/ProgressDetailPage";
 import ProgressPageStudent from "../pages/studentPages/progress/ProgressDetailPage";
+import ArrangeCalendarPage from "../pages/adminPages/ArrangeCalendarPage";
 
 const Router = createBrowserRouter([
   {
@@ -183,6 +184,14 @@ const Router = createBrowserRouter([
     element: (
       <AdminLayout>
         <AdminDefendThesisPage />
+      </AdminLayout>
+    ),
+  },
+  {
+    path: "/admin/defenseSchedules/create",
+    element: (
+      <AdminLayout>
+        <ArrangeCalendarPage />
       </AdminLayout>
     ),
   },

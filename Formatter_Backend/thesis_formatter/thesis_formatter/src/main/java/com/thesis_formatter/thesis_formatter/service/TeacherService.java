@@ -273,4 +273,20 @@ public class TeacherService {
                 .build();
     }
 
+    public APIResponse<List<TeacherDTO>> getListTeachersByIds(List<String> teacherIds) {
+        List<TeacherDTO> teacherDTOList = new ArrayList<>();
+        for (String teacherId : teacherIds) {
+            Teacher teacher = teacherRepo.findByUserId(teacherId);
+            if (teacher == null) {
+                teacherDTOList.add(null);
+            } else {
+                TeacherDTO teacherDTO = teacherMapper.toDTO(teacher);
+                teacherDTOList.add(teacherDTO);
+            }
+        }
+        return APIResponse.<List<TeacherDTO>>builder()
+                .code("200")
+                .result(teacherDTOList)
+                .build();
+    }
 }
