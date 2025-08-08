@@ -5,6 +5,67 @@ import PropTypes from "prop-types";
 import api from "../../services/api";
 import { IconButton } from "@mui/material";
 import { ExpandMore, ExpandLess } from "@mui/icons-material";
+import InputMask from "react-input-mask";
+import { Tooltip } from "@mui/material";
+
+const CouncilTeachersInput = ({
+  value = ["", "", ""],
+  onChange,
+  onTeacherDataChange,
+}) => {
+  const [teacherData, setTeacherData] = useState([null, null, null]);
+
+  const handleInputChange = (index, val) => {
+    const updated = [...value];
+    updated[index] = val;
+    onChange(updated);
+  };
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      const fetchTeachers = async () => {
+        try {
+          const response = await api.post("/teachers/getListId", value);
+          if (response.data?.result) {
+            setTeacherData(response.data.result);
+            onTeacherDataChange?.(response.data.result);
+          }
+        } catch (err) {
+          console.error("Error fetching teachers", err);
+        }
+      };
+      fetchTeachers();
+    }, 1000);
+
+    return () => clearTimeout(handler);
+  }, [value]);
+
+  return (
+    <div className="space-y-1">
+      {value.map((nameOrId, index) => (
+        <Tooltip
+          key={index}
+          title={
+            teacherData[index]
+              ? `${teacherData[index].name} - ${teacherData[index].department?.departmentName}`
+              : "Không tìm thấy giáo viên"
+          }
+          arrow
+        >
+          <input
+            type="text"
+            className={`border px-1 py-0.5 w-full rounded-md 
+              ${nameOrId.trim() && teacherData[index] ? "border-green-500" : ""}
+            `}
+            placeholder={`Giáo viên ${index + 1} (ID)`}
+            value={nameOrId}
+            onChange={(e) => handleInputChange(index, e.target.value)}
+          />
+        </Tooltip>
+      ))}
+    </div>
+  );
+};
 
 const EachTeacherTopics = ({ teacher }) => {
   const [expanded, setExpanded] = useState(true);
@@ -20,62 +81,97 @@ const EachTeacherTopics = ({ teacher }) => {
     }));
   };
 
+  const handleCouncilTeachersChange = (recordId, updatedIds) => {
+    handleEditChange(recordId, "councilTeachers", updatedIds);
+  };
+
+  const handleCouncilTeachersDataChange = (recordId, fetchedData) => {
+    handleEditChange(recordId, "councilTeachersData", fetchedData);
+  };
+
   const validateEdits = (edit) => {
     const { councilTeachers, date, time, room } = edit;
-  
-    if (!Array.isArray(councilTeachers) || councilTeachers.length === 0) return false;
-    if (councilTeachers.some((id) => !id || id.trim() === "")) return false;
-  
-    if (!date || date.trim() === "") return false;
-    if (!time || time.trim() === "") return false;
-  
-    if (!room || room.trim() === "") return false;
-  
-    return true;
+
+    // At least one teacher ID must be filled
+    if (
+      !Array.isArray(councilTeachers) ||
+      councilTeachers.filter((id) => id && id.trim() !== "").length === 0
+    ) {
+      return { valid: false, reason: "Vui lòng nhập đầy đủ thông tin." };
+    }
+
+    // Date format check dd/mm/yyyy
+    if (!date || !/^\d{2}\/\d{2}\/\d{4}$/.test(date)) {
+      return { valid: false, reason: "Thời gian không hợp lệ" };
+    }
+    const [day, month, year] = date.split("/").map(Number);
+    const dateObj = new Date(year, month - 1, day);
+    if (
+      dateObj.getFullYear() !== year ||
+      dateObj.getMonth() + 1 !== month ||
+      dateObj.getDate() !== day
+    ) {
+      return { valid: false, reason: "Thời gian không hợp lệ" };
+    }
+
+    // Time format check hh:mm (24-hour)
+    if (!time || !/^\d{2}:\d{2}$/.test(time)) {
+      return { valid: false, reason: "Thời gian không hợp lệ" };
+    }
+    const [hour, minute] = time.split(":").map(Number);
+    if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+      return { valid: false, reason: "Thời gian không hợp lệ" };
+    }
+
+    // Room check
+    if (!room || room.trim() === "") {
+      return { valid: false, reason: "Vui lòng nhập đầy đủ thông tin." };
+    }
+
+    return { valid: true };
   };
-  
+
   const handleSave = (formRecordId, index) => {
     const edit = edits[formRecordId];
     if (!edit) return;
-
-    if (!validateEdits(edit)) {
-      alert("Vui lòng nhập đầy đủ thông tin.");
+    if (
+      edit.councilTeachers?.some(
+        (id, i) => id.trim() !== "" && !edit.councilTeachersData?.[i]
+      )
+    ) {
+      alert("Có giáo viên không tồn tại. Vui lòng kiểm tra lại ID.");
       return;
     }
-  
-    const date = edit.date; // e.g. "01/08/2025"
-    const time = edit.time; // e.g. "08:00"
-    const [day, month, year] = date.split("/");
-  
-    // Convert to ISO string
-    const isoString = new Date(`${year}-${month}-${day}T${time}:00`).toISOString();
-  
+
+    const { valid, reason } = validateEdits(edit);
+    if (!valid) {
+      alert(reason);
+      return;
+    }
+
+    const [day, month, year] = edit.date.split("/");
+    const isoString = new Date(
+      `${year}-${month}-${day}T${edit.time}:00`
+    ).toISOString();
+
     const payload = [
       {
         stt: (index + 1).toString().padStart(2, "0"),
-        formRecordId: formRecordId,
+        formRecordId,
         teacherIds: edit.councilTeachers?.filter((t) => t.trim() !== "") || [],
         startTime: isoString,
         place: edit.room || "",
       },
     ];
-  
+
     console.log("Payload to send:", payload);
-  
-    // Optional: clear saved edits
-    setEdits((prev) => {
-      const updated = { ...prev };
-      delete updated[formRecordId];
-      return updated;
-    });
   };
-  
 
   return (
     <div>
       <div className="flex items-center">
         <p className="text-xl font-semibold">
-          {teacher.name} - {teacher.userId}
+          {teacher.teacherName} - {teacher.userId}
         </p>
         <IconButton onClick={() => setExpanded(!expanded)}>
           {expanded ? <ExpandLess /> : <ExpandMore />}
@@ -89,12 +185,24 @@ const EachTeacherTopics = ({ teacher }) => {
             <table className="table-auto border-collapse border border-lightGray w-full mt-2">
               <thead>
                 <tr>
-                  <th className="border p-2">Tên đề tài</th>
-                  <th className="border p-2">Tên sinh viên</th>
-                  <th className="border p-2">Cán bộ hội đồng</th>
-                  <th className="border p-2">Thời gian</th>
-                  <th className="border p-2">Địa điểm</th>
-                  <th className="border p-2 min-w-20">Lưu</th>
+                  <th className="border p-2 bg-lightBlue text-white border-black">
+                    Tên đề tài
+                  </th>
+                  <th className="border p-2 bg-lightBlue text-white border-black">
+                    Tên sinh viên
+                  </th>
+                  <th className="border p-2 bg-lightBlue text-white border-black">
+                    Cán bộ hội đồng
+                  </th>
+                  <th className="border p-2 bg-lightBlue text-white border-black">
+                    Thời gian
+                  </th>
+                  <th className="border p-2 bg-lightBlue text-white border-black">
+                    Địa điểm
+                  </th>
+                  <th className="border p-2 bg-lightBlue text-white border-black min-w-20">
+                    Lưu
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -116,37 +224,16 @@ const EachTeacherTopics = ({ teacher }) => {
 
                       {/* Cán bộ hội đồng */}
                       <td className="border p-2">
-                        {showInputCouncil &&
-                        (!defense.councilTeachers ||
-                          defense.councilTeachers.length === 0) ? (
-                          <div className="space-y-1">
-                            {(localEdit.councilTeachers || ["", "", ""]).map(
-                              (name, index) => (
-                                <input
-                                  key={index}
-                                  type="text"
-                                  className="border px-1 py-0.5 w-full"
-                                  placeholder={`Giáo viên ${index + 1}`}
-                                  value={name}
-                                  onChange={(e) => {
-                                    const updated = [
-                                      ...(localEdit.councilTeachers || [
-                                        "",
-                                        "",
-                                        "",
-                                      ]),
-                                    ];
-                                    updated[index] = e.target.value;
-                                    handleEditChange(
-                                      recordId,
-                                      "councilTeachers",
-                                      updated
-                                    );
-                                  }}
-                                />
-                              )
-                            )}
-                          </div>
+                        {showInputCouncil ? (
+                          <CouncilTeachersInput
+                            value={localEdit.councilTeachers || ["", "", ""]}
+                            onChange={(updated) =>
+                              handleCouncilTeachersChange(recordId, updated)
+                            }
+                            onTeacherDataChange={(data) =>
+                              handleCouncilTeachersDataChange(recordId, data)
+                            }
+                          />
                         ) : (
                           <ul className="list-disc pl-4">
                             {defense.councilTeachers?.map((teacher, idx) => (
@@ -160,10 +247,10 @@ const EachTeacherTopics = ({ teacher }) => {
                       <td className="border p-2">
                         {showInputTime ? (
                           <div className="flex gap-1">
-                            <input
-                              type="text"
-                              placeholder="dd/mm/yyyy"
-                              className="border px-1 py-0.5 w-[110px]"
+                            {/* Date input */}
+                            <InputMask
+                              mask="99/99/9999"
+                              placeholder="DD/MM/YYYY"
                               value={localEdit.date || ""}
                               onChange={(e) =>
                                 handleEditChange(
@@ -172,10 +259,13 @@ const EachTeacherTopics = ({ teacher }) => {
                                   e.target.value
                                 )
                               }
+                              className="border px-1 py-0.5 w-[110px] rounded-md"
                             />
-                            <input
-                              type="time"
-                              className="border px-1 py-0.5 w-[100px]"
+
+                            {/* Time input */}
+                            <InputMask
+                              mask="99:99"
+                              placeholder="HH:MM"
                               value={localEdit.time || ""}
                               onChange={(e) =>
                                 handleEditChange(
@@ -184,6 +274,7 @@ const EachTeacherTopics = ({ teacher }) => {
                                   e.target.value
                                 )
                               }
+                              className="border px-1 py-0.5 w-[80px] rounded-md"
                             />
                           </div>
                         ) : (
@@ -204,7 +295,7 @@ const EachTeacherTopics = ({ teacher }) => {
                         {showInputRoom ? (
                           <input
                             type="text"
-                            className="border px-1 py-0.5 w-full"
+                            className="border px-1 py-0.5 w-full rounded-md"
                             placeholder="Nhập địa điểm"
                             value={localEdit.room || ""}
                             onChange={(e) =>
@@ -376,10 +467,9 @@ const ArrangeCalendar = () => {
 
   return (
     <div className="flex justify-center mb-6">
-      {/* department, faculty, class, major */}
       <div className="w-3/4 border-lightBlue rounded-md border mx-1 p-2 font-textFont px-6">
         <h2 className="border-b border-b-darkBlue text-xl font-medium ">
-          Phân chia số lượng đề tài
+          Xếp lịch bảo vệ đề tài
         </h2>
         <QueryFields
           semester={semester}
@@ -388,14 +478,14 @@ const ArrangeCalendar = () => {
           setSchoolYear={setSchoolYear}
           handleSearch={handleSearch}
         ></QueryFields>
-        {teachers &&
-          teachers.length > 0 &&
+        {teachers && teachers.length > 0 ? (
           teachers.map((teacher) => (
-            <EachTeacherTopics
-              teacher={teacher}
-              key={teacher.userId}
-            ></EachTeacherTopics>
-          ))}
+            <EachTeacherTopics teacher={teacher} key={teacher.userId} />
+          ))
+        ) : (
+          <p>Dữ liệu trống</p>
+        )}
+
         <PageNumberFooter
           totalPages={totalPages}
           maxPage={5}

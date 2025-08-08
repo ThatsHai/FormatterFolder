@@ -10,9 +10,9 @@ const ThesisCard = ({ formRecord }) => {
       onClick={() => navigate(`/thesis/${formRecord.formRecordId}`)}
     >
       <p className="font-headerFont text-2xl font-bold">
-        {formRecord.topic.form.title}
+        {formRecord.topic.title}
       </p>
-      <p className="py-3">{formRecord.topic.title}</p>
+      <p className="py-3">{formRecord.topic.description}</p>
       <p className="py-3">Người thực hiện: {formRecord.student.name}</p>
       <div className="flex items-end w-full justify-end absolute right-4 bottom-4 cursor-pointer">
         <button
@@ -33,7 +33,6 @@ const ThesisCard = ({ formRecord }) => {
             : formRecord.status === "DELETED"
             ? "Đã xóa"
             : "Không rõ trạng thái"}{" "}
-          
         </button>
       </div>
     </div>

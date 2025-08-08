@@ -18,8 +18,6 @@ public class DefenseSchedule {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-
-    String stt;
     @OneToOne
     @JoinColumn(name = "studentId", unique = true)
     Student student;
