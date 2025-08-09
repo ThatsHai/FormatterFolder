@@ -305,12 +305,12 @@ const TopicManagementPageContent = ({
           setCurrentPage={setCurrentPage}
         ></PageNumberFooter>
         <div className="w-full flex my-2 justify-end">
-          <button
+          {semester !== "Cả năm" && semester !== "" && <button
             className="text-lg bg-darkBlue px-4 py-1 rounded-md text-white"
             onClick={handleSubmit}
           >
             Lưu
-          </button>
+          </button>}
         </div>
       </div>
     </div>
