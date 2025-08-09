@@ -67,7 +67,6 @@ public class StudentService {
 
         student.setRole(role);
         student.setStudentClass(studentClass);
-        student.setAvatar("https://icon-icons.com/icon/avatar-default-user/92824");
         student.setEducationLevel(EducationLevel.UNDERGRADUATE);
 
         String email = EmailService.generateStudentEmail(student.getName(), student.getUserId());

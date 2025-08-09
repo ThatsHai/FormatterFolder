@@ -32,6 +32,7 @@ public class NotificationController {
     @PreAuthorize("hasAuthority('NOTIFICATION')")
     @PostMapping("/user")
     public APIResponse<Void> userNotification(@RequestBody NotificationRequest notification) throws MessagingException {
+
         return notificationService.createUserNotification(notification);
     }
 

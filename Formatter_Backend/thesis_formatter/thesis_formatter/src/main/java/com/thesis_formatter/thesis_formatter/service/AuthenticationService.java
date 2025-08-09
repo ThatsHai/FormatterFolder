@@ -22,7 +22,9 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -31,6 +33,9 @@ import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 @Slf4j
 @Service
@@ -137,7 +142,7 @@ public class AuthenticationService {
             jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
             refreshTokenRepo.save(RefreshToken.builder()
                     .jti(jti)
-                    .userId(account.getUserId())
+                    .account(account)
                     .issuedAt(new Date())
                     .expiryTime(expiryTime)
                     .revoked(false)

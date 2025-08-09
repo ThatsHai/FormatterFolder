@@ -45,7 +45,6 @@ public class DefenseScheduleService {
         List<Teacher> teachers = teacherRepo.findByUserIdIn(request.getTeacherIds());
         DefenseSchedule defenseSchedule = DefenseSchedule.builder()
                 .formRecord(formRecord)
-                .student(student)
                 .teachers(teachers)
                 .startTime(request.getStartTime())
                 .place(request.getPlace())
