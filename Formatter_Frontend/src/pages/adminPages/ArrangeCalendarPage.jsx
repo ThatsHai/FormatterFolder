@@ -7,6 +7,7 @@ import { IconButton } from "@mui/material";
 import { ExpandMore, ExpandLess } from "@mui/icons-material";
 import InputMask from "react-input-mask";
 import { Tooltip } from "@mui/material";
+import { useRef } from "react";
 
 const CouncilTeachersInput = ({
   value = ["", "", ""],
@@ -21,7 +22,15 @@ const CouncilTeachersInput = ({
     onChange(updated);
   };
 
+  const prevValueRef = useRef();
+
   useEffect(() => {
+    const isSame =
+      JSON.stringify(prevValueRef.current) === JSON.stringify(value);
+    if (isSame) return;
+
+    prevValueRef.current = value;
+
     const handler = setTimeout(() => {
       const fetchTeachers = async () => {
         try {
@@ -460,7 +469,7 @@ const ArrangeCalendar = () => {
           };
         });
         setTeachers(enrichedData);
-        console.log(teachers);
+        // console.log(teachers);
       } catch (error) {
         console.error("Error loading data:", error);
       }
