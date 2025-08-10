@@ -149,7 +149,7 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
             </button>
             {formRecord.status != "ACCEPTED" && (
               <button
-                className="p-2 mx-1 rounded-md text-white bg-lightBlue tx-lg gap-1 hover:bg-darkBlue"
+                className="p-2 mx-1 rounded-md text-white bg-red-400 tx-lg gap-1 hover:bg-red-500"
                 onClick={handleDeleteRecord}
               >
                 Xoá

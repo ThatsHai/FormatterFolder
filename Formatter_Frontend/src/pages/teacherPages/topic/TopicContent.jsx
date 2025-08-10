@@ -54,8 +54,8 @@ const TopicContent = () => {
   return (
     <div className="pt-6">
       <div className="flex justify-end">
-        <div className="w-1/3 flex mr-3">
-          <Button label="Tìm kiếm..."></Button>
+        <div className="w-1/6 flex mr-3">
+          {/* <Button label="Tìm kiếm..."></Button> */}
           <Button label="Thêm đề tài" handleClick={handleFormToggle}></Button>
         </div>
       </div>
