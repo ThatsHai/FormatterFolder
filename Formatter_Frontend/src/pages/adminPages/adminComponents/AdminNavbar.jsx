@@ -98,7 +98,7 @@ const AdminNavbar = () => {
         onMouseLeave={() => setCalender(false)}
       >
         <button className="hover:bg-gray border border-transparent hover:border-black p-2 px-4 my-1 rounded-lg">
-          Quản lý danh mục
+          Quản lý lịch bảo vệ
         </button>
         {calender && <ThesisCalendarPane></ThesisCalendarPane>}
       </div>
