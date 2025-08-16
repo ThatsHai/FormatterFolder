@@ -30,6 +30,7 @@ const DisplayObjectInfo = ({
     }
   };
 
+  //This is used to return a level higher
   const getParentItem = async (item, level) => {
     try {
       if (level === "studentClass") {
@@ -84,13 +85,13 @@ const DisplayObjectInfo = ({
   const getLabel = (level) => {
     switch (level) {
       case "major":
-        return "ngành";
+        return "Ngành";
       case "department":
-        return "môn";
+        return "Khoa/Bộ môn";
       case "faculty":
-        return "khoa";
+        return "Trường/Viện/Khoa";
       case "studentClass":
-        return "lớp";
+        return "Lớp";
       default:
         return "đơn vị";
     }

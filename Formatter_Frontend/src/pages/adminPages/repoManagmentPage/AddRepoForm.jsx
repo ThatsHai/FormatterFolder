@@ -21,15 +21,15 @@ const AddRepoForm = ({
   const getLabel = (level) => {
     switch (level) {
       case "major":
-        return "ngành";
+        return "Ngành";
       case "department":
-        return "môn";
+        return "Khoa/Bộ môn";
       case "faculty":
-        return "khoa";
+        return "Trường/Viện/Khoa";
       case "studentClass":
-        return "lớp";
+        return "Lớp";
       default:
-        return "đơn vị";
+        return "Đơn vị";
     }
   };
 
@@ -185,9 +185,9 @@ const AddRepoForm = ({
         setRefreshKey((prev) => prev + 1);
 
         // Pass updated data to appropriate handler
-        if (isUpdating && result.data?.result) {
+        if (result.data?.result) {
           const updated = result.data.result;
-
+        
           if (level === "faculty") {
             handleSelectFaculty(updated);
           } else if (level === "department") {
@@ -195,7 +195,7 @@ const AddRepoForm = ({
           } else if (level === "major") {
             handleSelectMajor(updated);
           } else if (level === "studentClass") {
-            handleSelectStudentClass(updated);
+            handleSelectMajor({ majorId: updated.major.majorId, ...updated.major })
           }
         }
 
@@ -251,10 +251,10 @@ const AddRepoForm = ({
           >
             <option value="">
               {currentLevel === "department"
-                ? "Chọn khoa"
+                ? "Chọn Trường/Viện/Khoa"
                 : currentLevel === "major"
-                ? "Chọn môn"
-                : "Chọn ngành"}
+                ? "Chọn Khoa/Bộ môn"
+                : "Chọn Ngành"}
             </option>
 
             {parentList.map((parent) => (

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import FacultyTree from "./repoManagmentPage/FacultyTree";
 import DisplayObjectInfo from "./repoManagmentPage/DisplayObjectInfo";
 import AddRepoForm from "./repoManagmentPage/AddRepoForm";
@@ -32,7 +32,7 @@ const RepoManagementPage = () => {
 
   const handleSelectDepartment = async (department) => {
     if (!department) return;
-    const result = await api(`/majors?department=${department.departmentId}`);
+    const result = await api(`/majors?departmentId=${department.departmentId}`);
     const content = result.data.result;
     const object = {
       name: department.departmentName,
@@ -85,6 +85,7 @@ const RepoManagementPage = () => {
         {Object.keys(objectInfo).length > 0 && (
           <div className="col-span-2 border border-lightBlue rounded-md">
             <DisplayObjectInfo
+              key={`${objectInfo.level}-${objectInfo.id}`}
               objectInfo={objectInfo}
               handleSelectDepartment={handleSelectDepartment}
               handleSelectFaculty={handleSelectFaculty}
@@ -99,7 +100,7 @@ const RepoManagementPage = () => {
 
       <AddRepoForm
         isOpen={openAddForm}
-        objectInfo={addFormInfo} // ✅ Correct object now
+        objectInfo={addFormInfo}
         onClose={() => setOpenAddForm(false)}
         setRefreshKey={setRefreshKey}
         handleSelectDepartment={handleSelectDepartment}

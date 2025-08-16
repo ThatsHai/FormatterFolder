@@ -29,6 +29,7 @@ const FacultyTree = ({
       setFaculties(result.data.result);
       setDepartmentsByFaculty({});
       setMajorsByDepartment({});
+      setClassesByMajor({});
       setExpanded({});
     };
     initializeFaculties();
@@ -261,7 +262,7 @@ const FacultyTree = ({
                         {hoveredId === major.majorId && (
                           <IconButton
                             size="small"
-                            onClick={() => handleAddClick("class", major)}
+                            onClick={() => handleAddClick("studentClass", major)}
                           >
                             <AddIcon fontSize="small" />
                           </IconButton>
