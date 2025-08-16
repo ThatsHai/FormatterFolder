@@ -246,7 +246,14 @@ const Composer = ({
       } catch (error) {
         console.log(error);
         if (error.response.data.code == 400) {
-          alert("Không có khoa đang tìm!");
+          if (
+            error.response.data.message ==
+            "Không có giáo viên ứng với mã khoa truyền vào"
+          ) {
+            alert("Không có giáo viên thuộc khoa.");
+          } else {
+            alert("Không có khoa đang tìm!");
+          }
         } else {
           alert("Lỗi không gửi được thư, vui lòng thử lại sau.");
         }
