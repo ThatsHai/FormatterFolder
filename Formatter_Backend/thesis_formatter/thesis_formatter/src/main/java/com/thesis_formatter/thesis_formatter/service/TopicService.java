@@ -160,7 +160,7 @@ public class TopicService {
                 TeacherTopicWithLimitResponse limitResponse = teacherTopicLimitService.getLimitTopicByTeacherId(teacher.getAcId(), hk, year);
                 if (limitResponse == null) {
                     throw new RuntimeException("Chưa có giới hạn số lượng đề tài trong kỳ này!");
-                } else {
+                } else if (topic.getStatus() != TopicStatus.PUBLISHED) {
                     List<Topic> topics = topicRepo.findPublishedTopicsByTeacherAndSemesterAndYear(teacher, Semester.valueOf(hk.toUpperCase()), year);
                     if (topics.size() >= limitResponse.getMaxTopics()) {
                         throw new RuntimeException("Số lượng đề tài công khai trong kỳ này của giảng viên " + teacher.getName() + " đã đạt giới hạn!");

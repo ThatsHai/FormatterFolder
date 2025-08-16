@@ -114,6 +114,17 @@ const SubmitThesisForm = ({
 
     console.log("initialData: ", initialData);
   }, [initialData]);
+  useEffect(() => {
+    if (!initialData && selectedForm?.formFields?.length > 0) {
+      setFormData((prev) => ({
+        ...prev,
+        formRecordFields: selectedForm.formFields.map((field) => ({
+          formFieldId: field.formFieldId,
+          value: "", // giữ cả khi bỏ trống
+        })),
+      }));
+    }
+  }, [selectedForm, initialData]);
 
   useEffect(() => {
     document.body.classList.add("overflow-hidden");

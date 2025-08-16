@@ -17,6 +17,7 @@ const AddMilestone = ({
   const today = new Date().toISOString().split("T")[0]; // yyyy-MM-dd
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [displaySuccessPopup, setDisplaySuccessPopup] = useState(false);
+  const [errors, setErrors] = useState("");
 
   useEffect(() => {
     if (initialData) {
@@ -42,6 +43,17 @@ const AddMilestone = ({
   if (name) {
     previewStages.splice(order - 1, 0, name);
   }
+  const validateForm = () => {
+    const newErrors = {};
+    if (!name.trim()) {
+      newErrors.name = "Tên giai đoạn không được để trống";
+    }
+    if (!deadline) {
+      newErrors.deadline = "Chưa chọn ngày hết hạn";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const sendData = async () => {
     const payload = {
@@ -60,7 +72,7 @@ const AddMilestone = ({
     setShowConfirmPopup(false);
   };
   const handleSubmit = () => {
-    // TODO: Gọi API tạo milestone
+    if (!validateForm()) return;
     setShowConfirmPopup(true);
   };
   const onSuccessPopupClosed = () => {
@@ -100,10 +112,14 @@ const AddMilestone = ({
           <input
             type="text"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value);
+              setErrors((prev) => ({ ...prev, name: "" }));
+            }}
             placeholder="Tên giai đoạn"
             className="w-full border-b border-blue-300 focus:outline-none py-1"
           />
+          {errors.name && <p className="text-redError pt-2">{errors.name}</p>}
         </div>
 
         <div className="m-4 flex items-center gap-1">
@@ -135,9 +151,15 @@ const AddMilestone = ({
             value={deadline}
             min={minDate}
             max={maxDate}
-            onChange={(e) => setDeadline(e.target.value)}
+            onChange={(e) => {
+              setDeadline(e.target.value);
+              setErrors((prev) => ({ ...prev, deadline: "" }));
+            }}
             className="border border-gray-300 rounded-md p-2 w-1/4"
           />
+          {errors.deadline && (
+            <p className="text-redError pt-2">{errors.deadline}</p>
+          )}
         </div>
 
         <div className="m-4">

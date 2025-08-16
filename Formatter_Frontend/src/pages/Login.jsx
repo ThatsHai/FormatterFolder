@@ -89,7 +89,7 @@ const Login = () => {
 
       setFormInfo(Object.fromEntries(fields.map((f) => [f.label, ""])));
       setResetSignal((prev) => prev + 1);
-      alert(JSON.stringify(user));
+      // alert(JSON.stringify(user));
       const roleName = user.role?.name?.toUpperCase();
 
       if (roleName === "STUDENT") {
