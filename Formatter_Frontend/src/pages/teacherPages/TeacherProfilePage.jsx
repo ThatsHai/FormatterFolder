@@ -107,8 +107,8 @@ const TeacherProfilePage = ({ userData }) => {
                     label="Bộ môn"
                     value={userData.department?.departmentName || "N/A"}
                   />
-                  <Field label="Học vị" value={userData.degree} />
-                  <Field label="Chức vụ" value={userData.position} />
+                  <Field label="Học hàm học vị" value={userData.degree || "Chưa có dữ liệu"} />
+                  <Field label="Vị trí công tác" value={userData.position || "Chưa có dữ liệu"} />
                 </div>
               </div>
             </div>
