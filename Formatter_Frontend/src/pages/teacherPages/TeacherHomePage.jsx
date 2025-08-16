@@ -33,11 +33,11 @@ const TeacherHomePage = () => {
 
   return (
     <div className="pt-6">
-      <div className="flex justify-end">
+      {/* <div className="flex justify-end">
         <div className="w-1/3 flex mr-3">
           <Button label="Tìm kiếm đề cương..." handleClick={handleSearch}></Button>
         </div>
-      </div>
+      </div> */}
       <ContentHomepage
         year={2025}
         refreshTrigger={refreshCounter}

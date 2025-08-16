@@ -80,7 +80,7 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
       alert("Bản ghi đã được duyệt trước đó, không thể duyệt lại");
       return;
     }
-    if (formRecord.topic.students!=null && formRecord.topic.students.every((student)=>student.userId!==formRecord.student.userId)){
+    if (formRecord.topic.students!=null && formRecord.topic.students.length>0 && formRecord.topic.students.every((student)=>student.userId!==formRecord.student.userId)){
       alert("Đề tài này đã có sinh viên khác thực hiện! Không thể duyệt!");
       return;
     }
@@ -149,7 +149,7 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
             </button>
             {formRecord.status != "ACCEPTED" && (
               <button
-                className="p-2 mx-1 rounded-md text-white bg-lightBlue tx-lg gap-1 hover:bg-darkBlue"
+                className="p-2 mx-1 rounded-md text-white bg-red-400 tx-lg gap-1 hover:bg-red-500"
                 onClick={handleDeleteRecord}
               >
                 Xoá

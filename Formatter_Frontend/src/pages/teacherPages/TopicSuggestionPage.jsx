@@ -540,7 +540,7 @@ const TopicSuggestionPage = ({
           ></AddingMajorField>
           <AddingStudentField
             className="flex items-start relative text-start font-textFont text-lg m-8 px-10"
-            title="12. SINH VIÊN THỰC HIỆN (nếu có)"
+            title="12. SINH VIÊN THỰC HIỆN (nếu có, tự động công khai)"
             studentsList={studentsList}
             setStudentsList={setStudentsList}
             formErrors={formErrors}
@@ -563,7 +563,7 @@ const TopicSuggestionPage = ({
               className="bg-darkBlue text-white px-6 py-2 rounded-full"
               onClick={(e) => handleSubmit(e)}
             >
-              Submit
+              Lưu
             </button>
           </div>
         </form>

@@ -328,7 +328,7 @@ const Composer = ({
               onChange={(e) => setTitle(e.target.value)}
             />
             <textarea
-              placeholder="Nội dung email..."
+              placeholder="Nội dung thông báo..."
               className="w-full p-2 rounded h-32 resize-none text-sm focus:outline-none focus:border-none"
               value={message}
               onChange={(e) => setMessage(e.target.value)}

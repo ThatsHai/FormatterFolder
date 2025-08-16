@@ -176,7 +176,7 @@ const SignUp = () => {
         const user = await fetchInfo();
 
         dispatch(loginSuccess({ user, accessToken }));
-        alert(JSON.stringify(user));
+        // alert(JSON.stringify(user));
 
         setFormInfo(Object.fromEntries(fields.map((f) => [f.label, ""])));
         setResetSignal((prev) => prev + 1);

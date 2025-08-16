@@ -190,7 +190,7 @@ public class NotificationService {
             }
         }
         if (teachers.isEmpty()) {
-            throw new RuntimeException("Không có giáo viên ưứng với mã khoa truyền vào");
+            throw new RuntimeException("Không có giáo viên ứng với mã khoa truyền vào");
         }
         request.setRecipientIds(teachers.stream().map(Teacher::getUserId).collect(Collectors.toList()));
         return createUserNotification(request);

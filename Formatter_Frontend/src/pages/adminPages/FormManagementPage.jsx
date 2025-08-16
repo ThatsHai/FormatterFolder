@@ -7,10 +7,10 @@ const FormManagementPage = () => {
   return (
     <div className="">
       <div className="flex justify-end">
-        <div className="w-1/3 flex mr-3">
-          <Button label="Tìm kiếm..." handleClick={() => {}}></Button>
+        <div className="w-1/6 flex mr-3">
+          {/* <Button label="Tìm kiếm..." handleClick={() => {}}></Button> */}
           <Button
-            label="Thêm đề cương"
+            label="Thêm biểu mẫu"
             handleClick={() => navigate("/admin/forms/create")}
           ></Button>
         </div>

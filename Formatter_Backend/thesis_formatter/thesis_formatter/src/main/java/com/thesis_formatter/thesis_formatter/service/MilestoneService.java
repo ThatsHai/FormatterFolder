@@ -7,9 +7,7 @@ import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.MilestoneResponse;
 import com.thesis_formatter.thesis_formatter.entity.Milestone;
 import com.thesis_formatter.thesis_formatter.entity.Progress;
-import com.thesis_formatter.thesis_formatter.entity.Task;
 import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
-import com.thesis_formatter.thesis_formatter.enums.MilestoneTemplate;
 import com.thesis_formatter.thesis_formatter.exception.AppException;
 import com.thesis_formatter.thesis_formatter.mapper.MilestoneMapper;
 import com.thesis_formatter.thesis_formatter.repo.MilestoneRepo;
@@ -109,34 +107,6 @@ public class MilestoneService {
                 .build();
     }
 
-    public List<Milestone> generateDefaultMilestones(Progress progress, List<String> resultTasks) {
-        List<Milestone> milestones = new ArrayList<>();
-
-        for (MilestoneTemplate template : MilestoneTemplate.values()) {
-            List<Task> tasks = new ArrayList<>();
-
-            if (template == MilestoneTemplate.RESULT && resultTasks != null) {
-                for (String taskName : resultTasks) {
-                    Task task = Task.builder()
-                            .name(taskName)
-                            .completed(false)
-                            .build();
-                    tasks.add(task);
-                }
-            }
-
-            Milestone milestone = Milestone.builder()
-                    .name(template.getName())
-                    .completed(false)
-                    .progress(progress)
-                    .tasks(tasks)
-                    .build();
-
-            milestones.add(milestone);
-        }
-
-        return milestones;
-    }
 
     public APIResponse<Void> setDueDate(SetDueDateOfMileStoneRequest request) {
         Milestone milestone = milestoneRepo.findById(request.getMilestoneId()).orElseThrow(() -> new AppException(ErrorCode.MILESTONE_NOT_FOUND));

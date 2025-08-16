@@ -72,7 +72,6 @@ const TopicInfoButtons = ({ topic, onUpdated = () => {} }) => {
     setShowConfirmPopup(false);
   };
 
-
   const handlePublishTopic = () => {
     // if (topic.status === "PUBLISHED") {
     //   alert("Đề tài đã được công khai trước đó");
@@ -83,7 +82,7 @@ const TopicInfoButtons = ({ topic, onUpdated = () => {} }) => {
     setSuccessPopupText("Đã công khai đề tài!");
     setConfirmAction("publish");
   };
-   const handleUnPublishTopic = () => {
+  const handleUnPublishTopic = () => {
     // if (topic.status === "UNPUBLISHED") {
     //   alert("Đề tài đã được công khai trước đó");
     //   return;
@@ -120,15 +119,15 @@ const TopicInfoButtons = ({ topic, onUpdated = () => {} }) => {
         >
           Chỉnh sửa
         </button>
-        {topic.status != "PUBLISHED" &&(
+        {topic.status != "PUBLISHED" && (
           <button
-          className="p-2 mx-1 rounded-md text-white bg-red-400 tx-lg gap-1 hover:bg-red-500"
-          onClick={handleDeleteTopic}
-        >
-          Xoá
-        </button>
+            className="p-2 mx-1 rounded-md text-white bg-red-400 tx-lg gap-1 hover:bg-red-500"
+            onClick={handleDeleteTopic}
+          >
+            Xoá
+          </button>
         )}
-        
+
         {topic.status === "UNPUBLISHED" ? (
           <button
             className="p-2 mx-1 rounded-md text-white bg-green-500 tx-lg gap-1 hover:bg-green-600"
@@ -137,12 +136,14 @@ const TopicInfoButtons = ({ topic, onUpdated = () => {} }) => {
             Công khai
           </button>
         ) : (
-          <button
-            className="p-2 mx-1 rounded-md text-white bg-lightBlue tx-lg gap-1 hover:bg-darkBlue"
-            onClick={handleUnPublishTopic}
-          >
-            Huỷ công khai
-          </button>
+          topic.students.length === 0 && (
+            <button
+              className="p-2 mx-1 rounded-md text-white bg-lightBlue tx-lg gap-1 hover:bg-darkBlue"
+              onClick={handleUnPublishTopic}
+            >
+              Huỷ công khai
+            </button>
+          )
         )}
         {openTopicForm && (
           <TopicSuggestionPage
@@ -163,7 +164,7 @@ const TopicInfoButtons = ({ topic, onUpdated = () => {} }) => {
               publishTopic();
             } else if (confirmAction === "delete") {
               deleteTopic();
-            }else if (confirmAction === "unpublish") {
+            } else if (confirmAction === "unpublish") {
               unPublishTopic();
             }
           }}

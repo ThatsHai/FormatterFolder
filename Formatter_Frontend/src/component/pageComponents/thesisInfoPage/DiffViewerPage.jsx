@@ -6,12 +6,16 @@ import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { current } from "@reduxjs/toolkit";
+import ConfirmationPopup from "../../ConfirmationPopup";
+import SuccessPopup from "../../SuccessPopup";
 
 const DiffViewerPage = () => {
   const { formRecordId } = useParams();
   const [versions, setVersions] = useState([]);
   const [selectedVersion, setSelectedVersion] = useState(null);
   const [diffs, setDiffs] = useState([]);
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false);
+  const [displaySuccessPopup, setDisplaySuccessPopup] = useState(false);
 
   useEffect(() => {
     api.get(`/formRecords/${formRecordId}/versions`).then((res) => {
@@ -34,29 +38,37 @@ const DiffViewerPage = () => {
         });
     }
   }, [formRecordId, selectedVersion]);
- const handleRestore = (versionToRestore) => {
-  api
-    .post(`/formRecords/${formRecordId}/restore/${versionToRestore}`)
-    .then(() => {
-      // Refetch version list
-      return api.get(`/formRecords/${formRecordId}/versions`);
-    })
-    .then((res) => {
-      const newVersions = res.data.result;
-      setVersions(newVersions);
 
-      const latestVersion = newVersions[0].version;
-      setSelectedVersion(latestVersion);
+  const submitData = async() => {
+    await api
+      .post(`/formRecords/${formRecordId}/restore/${selectedVersion}`)
+      .then(() => {
+        // Refetch version list
+        return api.get(`/formRecords/${formRecordId}/versions`);
+      })
+      .then((res) => {
+        const newVersions = res.data.result;
+        setVersions(newVersions);
 
-      // Optional: thông báo cho người dùng
-      alert("Khôi phục thành công!");
-    })
-    .catch((err) => {
-      console.error(err);
-      alert("Khôi phục thất bại!");
-    });
-};
+        const latestVersion = newVersions[0].version;
+        setSelectedVersion(latestVersion);
+        setDisplaySuccessPopup(true);
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("Khôi phục thất bại!");
+      });
 
+  }
+  const onSuccessPopupClosed = () => {
+    setShowConfirmPopup(false);
+    setDisplaySuccessPopup(false);
+  };
+
+  const handleRestore = (versionToRestore) => {
+    setSelectedVersion(versionToRestore);
+    setShowConfirmPopup(true);
+  };
 
   return (
     <div className=" relative p-6 pt-5">
@@ -80,6 +92,28 @@ const DiffViewerPage = () => {
             Khôi phục phiên bản này
           </button>
         </div>
+      )}
+      {showConfirmPopup && (
+        <ConfirmationPopup
+          isOpen={true}
+          text={
+          "Bạn chắc chắn muốn khôi phục phiên bản này?"
+          }
+          onConfirm={() => {
+            setShowConfirmPopup(false);
+            submitData();
+          }}
+          onDecline={() => {
+            setShowConfirmPopup(false);
+          }}
+        ></ConfirmationPopup>
+      )}
+      {displaySuccessPopup && (
+        <SuccessPopup
+          isOpen={true}
+          successPopupText={"Khôi phục thành công!"}
+          onClose={onSuccessPopupClosed}
+        />
       )}
     </div>
   );
