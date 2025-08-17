@@ -12,6 +12,7 @@ public class PDFDesignUtils {
 
     public static class CellData {
         public List<HtmlToStyledTextParser.StyledText> styledTexts;
+        public String rawText;
         public int colSpan;
         public int rowSpan;
         public int topPos;
@@ -26,6 +27,36 @@ public class PDFDesignUtils {
         public String description;
         public List<CellData> cells;
     }
+
+    //Chuẩn hóa thẻ HTML <ul>
+    private static String normalizeListHtml(String html) {
+        if (html == null) return "";
+
+        String trimmed = html.trim();
+
+        // Nếu đã có <li>, chỉ cần đảm bảo có <ul> bao ngoài
+        if (trimmed.contains("</li>")) {
+            if (!trimmed.startsWith("<ul>") && !trimmed.contains("<ul>")) {
+                trimmed = "<ul>" + trimmed;
+            }
+            if (!trimmed.endsWith("</ul>") && !trimmed.contains("</ul>")) {
+                trimmed = trimmed + "</ul>";
+            }
+            return trimmed;
+        }
+
+        // Nếu chưa có <li>, tách theo xuống dòng và wrap
+        String[] lines = trimmed.split("\\r?\\n");
+        StringBuilder sb = new StringBuilder("<ul>");
+        for (String line : lines) {
+            if (!line.trim().isEmpty()) {
+                sb.append("<li>").append(line.trim()).append("</li>");
+            }
+        }
+        sb.append("</ul>");
+        return sb.toString();
+    }
+
 
     public static void generatePdfFromDesign(DesignData design, String fileName, String outputPath) throws IOException, DocumentException {
         Document document = new Document();
@@ -100,9 +131,18 @@ public class PDFDesignUtils {
                         case "DATE":
                             phrase = new Phrase("__/__/____", unicodeFont);
                             break;
+
                         case "BULLETS":
-                            phrase = new Phrase("• First item\n• Second item", unicodeFont);
+                            List<HtmlToStyledTextParser.StyledText> parsed = HtmlToStyledTextParser.parseHtml(region.rawText);
+                            if (!parsed.isEmpty() && parsed.get(0).text != null) {
+                                parsed.get(0).text = parsed.get(0).text.replaceFirst("^[\\n\\r]+", "");
+                            }
+                            phrase = buildFormattedPhrase(
+                                    parsed,
+                                    unicodeFont, unicodeFontBold, unicodeFontItalic
+                            );
                             break;
+
                         case "TABLE":
                             phrase = new Phrase("[ Embedded table ]", unicodeFontItalic); // Placeholder for now
                             break;
@@ -112,7 +152,7 @@ public class PDFDesignUtils {
                             break;
                     }
 
-
+                    //Tuỳ chỉnh định dạng và padding cell
                     PdfPCell cell = new PdfPCell(phrase);
                     cell.setColspan(span);
                     cell.setBorder(Rectangle.NO_BORDER);
@@ -126,7 +166,11 @@ public class PDFDesignUtils {
                     if (row == er) cell.enableBorderSide(Rectangle.BOTTOM);
                     if (col == sc) cell.enableBorderSide(Rectangle.LEFT);
                     if (col + span - 1 == ec) cell.enableBorderSide(Rectangle.RIGHT);
-
+                    if (region.fieldType.equals("BULLETS")) {
+                        cell.setPaddingLeft(15f);
+                    } else {
+                        cell.setPaddingLeft(5f);
+                    }
                     cell.setPaddingBottom(5f);
                     table.addCell(cell);
                     col += span;
@@ -160,6 +204,7 @@ public class PDFDesignUtils {
         document.close();
     }
 
+    //Xử lý in đậm và nghiêng
     private static Phrase buildFormattedPhrase(List<HtmlToStyledTextParser.StyledText> styledTexts,
                                                Font normalFont, Font boldFont, Font italicFont) {
         Phrase phrase = new Phrase();

@@ -721,6 +721,7 @@ public class FormRecordService {
             PDFDesignUtils.CellData c = new PDFDesignUtils.CellData();
             c.fromDrag = cell.isFromDrag();
             c.fromDataSource = cell.isFromDataSource();
+            c.fieldType = cell.getFieldType();
 
             String finalText = "";
 
@@ -743,7 +744,8 @@ public class FormRecordService {
             } else {
                 finalText = cell.getText();
             }
-
+            
+            c.rawText = finalText;
             c.styledTexts = HtmlToStyledTextParser.parseHtml(finalText);
             c.colSpan = cell.getColSpan();
             c.rowSpan = cell.getRowSpan();

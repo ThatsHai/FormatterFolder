@@ -50,19 +50,30 @@ public class HtmlToStyledTextParser {
             boolean italic = isItalic || child.nodeName().equalsIgnoreCase("em") || child.nodeName().equalsIgnoreCase("i");
 
             switch (child.nodeName().toLowerCase()) {
-                case "ul":
-                    traverse(child, bold, italic, result, ListType.UL, 0);
-                    break;
                 case "ol":
-                    traverse(child, bold, italic, result, ListType.OL, 0);
+                    int olIndex = 0;
+                    for (Node olChild : child.childNodes()) {
+                        if (olChild.nodeName().equalsIgnoreCase("li")) {
+                            String prefix = (olIndex + 1) + ". ";
+                            result.add(new StyledText("\n" + prefix, false, false));
+                            traverse(olChild, bold, italic, result, ListType.OL, olIndex + 1);
+                            olIndex++;
+                        } else {
+                            traverse(olChild, bold, italic, result, ListType.OL, olIndex);
+                        }
+                    }
                     break;
-                case "li":
-                    String prefix = currentListType == ListType.UL ? "• " :
-                            currentListType == ListType.OL ? (itemIndex + 1) + ". " : "";
-                    result.add(new StyledText("\n" + prefix, false, false));
-                    traverse(child, bold, italic, result, currentListType,
-                            currentListType == ListType.OL ? itemIndex + 1 : itemIndex);
+                case "ul":
+                    for (Node ulChild : child.childNodes()) {
+                        if (ulChild.nodeName().equalsIgnoreCase("li")) {
+                            result.add(new StyledText("\n• ", false, false));
+                            traverse(ulChild, bold, italic, result, ListType.UL, 0);
+                        } else {
+                            traverse(ulChild, bold, italic, result, ListType.UL, 0);
+                        }
+                    }
                     break;
+
                 default:
                     traverse(child, bold, italic, result, currentListType, itemIndex);
             }
