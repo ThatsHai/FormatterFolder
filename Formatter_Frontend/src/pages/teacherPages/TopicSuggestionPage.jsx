@@ -362,9 +362,11 @@ const TopicSuggestionPage = ({
             handleChange={handleChange}
           ></ShortAnswer>
           <LongAnswer
-            label="3. NỘI DUNG NGHIÊN CỨU"
+            order="3"
+            title="NỘI DUNG NGHIÊN CỨU"
+            name="researchContent"
             value={formData.researchContent}
-            onChange={(val) => onUpdateFormData("researchContent", val)}
+            handleChange={handleChange}
             maxChars={500}
             error={formErrors.researchContent}
           />

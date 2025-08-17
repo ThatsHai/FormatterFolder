@@ -8,4 +8,5 @@ public enum FieldType {
     TABLE,
     BULLETS,
     DATE,
+    QUILL_DATA,
 }

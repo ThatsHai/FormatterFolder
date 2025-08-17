@@ -43,6 +43,35 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
     };
     fetchRecord();
   }, [formRecordId, refreshCounter]);
+  const applyTailwindToTable = (html) => {
+    // Thêm &nbsp; để giữ chiều cao ô trống
+    const filledHTML = html.replace(/<td>\s*<\/td>/g, "<td>&nbsp;</td>");
+
+    return (
+      filledHTML
+        // style cho <table>
+        .replace(
+          /<table(?![^>]*class=)/g,
+          '<table class="table-fixed border border-gray-300 border-collapse w-full text-sm text-left"'
+        )
+        // style cho <thead>
+        .replace(
+          /<thead(?![^>]*class=)/g,
+          '<thead class="bg-gray-100 border-b border-gray-300"'
+        )
+        // style cho <th>
+        .replace(
+          /<th(?![^>]*class=)/g,
+          '<th class="border border-gray-300 px-2 py-2 text-center font-semibold"'
+        )
+        // style cho <td>
+        .replace(
+          /<td(?![^>]*class=)/g,
+          '<td class="border border-gray-300 px-2 py-2 align-top"'
+        )
+    );
+  };
+
   if (!formData) return <div>Đang tải...</div>;
 
   return (
@@ -217,22 +246,34 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
                 </div>
               </div>
             )}
-            {/* Form Record Fields */}
-            <h2 className="text-3xl font-headerFont text-darkBlue font-bold text-center mb-6">
+            <h1 className="text-4xl font-headerFont text-darkBlue font-bold text-center mb-6">
               Thông tin đã điền
-            </h2>
+            </h1>
             {formRecord.formRecordFields
               .sort((a, b) => a.formField.position - b.formField.position)
               .map((field, index) => (
-                <div
-                  className="flex items-center font-textFont text-lg mb-8 px-10"
-                  key={index}
-                >
-                  <h3 className="w-1/3 text-black font-semibold">
+                <div className="font-textFont text-lg mb-8 px-10" key={index}>
+                  <h3 className="text-black font-semibold mb-3">
                     {index + 1}. {field.formField.fieldName}
                   </h3>
 
-                  <p className="w-2/3 rounded-md px-6 py-1">{field.value}</p>
+                  {field.formField.fieldType === "QUILL_DATA" ? (
+                    <div
+                      className="rounded-md px-3 py-2 overflow-x-auto border"
+                      dangerouslySetInnerHTML={{ __html: field.value }}
+                    />
+                  ) : field.formField.fieldType === "TABLE" ? (
+                    <div
+                      className="overflow-x-auto mt-2"
+                      dangerouslySetInnerHTML={{
+                        __html: applyTailwindToTable(field.value),
+                      }}
+                    />
+                  ) : (
+                    <p className="rounded-md border px-6 py-1">
+                      {field.value}
+                    </p>
+                  )}
                 </div>
               ))}
           </div>
