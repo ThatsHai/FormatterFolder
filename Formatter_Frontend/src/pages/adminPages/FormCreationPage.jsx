@@ -81,14 +81,15 @@ const FormCreationPage = () => {
   };
 
   //Display confirmation popup
-  const handleSaveForm = () => {
+  const handleValidateForm = () => {
     if (form.title.trim() === "") {
       setEmptyTitleError(true);
     } else {
       setEmptyTitleError(false);
     }
+    //Check fields with empty question. Tables can have empty question
     const emptyFields = form.formFields.filter(
-      (form) => form.fieldName.trim() === ""
+      (f) => f.fieldType !== "TABLE" && f.fieldName.trim() === ""
     );
 
     setEmptyFields(emptyFields);
@@ -97,21 +98,33 @@ const FormCreationPage = () => {
     }
   };
 
+  //When click ok, then send data
   const handleSendFormData = async () => {
     try {
-      const cleanedFields = form.formFields.map((field) => ({
-        ...field,
-        fieldName: field.fieldName.trim(),
-        fieldType: field.fieldType.trim(),
-        description: field.description.trim(),
-      }));
-
       const dataToSend = {
         title: form.title.trim(),
         description: form.description.trim(),
-        formFields: cleanedFields,
         readersList: form.readersList,
+        formFields: form.formFields.map((field) => {
+          let fieldName = field.fieldName?.trim() || "";
+  
+          if (field.fieldType === "TABLE") {
+            // Split once, keep everything after the first ::: intact
+            const parts = (field.fieldName || "").split(":::");
+            const questionName = (parts[0] || "").trim();
+            const html = parts.slice(1).join(":::"); // safely rejoin
+            fieldName = `${questionName}:::${field.tableHtml || html}`;
+          }
+  
+          return {
+            ...field,
+            fieldName,
+            fieldType: field.fieldType?.trim() || "",
+            description: field.description?.trim() || "",
+          };
+        }),
       };
+  
       const result = await api.post("/forms/create", dataToSend);
       console.log(result);
       setDisplaySuccessPopup(true);
@@ -123,6 +136,7 @@ const FormCreationPage = () => {
       }
     }
   };
+  
 
   const onSuccessPopupClosed = () => {
     setDisplayConfirmationPopup(false);
@@ -218,7 +232,7 @@ const FormCreationPage = () => {
           <div className="w-full flex justify-end font-textFont">
             <button
               className="bg-darkGray text-white font-semibold shadow-md py-2 px-4  rounded-md"
-              onClick={() => handleSaveForm()}
+              onClick={() => handleValidateForm()}
             >
               Lưu
             </button>

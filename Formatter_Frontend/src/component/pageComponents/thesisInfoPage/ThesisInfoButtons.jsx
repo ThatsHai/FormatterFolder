@@ -7,8 +7,9 @@ import ConfirmationPopup from "../../ConfirmationPopup";
 import api from "../../../services/api";
 import SuccessPopup from "../../SuccessPopup";
 import { useNavigate } from "react-router-dom";
+import useBootstrapUser from "../../../hook/useBootstrapUser";
+
 const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
-  const user = useSelector((state) => state.auth.user);
 
   const [showDesignWindow, setShowDesignWindow] = useState(false);
   const [openThesisForm, setIsThesisFormOpen] = useState(false);
@@ -119,6 +120,14 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
       onUpdated();
     }
   };
+
+  const { loading } = useBootstrapUser(); // hydrates redux on mount
+    const user = useSelector((state) => state.auth.user);
+    const role = user?.role; // safe access
+    
+    if (loading) return null;
+    if (!role) return null;
+    if (!user.userId) return null;
 
   if (!formRecord) return <div>Đang tải</div>;
   console.log("record truyền vào:", formRecord);

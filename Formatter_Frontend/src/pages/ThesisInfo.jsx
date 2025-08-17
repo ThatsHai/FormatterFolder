@@ -254,7 +254,40 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
               .map((field, index) => (
                 <div className="font-textFont text-lg mb-8 px-10" key={index}>
                   <h3 className="text-black font-semibold mb-3">
-                    {index + 1}. {field.formField.fieldName}
+                    {index + 1}. {field.formField?.fieldType === "TABLE"
+                      ? (() => {
+                          const [q, raw = ""] = (
+                            field.formField?.fieldName || ""
+                          ).split(":::");
+                          const question = (q || "").trim();
+                          if (question) return question;
+
+                          // Extract headers from HTML <th>
+                          const headers = [];
+                          const thRegex = /<th\b[^>]*>(.*?)<\/th>/gi;
+                          let m;
+                          while ((m = thRegex.exec(raw)) !== null) {
+                            headers.push(m[1].replace(/<[^>]+>/g, "").trim());
+                          }
+
+                          return (
+                            <table className="inline-table border border-gray-400 border-collapse text-sm max-w-xs">
+                              <thead>
+                                <tr>
+                                  {headers.map((header, idx) => (
+                                    <th
+                                      key={idx}
+                                      className="border border-gray-400 px-2 py-1 font-semibold"
+                                    >
+                                      {header}
+                                    </th>
+                                  ))}
+                                </tr>
+                              </thead>
+                            </table>
+                          );
+                        })()
+                      : field.formField?.fieldName}
                   </h3>
 
                   {field.formField.fieldType === "QUILL_DATA" ? (
@@ -270,9 +303,7 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
                       }}
                     />
                   ) : (
-                    <p className="rounded-md border px-6 py-1">
-                      {field.value}
-                    </p>
+                    <p className="rounded-md border px-6 py-1">{field.value}</p>
                   )}
                 </div>
               ))}

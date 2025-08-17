@@ -598,7 +598,6 @@ const AdminNotificationPage = () => {
   const { loading } = useBootstrapUser(); // hydrates redux on mount
   const user = useSelector((state) => state.auth.user);
   const role = user?.role; // safe access
-  console.log(user);
   if (loading) return null;
   if (!role) return null;
   if (!user.userId) return null;

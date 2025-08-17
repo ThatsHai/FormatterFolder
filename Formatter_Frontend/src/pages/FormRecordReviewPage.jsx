@@ -6,6 +6,8 @@ import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
 import { useEffect } from "react";
 import api from "../services/api";
+import useBootstrapUser from "../hook/useBootstrapUser";
+import { useSelector } from "react-redux";
 
 const FormRecordReviewPage = ({ onDecline = () => {} }) => {
   // const currentYear = new Date().getFullYear();
@@ -42,6 +44,14 @@ const FormRecordReviewPage = ({ onDecline = () => {} }) => {
     };
     fetchRecord();
   }, [formRecordId, refreshCounter]);
+  const { loading } = useBootstrapUser(); // hydrates redux on mount
+  const user = useSelector((state) => state.auth.user);
+  const role = user?.role; // safe access
+
+  if (loading) return null;
+  if (!role) return null;
+  if (!user.userId) return null;
+
   if (!formData) return <div>Đang tải...</div>;
 
   return (
@@ -228,15 +238,13 @@ const FormRecordReviewPage = ({ onDecline = () => {} }) => {
                   key={index}
                 >
                   <h3 className="w-1/3 text-black font-semibold">
-                    {index + 1}. {field.formField.fieldName}
+                    {index + 1}. {JSON.stringify(field.formField.fieldName)}
                   </h3>
 
                   <p className="w-2/3 rounded-md px-6 py-1">{field.value}</p>
                 </div>
               ))}
           </div>
-        </div>
-        <div>
         </div>
       </div>
     </div>

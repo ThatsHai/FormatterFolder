@@ -28,36 +28,6 @@ public class PDFDesignUtils {
         public List<CellData> cells;
     }
 
-    //Chuẩn hóa thẻ HTML <ul>
-    private static String normalizeListHtml(String html) {
-        if (html == null) return "";
-
-        String trimmed = html.trim();
-
-        // Nếu đã có <li>, chỉ cần đảm bảo có <ul> bao ngoài
-        if (trimmed.contains("</li>")) {
-            if (!trimmed.startsWith("<ul>") && !trimmed.contains("<ul>")) {
-                trimmed = "<ul>" + trimmed;
-            }
-            if (!trimmed.endsWith("</ul>") && !trimmed.contains("</ul>")) {
-                trimmed = trimmed + "</ul>";
-            }
-            return trimmed;
-        }
-
-        // Nếu chưa có <li>, tách theo xuống dòng và wrap
-        String[] lines = trimmed.split("\\r?\\n");
-        StringBuilder sb = new StringBuilder("<ul>");
-        for (String line : lines) {
-            if (!line.trim().isEmpty()) {
-                sb.append("<li>").append(line.trim()).append("</li>");
-            }
-        }
-        sb.append("</ul>");
-        return sb.toString();
-    }
-
-
     public static void generatePdfFromDesign(DesignData design, String fileName, String outputPath) throws IOException, DocumentException {
         Document document = new Document();
         PdfWriter.getInstance(document, new FileOutputStream(outputPath + fileName));

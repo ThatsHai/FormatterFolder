@@ -86,8 +86,44 @@ const FormInfoPage = () => {
                     ({ formFieldId, fieldName, description, fieldType }) => (
                       <tr key={formFieldId} className="hover:bg-gray-50">
                         <td className="border border-gray-300 px-4 py-2">
-                          {fieldName}
+                          {fieldType === "TABLE"
+                            ? (() => {
+                                const [q, raw = ""] = (fieldName || "").split(
+                                  ":::"
+                                );
+                                const question = (q || "").trim();
+                                if (question) return question;
+
+                                // Extract headers from HTML <th>
+                                const headers = [];
+                                const thRegex = /<th\b[^>]*>(.*?)<\/th>/gi;
+                                let m;
+                                while ((m = thRegex.exec(raw)) !== null) {
+                                  headers.push(
+                                    m[1].replace(/<[^>]+>/g, "").trim()
+                                  );
+                                }
+
+                                return (
+                                  <table className="inline-table border border-gray-400 border-collapse text-sm max-w-xs">
+                                    <thead>
+                                      <tr>
+                                        {headers.map((header, idx) => (
+                                          <th
+                                            key={idx}
+                                            className="border border-gray-400 px-2 py-1 font-semibold"
+                                          >
+                                            {header}
+                                          </th>
+                                        ))}
+                                      </tr>
+                                    </thead>
+                                  </table>
+                                );
+                              })()
+                            : fieldName}
                         </td>
+
                         <td className="border border-gray-300 px-4 py-2">
                           {description || (
                             <span className="italic text-gray-400">
@@ -139,4 +175,3 @@ const FormInfoPage = () => {
 };
 
 export default FormInfoPage;
-

@@ -425,6 +425,15 @@ const GridBoard = ({
               const data = e.dataTransfer.getData("text/plain");
               if (!data) return;
               const droppedField = JSON.parse(data);
+              //Đảm bảo bảng phải dài hết cột
+              if (
+                droppedField.fieldType == "TABLE" &&
+                region.top !== 0 &&
+                region.width !== col
+              ) {
+                alert("Dữ liệu bảng chỉ có thể chiếm hết chiều dài bảng");
+                return;
+              }
 
               setMergeRegions((prev) => {
                 const copy = [...prev];
@@ -432,7 +441,7 @@ const GridBoard = ({
                   ...copy[index],
                   text: "Dữ liệu từ ${{" + droppedField.fieldName + "}}",
                   fromDrag: true,
-                  fieldType: droppedField.fieldType || "TEXT", 
+                  fieldType: droppedField.fieldType || "TEXT",
                 };
                 return copy;
               });
