@@ -17,6 +17,8 @@ public class FormRecordField {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String formRecordFieldId;
+
+    @Column(columnDefinition = "TEXT")
     String value;
 
     @ManyToOne

@@ -5,6 +5,9 @@ import SelectField from "../../SelectField.jsx";
 import ShortAnswer from "./ShortAnswer.jsx";
 import FieldInfo from "./../../FieldInfo.jsx";
 import DateField from "./../../DateField.jsx";
+import LongAnswer from "./../../LongAnswer.jsx";
+import QuillData from "../../QuillData.jsx";
+import DynamicTable from "../../../DynamicTable.jsx";
 
 const FormField = ({ type = "text", ...rest }) => {
   const renderFieldByType = () => {
@@ -19,6 +22,12 @@ const FormField = ({ type = "text", ...rest }) => {
         return <FieldInfo {...rest} />;
       case "date":
         return <DateField type="date" {...rest} />;
+      case "LONG_ANSWER":
+        return <LongAnswer {...rest} />;
+      case "QUILL_DATA":
+        return <QuillData {...rest} />;
+      case "TABLE":
+        return <DynamicTable {...rest} />;
       default:
         return <ShortAnswer {...rest} />;
     }

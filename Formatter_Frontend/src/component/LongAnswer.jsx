@@ -1,52 +1,58 @@
 import PropTypes from "prop-types";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 const LongAnswer = ({
-  label,
+  title,
+  order,
+  name,
   value,
-  onChange,
-  maxChars = 500,
+  handleChange,
+  maxWords = 500,
   maxHeight = "300px",
   placeholder = "Nhập nội dung...",
   className = "",
   error = "",
 }) => {
-  const [inputValue, setInputValue] = useState(value || "");
   const textareaRef = useRef(null);
 
   useEffect(() => {
-    setInputValue(value || "");
+    autoResize();
   }, [value]);
 
-  useEffect(() => {
-    autoResize();
-  }, [inputValue]);
+  const countWords = (text) =>
+    text.trim().split(/\s+/).filter((word) => word.length > 0).length;
 
-  const handleChange = (e) => {
+  const onInputChange = (e) => {
     const newValue = e.target.value;
-    if (newValue.length <= maxChars) {
-      setInputValue(newValue);
-      onChange && onChange(newValue);
+    const wordCount = countWords(newValue);
+    if (maxWords === 0 || wordCount <= maxWords) {
+      handleChange(e);
     }
   };
 
   const autoResize = () => {
     const textarea = textareaRef.current;
     if (textarea) {
-      textarea.style.height = "auto"; // reset to auto to shrink if needed
-      const newHeight = Math.min(textarea.scrollHeight, parseInt(maxHeight)) + "px";
+      textarea.style.height = "auto";
+      const newHeight =
+        Math.min(textarea.scrollHeight, parseInt(maxHeight)) + "px";
       textarea.style.height = newHeight;
     }
   };
 
   return (
     <div className={`flex flex-col text-lg font-textFont my-4 m-8 px-10 ${className}`}>
-      {label && <label className="mb-1 font-semibold">{label}</label>}
+      {title && (
+        <label className="mb-1 font-semibold">
+          {order}. {title}
+        </label>
+      )}
       <textarea
         ref={textareaRef}
         className="p-3 mt-2 text-lg border border-darkBlue rounded overflow-auto focus:outline-none focus:ring-2 focus:ring-blue-500"
-        value={inputValue}
-        onChange={handleChange}
+        value={value}
+        name={name}
+        onChange={onInputChange}
         placeholder={placeholder}
         style={{
           minHeight: "120px",
@@ -56,7 +62,7 @@ const LongAnswer = ({
         }}
       />
       <div className="text-sm text-right text-gray-500 mt-1">
-        {inputValue.length}/{maxChars} ký tự
+        {maxWords > 0 ? `${countWords(value)}/${maxWords} từ` : "Không giới hạn từ"}
       </div>
       {error && <p className="text-redError pt-2">{error}</p>}
     </div>
@@ -64,10 +70,12 @@ const LongAnswer = ({
 };
 
 LongAnswer.propTypes = {
-  label: PropTypes.string,
+  title: PropTypes.string,
+  order: PropTypes.number,
+  name: PropTypes.string.isRequired,
   value: PropTypes.string,
-  onChange: PropTypes.func.isRequired,
-  maxChars: PropTypes.number,
+  handleChange: PropTypes.func.isRequired,
+  maxWords: PropTypes.number,
   maxHeight: PropTypes.string,
   placeholder: PropTypes.string,
   className: PropTypes.string,

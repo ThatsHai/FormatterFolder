@@ -232,7 +232,17 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
                     {index + 1}. {field.formField.fieldName}
                   </h3>
 
-                  <p className="w-2/3 rounded-md px-6 py-1">{field.value}</p>
+                  <div className="w-2/3 rounded-md px-1 py-1">
+                    {field.formField.fieldType === "QUILL_DATA" ? (
+                      <div
+                        className="col-span-2 bg-[#e4e4e4] min-h-[40px] text-lg rounded-md px-3 py-1 prose prose-sm max-w-none
+                    prose-ul:list-disc prose-ol:list-decimal prose-li:ml-1 text-black  prose-li:marker:text-black"
+                        dangerouslySetInnerHTML={{ __html: field.value }}
+                      />
+                    ) : (
+                      <p className="col-span-2 rounded-md bg-[#e4e4e4] px-6 py-1 ">{field.value}</p>
+                    )}
+                  </div>
                 </div>
               ))}
           </div>

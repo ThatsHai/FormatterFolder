@@ -8,7 +8,7 @@ import SelectField from "../SelectField";
 import TopicDetail from "./SubmitThesisFormComponents/TopicDetail";
 import AddingTeacherField from "../../pages/teacherPages/AddingTeacherField";
 import FormField from "./SubmitThesisFormComponents/FormField";
-import ConfirmationPopup from "../ConfirmationPopup";
+import ConfirmationPopup from "../ConfirmationPopup"; 
 import SuccessPopup from "../SuccessPopup";
 
 const SubmitThesisForm = ({
@@ -375,10 +375,12 @@ const SubmitThesisForm = ({
                   .map((field) => (
                     <FormField
                       key={field.formFieldId}
-                      type={field.filedType || ""}
+                      type={field.fieldType || ""}
                       name={field.fieldName}
                       title={field.fieldName}
                       order={field.position + 1}
+                      maxWords={field.length}
+                      html={field.fieldName}
                       value={
                         formData.formRecordFields.find(
                           (f) => f.formFieldId === field.formFieldId
