@@ -15,6 +15,7 @@ public class FormRecordFieldDiff {
     String fieldName;
     String oldValue;
     String newValue;
+    String fieldType;
     int position;
     LocalDateTime modifiedAt;
 }
