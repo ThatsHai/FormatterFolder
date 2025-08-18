@@ -100,14 +100,14 @@ const DesignMainContent = ({ formData, fetchFormInfo }) => {
   };
 
   const handleSendFormData = async () => {
-    // console.log(designInfo);
-    // return;
     try {
       if (Object.keys(formData).length === 0) {
         await fetchFormInfo();
       }
-
-      console.log(formData);
+      
+      // console.log(designInfo);
+      // return;
+      // console.log(formData);
 
       const latestDesignInfo = { ...designInfo, form: formData };
       const result = await api.post("/designs", latestDesignInfo);

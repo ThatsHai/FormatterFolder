@@ -225,42 +225,42 @@ const Fields = ({ formData }) => {
                 }}
               >
                 <div className="flex">
-                  <p>
-                    {formField?.fieldType === "TABLE"
-                      ? (() => {
-                          const [q, raw = ""] = (
-                            formField?.fieldName || ""
-                          ).split(":::");
-                          const question = (q || "").trim();
-                          if (question) return question;
+                  <p>{formField.fieldType === "TABLE"
+                            ? (() => {
+                                const [q, raw = ""] = (formField.fieldName || "").split(
+                                  ":::"
+                                );
+                                const question = (q || "").trim();
+                                if (question) return question;
 
-                          // Extract headers from HTML <th>
-                          const headers = [];
-                          const thRegex = /<th\b[^>]*>(.*?)<\/th>/gi;
-                          let m;
-                          while ((m = thRegex.exec(raw)) !== null) {
-                            headers.push(m[1].replace(/<[^>]+>/g, "").trim());
-                          }
+                                // Extract headers from HTML <th>
+                                const headers = [];
+                                const thRegex = /<th\b[^>]*>(.*?)<\/th>/gi;
+                                let m;
+                                while ((m = thRegex.exec(raw)) !== null) {
+                                  headers.push(
+                                    m[1].replace(/<[^>]+>/g, "").trim()
+                                  );
+                                }
 
-                          return (
-                            <table className="inline-table border border-gray-400 border-collapse text-sm max-w-xs">
-                              <thead>
-                                <tr>
-                                  {headers.map((header, idx) => (
-                                    <th
-                                      key={idx}
-                                      className="border border-gray-400 px-2 py-1 font-semibold"
-                                    >
-                                      {header}
-                                    </th>
-                                  ))}
-                                </tr>
-                              </thead>
-                            </table>
-                          );
-                        })()
-                      : formField?.fieldName}
-                  </p>
+                                return (
+                                  <table className="inline-table border border-gray-400 border-collapse text-sm max-w-xs">
+                                    <thead>
+                                      <tr>
+                                        {headers.map((header, idx) => (
+                                          <th
+                                            key={idx}
+                                            className="border border-gray-400 px-2 py-1 font-semibold"
+                                          >
+                                            {header}
+                                          </th>
+                                        ))}
+                                      </tr>
+                                    </thead>
+                                  </table>
+                                );
+                              })()
+                            : formField.fieldName}</p>
                 </div>
                 <p className="text-sm text-gray">
                   {formField.description || "Không có mô tả"}

@@ -35,8 +35,8 @@ public class HtmlToStyledTextParser {
         return result;
     }
 
-    private static void traverse(Node node, boolean isBold, boolean isItalic, List<StyledText> result,
-                                 ListType currentListType, int itemIndex) {
+    private static void traverse(Node node, boolean isBold, boolean isItalic,
+                                 List<StyledText> result, ListType currentListType, int itemIndex) {
 
         if (node instanceof TextNode) {
             String text = ((TextNode) node).text();
@@ -79,4 +79,57 @@ public class HtmlToStyledTextParser {
             }
         }
     }
+
+    // ✅ StyledTable is nested here
+    public static class StyledTable {
+        public List<List<List<StyledText>>> rows = new ArrayList<>();
+        // rows -> row -> cell -> styled text parts
+    }
+
+    // ✅ Table parsing reuses traverse()
+    public static StyledTable parseHtmlTable(String html) {
+        Element body = Jsoup.parse(html).body();
+        Element table = body.selectFirst("table");
+        if (table == null) return null;
+
+        StyledTable styledTable = new StyledTable();
+
+        for (Element row : table.select("tr")) {
+            List<List<StyledText>> styledRow = new ArrayList<>();
+            for (Element cell : row.select("th, td")) {
+                List<StyledText> cellTexts = new ArrayList<>();
+                traverse(cell, false, false, cellTexts, ListType.NONE, 0);
+                styledRow.add(cellTexts);
+            }
+            styledTable.rows.add(styledRow);
+        }
+
+        return styledTable;
+    }
+
+    public static void printStyledTable(StyledTable styledTable) {
+        if (styledTable == null) {
+            System.out.println("❌ No table found.");
+            return;
+        }
+
+        int rowIndex = 0;
+        for (List<List<StyledText>> row : styledTable.rows) {
+            System.out.println("Row " + rowIndex + ":");
+            int colIndex = 0;
+            for (List<StyledText> cell : row) {
+                System.out.print("  Cell " + colIndex + ": ");
+                for (StyledText st : cell) {
+                    String flags = "";
+                    if (st.bold) flags += "[B]";
+                    if (st.italic) flags += "[I]";
+                    System.out.print(flags + st.text + " ");
+                }
+                System.out.println();
+                colIndex++;
+            }
+            rowIndex++;
+        }
+    }
+
 }

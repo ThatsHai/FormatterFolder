@@ -114,8 +114,48 @@ public class PDFDesignUtils {
                             break;
 
                         case "TABLE":
-                            phrase = new Phrase("[ Embedded table ]", unicodeFontItalic); // Placeholder for now
+                            HtmlToStyledTextParser.StyledTable styledTable = HtmlToStyledTextParser.parseHtmlTable(region.rawText);
+
+                            if (styledTable != null) {
+                                // 🔹 Build an inner PdfPTable from StyledTable
+                                PdfPTable innerTable = new PdfPTable(styledTable.rows.get(0).size());
+                                innerTable.setWidthPercentage(100);
+
+                                for (List<List<HtmlToStyledTextParser.StyledText>> rowCells : styledTable.rows) {
+                                    for (List<HtmlToStyledTextParser.StyledText> cellTexts : rowCells) {
+                                        Phrase cellPhrase = buildFormattedPhrase(cellTexts, unicodeFont, unicodeFontBold, unicodeFontItalic);
+                                        PdfPCell innerCell = new PdfPCell(cellPhrase);
+                                        innerCell.setPadding(5f);
+                                        innerCell.setBorder(Rectangle.BOX);
+                                        innerTable.addCell(innerCell);
+                                    }
+                                }
+
+                                // 🔹 Outer cell that holds the entire table
+                                PdfPCell outerCell = new PdfPCell(innerTable);
+                                outerCell.setColspan(span);
+                                outerCell.setBorder(Rectangle.NO_BORDER);
+
+                                int sr = region.topPos;
+                                int er = sr + region.rowSpan - 1;
+                                int sc = region.leftPos;
+                                int ec = sc + region.colSpan - 1;
+
+                                if (row == sr) outerCell.enableBorderSide(Rectangle.TOP);
+                                if (row == er) outerCell.enableBorderSide(Rectangle.BOTTOM);
+                                if (col == sc) outerCell.enableBorderSide(Rectangle.LEFT);
+                                if (col + span - 1 == ec) outerCell.enableBorderSide(Rectangle.RIGHT);
+
+                                outerCell.setPaddingBottom(0f);
+
+                                table.addCell(outerCell);
+                                col += span;
+                                continue; // 🔴 Skip default phrase logic
+                            } else {
+                                phrase = new Phrase("Bảng trống", unicodeFontItalic);
+                            }
                             break;
+
                         case "TEXT":
                         default:
                             phrase = buildFormattedPhrase(region.styledTexts, unicodeFont, unicodeFontBold, unicodeFontItalic);
