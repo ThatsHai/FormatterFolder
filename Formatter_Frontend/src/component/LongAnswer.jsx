@@ -12,6 +12,7 @@ const LongAnswer = ({
   placeholder = "Nhập nội dung...",
   className = "",
   error = "",
+  spellErrorWords = [],
 }) => {
   const textareaRef = useRef(null);
 
@@ -20,13 +21,20 @@ const LongAnswer = ({
   }, [value]);
 
   const countWords = (text) =>
-    text.trim().split(/\s+/).filter((word) => word.length > 0).length;
+    text
+      .trim()
+      .split(/\s+/)
+      .filter((word) => word.length > 0).length;
 
   const onInputChange = (e) => {
     const newValue = e.target.value;
     const wordCount = countWords(newValue);
+
     if (maxWords === 0 || wordCount <= maxWords) {
-      handleChange(e);
+      handleChange(e); // chỉ cập nhật nếu chưa vượt max
+    } else {
+      // Nếu đã vượt maxWords thì không cho nhập thêm
+      e.target.value = e.target.value.split(/\s+/).slice(0, maxWords).join(" ");
     }
   };
 
@@ -41,7 +49,9 @@ const LongAnswer = ({
   };
 
   return (
-    <div className={`flex flex-col text-lg font-textFont my-4 m-8 px-10 ${className}`}>
+    <div
+      className={`flex flex-col text-lg font-textFont my-4 m-8 px-10 ${className}`}
+    >
       {title && (
         <label className="mb-1 font-semibold">
           {order}. {title}
@@ -62,8 +72,26 @@ const LongAnswer = ({
         }}
       />
       <div className="text-sm text-right text-gray-500 mt-1">
-        {maxWords > 0 ? `${countWords(value)}/${maxWords} từ` : "Không giới hạn từ"}
+        {maxWords > 0
+          ? `${countWords(value)}/${maxWords} từ`
+          : "Không giới hạn từ"}
       </div>
+      {Object.keys(spellErrorWords).length > 0 && (
+        <div className="mt-2 text-sm text-red-600">
+          <p>Từ có thể sai:</p>
+          <ul className="list-disc list-inside">
+            {Object.entries(spellErrorWords).map(([word, suggestions], idx) => (
+              <li key={idx}>
+                <span className="font-semibold">{word}</span>
+                {suggestions && suggestions.length > 0 && (
+                  <> — gợi ý sửa: {suggestions.join(", ")}</>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {error && <p className="text-redError pt-2">{error}</p>}
     </div>
   );
@@ -80,6 +108,7 @@ LongAnswer.propTypes = {
   placeholder: PropTypes.string,
   className: PropTypes.string,
   error: PropTypes.string,
+  spellErrorWords: PropTypes.object, // { word: ["suggestion1", "suggestion2"] }
 };
 
 export default LongAnswer;

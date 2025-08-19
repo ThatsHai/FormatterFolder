@@ -17,13 +17,20 @@ const QuillData = ({
   const quillRef = useRef(null);
 
   const countWords = (text) => {
-    const plainText = text.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    const plainText = text
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
     return plainText.length > 0 ? plainText.split(" ").length : 0;
   };
 
   const onQuillChange = (content) => {
     const wordCount = countWords(content);
-    if (maxWords === 0 || wordCount <= maxWords) {
+    if (maxWords && wordCount > maxWords) {
+      // content = content.slice(0, -2); // Cắt bớt ký tự cuối + space nếu vượt quá giới hạn
+      alert(`Số từ hiện tại: ${wordCount}, nhiều nhất: ${maxWords}`);
+      return;
+    } else {
       // Tạo synthetic event giống như input
       const syntheticEvent = {
         target: {
@@ -38,7 +45,9 @@ const QuillData = ({
   const currentWordCount = countWords(value);
 
   return (
-    <div className={`flex flex-col text-lg font-textFont my-4 m-8 px-10 ${className}`}>
+    <div
+      className={`flex flex-col text-lg font-textFont my-4 m-8 px-10 ${className}`}
+    >
       {title && (
         <label className="mb-1 font-semibold">
           {order}. {title}
@@ -65,7 +74,9 @@ const QuillData = ({
       />
 
       <div className="text-sm text-right text-gray-500 mt-1">
-        {maxWords > 0 ? `${currentWordCount}/${maxWords} từ` : "Không giới hạn từ"}
+        {maxWords > 0
+          ? `${currentWordCount}/${maxWords} từ`
+          : "Không giới hạn từ"}
       </div>
 
       {error && <p className="text-redError pt-2">{error}</p>}

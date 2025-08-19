@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import DisabledField from "./SubmitThesisFormComponents/DisabledField";
 import api from "../../services/api";
@@ -8,8 +8,10 @@ import SelectField from "../SelectField";
 import TopicDetail from "./SubmitThesisFormComponents/TopicDetail";
 import AddingTeacherField from "../../pages/teacherPages/AddingTeacherField";
 import FormField from "./SubmitThesisFormComponents/FormField";
-import ConfirmationPopup from "../ConfirmationPopup"; 
+import ConfirmationPopup from "../ConfirmationPopup";
 import SuccessPopup from "../SuccessPopup";
+import { debounce } from "lodash";
+import axios from "axios";
 
 const SubmitThesisForm = ({
   handleFormToggle = () => {},
@@ -37,6 +39,7 @@ const SubmitThesisForm = ({
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [displaySuccessPopup, setDisplaySuccessPopup] = useState(false);
   const [successPopupText, setSuccessPopupText] = useState("");
+  const [spellErrors, setSpellErrors] = useState({});
 
   // Handle form field changes
   const handleChange = (e) => {
@@ -208,6 +211,55 @@ const SubmitThesisForm = ({
       setSelectedTopic(topic || null);
     }
   };
+
+  const checkSpelling = async (formFieldId, text) => {
+    try {
+      const response = await fetch("http://localhost:8000/spellcheck", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+      const data = await response.json();
+      // Chuyển đổi thành dạng: { word: ["suggestion1", "suggestion2"] }
+      const misspelledWordsWithSuggestions = {};
+      if (data.misspelled) {
+        Object.keys(data.misspelled).forEach((word) => {
+          misspelledWordsWithSuggestions[word.toLowerCase()] =
+            data.misspelled[word]; // giữ nguyên mảng gợi ý
+        });
+      }
+
+      setSpellErrors((prev) => ({
+        ...prev,
+        [formFieldId]: misspelledWordsWithSuggestions,
+      }));
+      console.log("Spell check results:", misspelledWords);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // const handleFormFieldChange = (formFieldId, value) => {
+  //   setFormData((prev) => {
+  //     const existingIndex = prev.formRecordFields.findIndex(
+  //       (f) => f.formFieldId === formFieldId
+  //     );
+
+  //     let updatedFields;
+  //     if (existingIndex !== -1) {
+  //       updatedFields = [...prev.formRecordFields];
+  //       updatedFields[existingIndex].value = value;
+  //     } else {
+  //       updatedFields = [...prev.formRecordFields, { formFieldId, value }];
+  //     }
+
+  //     return {
+  //       ...prev,
+  //       formRecordFields: updatedFields,
+  //     };
+  //   });
+  // };
+
   const handleFormFieldChange = (formFieldId, value) => {
     setFormData((prev) => {
       const existingIndex = prev.formRecordFields.findIndex(
@@ -228,16 +280,6 @@ const SubmitThesisForm = ({
       };
     });
   };
-
-  // Generate years
-  const yearOptions = [
-    currentYear - 4,
-    currentYear - 3,
-    currentYear - 2,
-    currentYear - 1,
-    currentYear,
-    currentYear + 1,
-  ];
 
   return (
     <div className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-black bg-opacity-50 p-6">
@@ -373,23 +415,43 @@ const SubmitThesisForm = ({
                   ?.slice() // create a copy
                   .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
                   .map((field) => (
-                    <FormField
-                      key={field.formFieldId}
-                      type={field.fieldType || ""}
-                      name={field.fieldName}
-                      title={field.fieldName}
-                      order={field.position + 1}
-                      maxWords={field.length}
-                      html={field.fieldName}
-                      value={
-                        formData.formRecordFields.find(
-                          (f) => f.formFieldId === field.formFieldId
-                        )?.value || ""
-                      }
-                      handleChange={(e) =>
-                        handleFormFieldChange(field.formFieldId, e.target.value)
-                      }
-                    />
+                    <>
+                      <FormField
+                        key={field.formFieldId}
+                        type={field.fieldType || ""}
+                        name={field.fieldName}
+                        title={field.fieldName}
+                        order={field.position + 1}
+                        maxWords={field.length}
+                        html={field.fieldName}
+                        spellErrorWords={spellErrors[field.formFieldId] || []}
+                        value={
+                          formData.formRecordFields.find(
+                            (f) => f.formFieldId === field.formFieldId
+                          )?.value || ""
+                        }
+                        handleChange={(e) =>
+                          handleFormFieldChange(
+                            field.formFieldId,
+                            e.target.value
+                          )
+                        }
+                      />
+                      {field.fieldType != "TABLE" && (<button
+                        type="button"
+                        className="mx-8 my-0 px-10 text-sm text-blue-600 "
+                        onClick={() =>
+                          checkSpelling(
+                            field.formFieldId,
+                            formData.formRecordFields.find(
+                              (f) => f.formFieldId === field.formFieldId
+                            )?.value || ""
+                          )
+                        }
+                      >
+                        Kiểm tra chính tả 
+                      </button>)}
+                    </>
                   ))}
               <div className="mt-6 flex justify-between">
                 <button
