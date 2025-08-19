@@ -282,6 +282,40 @@ public class FormRecordService {
                 .build();
     }
 
+    public APIResponse<PaginationResponse<FormRecordResponse>> searchAcceptedByStudentId(String studentId, String page, String numberOfRecords) {
+        Student student = studentRepo.findByUserId(studentId);
+        if (student == null) {
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
+        }
+        Pageable pageable = PageRequest.of(Integer.parseInt(page), Integer.parseInt((numberOfRecords)));
+        Page<FormRecord> formRecords = formRecordRepo.findAllByStudent_UserIdAndStatusIs(studentId, pageable, FormStatus.ACCEPTED);
+        if (formRecords.getTotalElements() == 0) {
+            PaginationResponse<FormRecordResponse> emptyResponse = new PaginationResponse<>();
+            emptyResponse.setContent(Collections.emptyList());
+            emptyResponse.setTotalElements(0L);
+            emptyResponse.setTotalPages(0);
+            emptyResponse.setCurrentPage(Integer.parseInt(page));
+
+            return APIResponse.<PaginationResponse<FormRecordResponse>>builder()
+                    .code("200")
+                    .message("Chưa có đề tài được duyệt")
+                    .result(emptyResponse)
+                    .build();
+
+        }
+        List<FormRecordResponse> dtoList = formRecordMapper.toResponses(formRecords.getContent());
+
+        PaginationResponse<FormRecordResponse> paginationResponse = new PaginationResponse<>();
+        paginationResponse.setContent(dtoList);
+        paginationResponse.setTotalElements(formRecords.getTotalElements());
+        paginationResponse.setTotalPages(formRecords.getTotalPages());
+        paginationResponse.setCurrentPage(formRecords.getNumber());
+        return APIResponse.<PaginationResponse<FormRecordResponse>>builder()
+                .code("200")
+                .result(paginationResponse)
+                .build();
+    }
+
     public APIResponse<PaginationResponse<FormRecordResponse>> searchByTeacherIdAndStatus(String teacherId, String status, String page, String numberOfRecords) {
         Teacher teacher = teacherRepo.findByAcId(teacherId);
         if (teacher == null) {

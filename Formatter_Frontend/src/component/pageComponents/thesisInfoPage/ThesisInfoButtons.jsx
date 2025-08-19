@@ -42,9 +42,14 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
   };
 
   const approveRecord = async () => {
-    await api.put(`/formRecords/${formRecord.formRecordId}/approve`);
+    try {
+      await api.put(`/formRecords/${formRecord.formRecordId}/approve`);
+      setShowSuccessPopup(true);
+    } catch (error) {
+      alert("Duyệt thất bại: " + error.response.data.message);
+    }
 
-    setShowSuccessPopup(true);
+   
     setShowConfirmPopup(false);
   };
 
@@ -80,7 +85,13 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
       alert("Bản ghi đã được duyệt trước đó, không thể duyệt lại");
       return;
     }
-    if (formRecord.topic.students!=null && formRecord.topic.students.length>0 && formRecord.topic.students.every((student)=>student.userId!==formRecord.student.userId)){
+    if (
+      formRecord.topic.students != null &&
+      formRecord.topic.students.length > 0 &&
+      formRecord.topic.students.every(
+        (student) => student.userId !== formRecord.student.userId
+      )
+    ) {
       alert("Đề tài này đã có sinh viên khác thực hiện! Không thể duyệt!");
       return;
     }
@@ -165,7 +176,8 @@ const ThesisInfoButtons = ({ formRecord, onUpdated = () => {} }) => {
             )}
           </>
         ) : (
-          (formRecord.status === "WAITING" || formRecord.status === "DENIED") && (
+          (formRecord.status === "WAITING" ||
+            formRecord.status === "DENIED") && (
             <>
               <button
                 className="p-2 mx-1 rounded-md text-white bg-green-500 tx-lg gap-1 hover:bg-green-600"

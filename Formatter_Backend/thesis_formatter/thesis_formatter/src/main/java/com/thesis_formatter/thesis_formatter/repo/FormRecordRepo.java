@@ -19,6 +19,7 @@ import java.util.Optional;
 @Repository
 public interface FormRecordRepo extends JpaRepository<FormRecord, String> {
     Page<FormRecord> findAllByStudent_UserIdAndStatusIsNot(String userId, Pageable pageable, FormStatus status);
+    Page<FormRecord> findAllByStudent_UserIdAndStatusIs(String userId, Pageable pageable, FormStatus status);
 
     @Query("SELECT fr from FormRecord fr join fr.topic t join t.teachers teacher where teacher.acId = :userId and fr.status = :status")
     Page<FormRecord> findByTeacherAndStatus(@Param("userId") String userId, @Param("status") FormStatus status, Pageable pageable);

@@ -76,22 +76,7 @@ const LongAnswer = ({
           ? `${countWords(value)}/${maxWords} từ`
           : "Không giới hạn từ"}
       </div>
-      {Object.keys(spellErrorWords).length > 0 && (
-        <div className="mt-2 text-sm text-red-600">
-          <p>Từ có thể sai:</p>
-          <ul className="list-disc list-inside">
-            {Object.entries(spellErrorWords).map(([word, suggestions], idx) => (
-              <li key={idx}>
-                <span className="font-semibold">{word}</span>
-                {suggestions && suggestions.length > 0 && (
-                  <> — gợi ý sửa: {suggestions.join(", ")}</>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
+      
       {error && <p className="text-redError pt-2">{error}</p>}
     </div>
   );

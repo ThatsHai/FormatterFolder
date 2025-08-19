@@ -68,6 +68,15 @@ public interface TopicRepo extends JpaRepository<Topic, String> {
                                                    @Param("year") String year,
                                                    Pageable pageable);
 
+    @Query("SELECT t FROM Topic t JOIN t.teachers teacher " +
+            "WHERE teacher.acId = :acId " +
+            "AND t.semester = :semester " +
+            "AND t.year = :year AND t.status = com.thesis_formatter.thesis_formatter.enums.TopicStatus.PUBLISHED")
+    Page<Topic> findPublicTopicsByAcIdAndSemesterAndYear(@Param("acId") String acId,
+                                                         @Param("semester") Semester semester,
+                                                         @Param("year") String year,
+                                                         Pageable pageable);
+
     // A: Paginated topic lookup by acId and year only
     @Query("SELECT t FROM Topic t JOIN t.teachers teacher " +
             "WHERE teacher.acId = :acId " +
@@ -75,6 +84,13 @@ public interface TopicRepo extends JpaRepository<Topic, String> {
     Page<Topic> findTopicsByAcIdAndYear(@Param("acId") String acId,
                                         @Param("year") String year,
                                         Pageable pageable);
+
+    @Query("SELECT t FROM Topic t JOIN t.teachers teacher " +
+            "WHERE teacher.acId = :acId " +
+            "AND t.year = :year and t.status = com.thesis_formatter.thesis_formatter.enums.TopicStatus.PUBLISHED")
+    Page<Topic> findPublishedTopicsByAcIdAndYear(@Param("acId") String acId,
+                                                 @Param("year") String year,
+                                                 Pageable pageable);
 
     // B: List of published topics by teacher entity, semester, and year
     @Query("SELECT t FROM Topic t JOIN t.teachers teacher " +
@@ -85,4 +101,6 @@ public interface TopicRepo extends JpaRepository<Topic, String> {
     List<Topic> findPublishedTopicsByTeacherAndSemesterAndYear(@Param("teacher") Teacher teacher,
                                                                @Param("semester") Semester semester,
                                                                @Param("year") String year);
+
+//    Page<Topic> findPublishedTopicsByAcIdAndSemesterAndYear(String acId, Semester semester, String year);
 }

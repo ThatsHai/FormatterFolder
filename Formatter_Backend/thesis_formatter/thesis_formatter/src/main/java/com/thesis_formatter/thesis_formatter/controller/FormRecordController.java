@@ -78,6 +78,11 @@ public class FormRecordController {
         return formRecordService.searchByStudentId(studentId, page, numberOfRecords);
     }
 
+    @GetMapping("/formRecords/accepted/student")
+    public APIResponse<PaginationResponse<FormRecordResponse>> searchAcceptedFormRecordForStudent(@RequestParam String studentId, @RequestParam("p") String page, @RequestParam("n") String numberOfRecords) {
+        return formRecordService.searchAcceptedByStudentId(studentId, page, numberOfRecords);
+    }
+
     @GetMapping("/formRecords/teacher")
     public APIResponse<PaginationResponse<FormRecordResponse>> searchFormRecordForTeacher(@RequestParam String teacherId, @RequestParam("p") String page, @RequestParam("n") String numberOfRecords) {
         return formRecordService.searchByTeacherId(teacherId, page, numberOfRecords);

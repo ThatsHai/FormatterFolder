@@ -573,11 +573,23 @@ public class TopicService {
 
         if ("Cả năm".equals(semester)) {
             // Query all topics by year
-            topicPage = topicRepo.findTopicsByAcIdAndYear(acId, year, pageable);
+            topicPage = topicRepo.findPublishedTopicsByAcIdAndYear(acId, year, pageable);
         } else {
             // Convert string to enum safely
             Semester semesterEnum = Semester.valueOf(semester); // "HK1", "HK2", "HK3"
-            topicPage = topicRepo.findTopicsByAcIdAndSemesterAndYear(acId, semesterEnum, year, pageable);
+            topicPage = topicRepo.findPublicTopicsByAcIdAndSemesterAndYear(acId, semesterEnum, year, pageable);
+        }
+        if (topicPage.getTotalPages() == 0) {
+            paginationResponse.setCurrentPage(Integer.parseInt(p));
+            paginationResponse.setTotalPages(0);
+            paginationResponse.setTotalElements(0L);
+            paginationResponse.setContent(Collections.emptyList());
+
+            return APIResponse.<PaginationResponse<TopicResponse>>builder()
+                    .code("200")
+                    .message("Không có đề tài nào được công bố trong học kỳ này")
+                    .result(paginationResponse)
+                    .build();
         }
 
         List<TopicResponse> topicResponses = topicPage.getContent()

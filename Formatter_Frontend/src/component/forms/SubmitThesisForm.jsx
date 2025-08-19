@@ -40,6 +40,7 @@ const SubmitThesisForm = ({
   const [displaySuccessPopup, setDisplaySuccessPopup] = useState(false);
   const [successPopupText, setSuccessPopupText] = useState("");
   const [spellErrors, setSpellErrors] = useState({});
+  const [activeSpellCheckField, setActiveSpellCheckField] = useState(null);
 
   // Handle form field changes
   const handleChange = (e) => {
@@ -214,18 +215,14 @@ const SubmitThesisForm = ({
 
   const checkSpelling = async (formFieldId, text) => {
     try {
-      const response = await fetch("http://localhost:8000/spellcheck", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
-      });
-      const data = await response.json();
-      // Chuyển đổi thành dạng: { word: ["suggestion1", "suggestion2"] }
+      const response = await api.post("/client/spellcheck", { text });
+
+      const data = response.data;
+
       const misspelledWordsWithSuggestions = {};
-      if (data.misspelled) {
-        Object.keys(data.misspelled).forEach((word) => {
-          misspelledWordsWithSuggestions[word.toLowerCase()] =
-            data.misspelled[word]; // giữ nguyên mảng gợi ý
+      if (data.result) {
+        Object.entries(data.result).forEach(([word, suggestions]) => {
+          misspelledWordsWithSuggestions[word.toLowerCase()] = suggestions;
         });
       }
 
@@ -233,9 +230,12 @@ const SubmitThesisForm = ({
         ...prev,
         [formFieldId]: misspelledWordsWithSuggestions,
       }));
-      console.log("Spell check results:", misspelledWords);
+
+      setActiveSpellCheckField(formFieldId);
+
+      console.log("Spell check results:", misspelledWordsWithSuggestions);
     } catch (err) {
-      console.error(err);
+      console.error("Spell check failed:", err);
     }
   };
 
@@ -412,47 +412,74 @@ const SubmitThesisForm = ({
               </h1>
               {selectedForm?.formFields?.length > 0 &&
                 selectedForm.formFields
-                  ?.slice() // create a copy
+                  ?.slice()
                   .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
-                  .map((field) => (
-                    <>
-                      <FormField
-                        key={field.formFieldId}
-                        type={field.fieldType || ""}
-                        name={field.fieldName}
-                        title={field.fieldName}
-                        order={field.position + 1}
-                        maxWords={field.length}
-                        html={field.fieldName}
-                        spellErrorWords={spellErrors[field.formFieldId] || []}
-                        value={
-                          formData.formRecordFields.find(
-                            (f) => f.formFieldId === field.formFieldId
-                          )?.value || ""
-                        }
-                        handleChange={(e) =>
-                          handleFormFieldChange(
-                            field.formFieldId,
-                            e.target.value
-                          )
-                        }
-                      />
-                      {field.fieldType != "TABLE" && (<button
-                        type="button"
-                        className="mx-8 my-0 px-10 text-sm text-blue-600 "
-                        onClick={() =>
-                          checkSpelling(
-                            field.formFieldId,
-                            formData.formRecordFields.find(
-                              (f) => f.formFieldId === field.formFieldId
-                            )?.value || ""
-                          )
-                        }
-                      >
-                        Kiểm tra chính tả 
-                      </button>)}
-                    </>
-                  ))}
+                  .map((field) => {
+                    const fieldValue =
+                      formData.formRecordFields.find(
+                        (f) => f.formFieldId === field.formFieldId
+                      )?.value || "";
+
+                    const fieldErrors = spellErrors[field.formFieldId] || {};
+
+                    return (
+                      <div key={field.formFieldId} className="mb-6">
+                        <FormField
+                          type={field.fieldType || ""}
+                          name={field.fieldName}
+                          title={field.fieldName}
+                          order={field.position + 1}
+                          maxWords={field.length}
+                          value={fieldValue}
+                          handleChange={(e) =>
+                            handleFormFieldChange(
+                              field.formFieldId,
+                              e.target.value
+                            )
+                          }
+                        />
+
+                        {field.fieldType !== "TABLE" && (
+                          <button
+                            type="button"
+                            className="mx-8 my-0 px-10 text-sm text-blue-600"
+                            onClick={() =>
+                              checkSpelling(field.formFieldId, fieldValue)
+                            }
+                          >
+                            Kiểm tra chính tả
+                          </button>
+                        )}
+
+                        {/* Hiển thị lỗi sai dưới field */}
+                        {activeSpellCheckField === field.formFieldId &&
+                          (Object.keys(fieldErrors).length > 0 ? (
+                            <div className="m-8 px-10 mt-2 text-sm text-red-600">
+                              <p>Từ có thể sai:</p>
+                              <ul className="list-disc list-inside">
+                                {Object.entries(fieldErrors).map(
+                                  ([word, suggestions]) => (
+                                    <li key={word}>
+                                      <span className="font-semibold">
+                                        {word}
+                                      </span>
+                                      {suggestions.length > 0 && (
+                                        <span> → {suggestions.join(", ")}</span>
+                                      )}
+                                    </li>
+                                  )
+                                )}
+                              </ul>
+                            </div>
+                          ) : (
+                            <div className="m-8 px-10 mt-2 text-sm text-green-600">
+                              <p> Không phát hiện lỗi sai.</p>
+                            </div>
+                          ))}
+                      </div>
+                    );
+                  })}
+
               <div className="mt-6 flex justify-between">
                 <button
                   type="button"

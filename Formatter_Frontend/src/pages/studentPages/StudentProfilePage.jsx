@@ -17,7 +17,7 @@ const StudentProfile = ({ userData }) => {
   const handleSearch = async () => {
     try {
       const response = await api.get(
-        `/formRecords/student?studentId=${userData.userId}&p=${currentPage}&n=5`
+        `/formRecords/accepted/student?studentId=${userData.userId}&p=${currentPage}&n=5`
       );
       setRecordsList(response.data.result.content);
       setTotalPages(response.data.result.totalPages);
