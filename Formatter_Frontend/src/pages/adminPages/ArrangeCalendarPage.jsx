@@ -143,42 +143,93 @@ const EachTeacherTopics = ({ teacher }) => {
     return { valid: true };
   };
 
-  const handleSave = async (formRecordId) => {
-    const edit = edits[formRecordId];
-    if (!edit) return;
-    if (
-      edit.councilTeachers?.some(
-        (id, i) => id.trim() !== "" && !edit.councilTeachersData?.[i]
-      )
-    ) {
-      alert("Có giáo viên không tồn tại. Vui lòng kiểm tra lại ID.");
-      return;
+  const getMergedRecord = (formRecordId) => {
+    const original = teacher.formRecordSchedules.find(
+      (value) => formRecordId === value.formRecordId
+    );
+
+    console.log("Original defense record:", original);
+
+    const edit = edits[formRecordId] || {};
+    console.log("Local edit:", edit);
+
+    // Extract from original.startTime (ISO or LocalDateTime string)
+    let originalDate = "";
+    let originalTime = "";
+
+    if (original?.defenseSchedule?.startTime) {
+      const dt = new Date(original.defenseSchedule.startTime);
+      const pad = (n) => String(n).padStart(2, "0");
+      originalDate = `${pad(dt.getDate())}/${pad(
+        dt.getMonth() + 1
+      )}/${dt.getFullYear()}`;
+      originalTime = `${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
     }
 
-    const { valid, reason } = validateEdits(edit);
+    const defense = {
+      date: originalDate,
+      time: originalTime,
+      room: original?.defenseSchedule?.place || "",
+      councilTeachers: original?.defenseSchedule?.teacherIds || [],
+      councilTeachersData: original?.defenseSchedule?.teacherNames || [],
+    };
+
+    // Merge: edits override defense
+    // If edit already has date/time, prefer that
+    const merged = {
+      ...defense,
+      ...edit,
+      date: edit.date || defense.date,
+      time: edit.time || defense.time,
+    };
+
+    console.log("Merged result:", merged);
+
+    return merged;
+  };
+
+  const handleSave = async (formRecordId) => {
+    // Get merged record (original defense + edits override)
+    const merged = getMergedRecord(formRecordId);
+    if (!merged) return;
+
+    const { valid, reason } = validateEdits(merged); // pass merged, not just edit
     if (!valid) {
       alert(reason);
       return;
     }
 
-    const [day, month, year] = edit.date.split("/");
-    const isoString = new Date(
-      `${year}-${month}-${day}T${edit.time}:00`
-    ).toISOString();
+    // Convert dd/mm/yyyy + hh:mm to local Date, then to UTC ISO string
+    const [day, month, year] = merged.date.split("/").map(Number);
+    const [hours, minutes] = merged.time.split(":").map(Number);
+
+    // Pad numbers to 2 digits
+    const pad = (n) => n.toString().padStart(2, "0");
+
+    const isoLocalString = `${year}-${pad(month)}-${pad(day)}T${pad(
+      hours
+    )}:${pad(minutes)}:00`;
+
+    console.log("Local ISO string to send:", isoLocalString);
 
     const payload = [
       {
-        // stt: (index + 1).toString().padStart(2, "0"),
         formRecordId,
-        teacherIds: edit.councilTeachers?.filter((t) => t.trim() !== "") || [],
-        startTime: isoString,
-        place: edit.room || "",
+        teacherIds: merged.councilTeachers.filter((t) => t.trim() !== ""),
+        startTime: isoLocalString, // send as string, not Date
+        place: merged.room,
       },
     ];
 
     console.log("Payload to send:", payload);
-    const response = await api.post("/defenseSchedules", payload);
-    console.log(response);
+
+    try {
+      await api.post("/defenseSchedules", payload);
+      alert("Lưu thành công")
+    } catch (e) {
+      console.error(e);
+      alert("Lưu thất bại")
+    }
   };
 
   return (
@@ -222,14 +273,17 @@ const EachTeacherTopics = ({ teacher }) => {
               <tbody>
                 {teacher.formRecordSchedules.map((record, index) => {
                   const recordId = record.formRecordId;
-                  const defense = record.defenseSchedule || {};
+                  const defense = {
+                    time: record.defenseSchedule?.startTime,
+                    room: record.defenseSchedule?.place,
+                    councilTeachers: [
+                      ...(record.defenseSchedule?.teacherNames || []),
+                      "",
+                      "",
+                      "",
+                    ].slice(0, 3),
+                  };
                   const localEdit = edits[recordId] || {};
-
-                  const showInputCouncil =
-                    !defense.councilTeachers ||
-                    defense.councilTeachers.length === 0;
-                  const showInputTime = !defense.time;
-                  const showInputRoom = !defense.room;
 
                   return (
                     <tr key={index}>
@@ -238,87 +292,74 @@ const EachTeacherTopics = ({ teacher }) => {
 
                       {/* Cán bộ hội đồng */}
                       <td className="border p-2">
-                        {showInputCouncil ? (
-                          <CouncilTeachersInput
-                            value={localEdit.councilTeachers || ["", "", ""]}
-                            onChange={(updated) =>
-                              handleCouncilTeachersChange(recordId, updated)
-                            }
-                            onTeacherDataChange={(data) =>
-                              handleCouncilTeachersDataChange(recordId, data)
-                            }
-                          />
-                        ) : (
-                          <ul className="list-disc pl-4">
-                            {defense.councilTeachers?.map((teacher, idx) => (
-                              <li key={idx}>{teacher.teacherNames}</li>
-                            ))}
-                          </ul>
-                        )}
+                        <CouncilTeachersInput
+                          value={
+                            localEdit.councilTeachers ||
+                            defense.councilTeachers || ["", "", ""]
+                          }
+                          onChange={(updated) =>
+                            handleCouncilTeachersChange(recordId, updated)
+                          }
+                          onTeacherDataChange={(data) =>
+                            handleCouncilTeachersDataChange(recordId, data)
+                          }
+                        />
                       </td>
 
-                      {/* Thời gian */}
+                      {/* Thời gian (always input, prefilled) */}
                       <td className="border p-2">
-                        {showInputTime ? (
-                          <div className="flex gap-1">
-                            {/* Date input */}
-                            <InputMask
-                              mask="99/99/9999"
-                              placeholder="DD/MM/YYYY"
-                              value={localEdit.date || ""}
-                              onChange={(e) =>
-                                handleEditChange(
-                                  recordId,
-                                  "date",
-                                  e.target.value
-                                )
-                              }
-                              className="border px-1 py-0.5 w-[110px] rounded-md"
-                            />
-
-                            {/* Time input */}
-                            <InputMask
-                              mask="99:99"
-                              placeholder="HH:MM"
-                              value={localEdit.time || ""}
-                              onChange={(e) =>
-                                handleEditChange(
-                                  recordId,
-                                  "time",
-                                  e.target.value
-                                )
-                              }
-                              className="border px-1 py-0.5 w-[80px] rounded-md"
-                            />
-                          </div>
-                        ) : (
-                          (() => {
-                            const d = new Date(defense.time);
-                            const pad = (n) => n.toString().padStart(2, "0");
-                            return `${pad(d.getDate())}/${pad(
-                              d.getMonth() + 1
-                            )}/${d.getFullYear()} ${pad(d.getHours())}:${pad(
-                              d.getMinutes()
-                            )}`;
-                          })()
-                        )}
-                      </td>
-
-                      {/* Địa điểm */}
-                      <td className="border p-2">
-                        {showInputRoom ? (
-                          <input
-                            type="text"
-                            className="border px-1 py-0.5 w-full rounded-md"
-                            placeholder="Nhập địa điểm"
-                            value={localEdit.room || ""}
+                        <div className="flex gap-1">
+                          <InputMask
+                            mask="99/99/9999"
+                            placeholder="DD/MM/YYYY"
+                            value={
+                              localEdit.date ||
+                              (defense.time
+                                ? new Date(defense.time).toLocaleDateString(
+                                    "en-GB"
+                                  ) // DD/MM/YYYY
+                                : "")
+                            }
                             onChange={(e) =>
-                              handleEditChange(recordId, "room", e.target.value)
+                              handleEditChange(recordId, "date", e.target.value)
                             }
+                            className="border px-1 py-0.5 w-[110px] rounded-md"
                           />
-                        ) : (
-                          defense.room
-                        )}
+
+                          <InputMask
+                            mask="99:99"
+                            placeholder="HH:MM"
+                            value={
+                              localEdit.time ||
+                              (defense.time
+                                ? new Date(defense.time).toLocaleTimeString(
+                                    "en-GB",
+                                    {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    }
+                                  )
+                                : "")
+                            }
+                            onChange={(e) =>
+                              handleEditChange(recordId, "time", e.target.value)
+                            }
+                            className="border px-1 py-0.5 w-[80px] rounded-md"
+                          />
+                        </div>
+                      </td>
+
+                      {/* Địa điểm (always input, prefilled) */}
+                      <td className="border p-2">
+                        <input
+                          type="text"
+                          className="border px-1 py-0.5 w-full rounded-md"
+                          placeholder="Nhập địa điểm"
+                          value={localEdit.room || defense.room || ""}
+                          onChange={(e) =>
+                            handleEditChange(recordId, "room", e.target.value)
+                          }
+                        />
                       </td>
 
                       {/* Lưu */}
@@ -443,17 +484,15 @@ const ArrangeCalendar = () => {
           )
           .filter(Boolean); // remove undefined/null
 
-        // Then, fetch the defense schedules using POST
         const defenseScheduleResult = await api.post(
           `/defenseSchedules/getByFormRecordIds`,
           allFormRecordIds
         );
-
         const enrichedData = groupedTeachers.map((teacher) => {
           const updatedFormRecordSchedules = teacher.formRecordSchedules.map(
             (formRecord) => {
               const defenseInfo = defenseScheduleResult.data.result.find(
-                (d) => d.formRecord?.formRecordId === formRecord.formRecordId
+                (d) => d.formRecordId === formRecord.formRecordId
               );
 
               return {
@@ -462,11 +501,13 @@ const ArrangeCalendar = () => {
               };
             }
           );
+
           return {
             ...teacher,
             formRecordSchedules: updatedFormRecordSchedules,
           };
         });
+
         setTeachers(enrichedData);
         // console.log(teachers);
       } catch (error) {
@@ -474,6 +515,10 @@ const ArrangeCalendar = () => {
       }
     }
   };
+
+  useEffect(() => {
+    console.log(teachers);
+  }, [teachers]);
 
   useEffect(() => {
     handleSearch();

@@ -40,17 +40,36 @@ public class DefenseScheduleService {
     private final FormRecordRepo formRecordRepo;
 
     public DefenseSchedule createDefenseSchedule(AddDefenseScheduleRequest request) {
-        FormRecord formRecord = formRecordRepo.findById(request.getFormRecordId()).orElseThrow(() -> new AppException(ErrorCode.FormRecord_NOT_FOUND));
-        Student student = formRecord.getStudent();
+//        FormRecord formRecord = formRecordRepo.findById(request.getFormRecordId()).orElseThrow(() -> new AppException(ErrorCode.FormRecord_NOT_FOUND));
+//        List<Teacher> teachers = teacherRepo.findByUserIdIn(request.getTeacherIds());
+//        DefenseSchedule defenseSchedule = DefenseSchedule.builder()
+//                .formRecord(formRecord)
+//                .teachers(teachers)
+//                .startTime(request.getStartTime())
+//                .place(request.getPlace())
+//                .build();
+//        DefenseSchedule savedschedule = defenseScheduleRepo.save(defenseSchedule);
+//        return savedschedule;
+        FormRecord formRecord = formRecordRepo.findById(request.getFormRecordId())
+                .orElseThrow(() -> new AppException(ErrorCode.FormRecord_NOT_FOUND));
+
+        DefenseSchedule defenseSchedule = defenseScheduleRepo
+                .findDefenseScheduleByFormRecord_FormRecordId(formRecord.getFormRecordId());
+
+        if (defenseSchedule == null) {
+            // no existing schedule → create new
+            defenseSchedule = DefenseSchedule.builder()
+                    .formRecord(formRecord)
+                    .build();
+        }
+
         List<Teacher> teachers = teacherRepo.findByUserIdIn(request.getTeacherIds());
-        DefenseSchedule defenseSchedule = DefenseSchedule.builder()
-                .formRecord(formRecord)
-                .teachers(teachers)
-                .startTime(request.getStartTime())
-                .place(request.getPlace())
-                .build();
-        DefenseSchedule savedschedule = defenseScheduleRepo.save(defenseSchedule);
-        return savedschedule;
+
+        defenseSchedule.setTeachers(teachers);
+        defenseSchedule.setStartTime(request.getStartTime());
+        defenseSchedule.setPlace(request.getPlace());
+
+        return defenseScheduleRepo.save(defenseSchedule);
     }
 
     public APIResponse<List<DefenseScheduleResponse>> addDefenseSchedule(List<AddDefenseScheduleRequest> requests) {
