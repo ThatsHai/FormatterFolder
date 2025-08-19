@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import api from "../services/api";
 import useBootstrapUser from "../hook/useBootstrapUser";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router";
 
 const FormRecordReviewPage = ({ onDecline = () => {} }) => {
   // const currentYear = new Date().getFullYear();
@@ -47,10 +48,13 @@ const FormRecordReviewPage = ({ onDecline = () => {} }) => {
   const { loading } = useBootstrapUser(); // hydrates redux on mount
   const user = useSelector((state) => state.auth.user);
   const role = user?.role; // safe access
+  const navigate = useNavigate();
 
   if (loading) return null;
   if (!role) return null;
   if (!user.userId) return null;
+
+  if (loading) return null;
 
   if (!formData) return <div>Đang tải...</div>;
 

@@ -7,6 +7,7 @@ import NumberInput from "../../component/NumberInput";
 import PropTypes from "prop-types";
 import PasswordInputForm from "../../component/pageComponents/profilePage/PasswordInputForm";
 import LogoutButton from "../../component/LogoutButton";
+import useBootstrapUser from "../../hook/useBootstrapUser";
 
 const TeacherProfilePage = ({ userData }) => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -75,6 +76,9 @@ const TeacherProfilePage = ({ userData }) => {
       PropTypes.node,
     ]).isRequired,
   };
+
+  const { loading } = useBootstrapUser(); // hydrates redux on mount
+  if(loading) return null;
 
   return (
     <div className="">

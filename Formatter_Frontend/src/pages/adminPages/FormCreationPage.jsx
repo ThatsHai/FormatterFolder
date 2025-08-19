@@ -5,6 +5,8 @@ import { v4 as uuidv4 } from "uuid";
 import api from "../../services/api";
 import { useNavigate } from "react-router";
 import SuccessPopup from "../../component/SuccessPopup";
+import useBootstrapUser from "../../hook/useBootstrapUser";
+import { useSelector } from "react-redux";
 
 const FormCreationPage = () => {
   const [form, setForm] = useState({
@@ -42,6 +44,14 @@ const FormCreationPage = () => {
   const textareaRef = useRef(null);
   const navigate = useNavigate();
 
+  const { loading } = useBootstrapUser(); // hydrates redux on mount
+  const userData = useSelector((state) => state.auth.user);
+
+  if (loading) return null;
+  if (userData.role.name !== "ADMIN") {
+    navigate("/notFound");
+  }
+
   const onBasicInfoChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({
@@ -49,6 +59,7 @@ const FormCreationPage = () => {
       [name]: value,
     }));
   };
+  
 
   const readerLabels = {
     "TEACHER AND STUDENT": "Giáo viên và Sinh viên",

@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import api from "../../services/api";
 import DesignsListWindow from "../../component/DesignListWindow";
+import useBootstrapUser from "../../hook/useBootstrapUser";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router";
 
 const fieldTypeLabels = {
   SHORT_ANSWER: "Trả lời ngắn",
@@ -44,6 +47,15 @@ const FormInfoPage = () => {
       );
     }
   }, [form]);
+
+  const { loading } = useBootstrapUser(); // hydrates redux on mount
+  const userData = useSelector((state) => state.auth.user);
+  const navigate = useNavigate();
+
+  if (loading) return null;
+  if (userData.role.name !== "ADMIN") {
+    navigate("/notFound");
+  }
 
   return (
     <div className="p-6">

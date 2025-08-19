@@ -6,7 +6,6 @@ import AuthLayout from "../layout/AuthLayout";
 import DefaultLayout from "../layout/DefaultLayout";
 import StudentHomePage from "../pages/studentPages/StudentHomePage";
 import ThesisInfo from "../pages/ThesisInfo";
-import AdminHomePage from "../pages/adminPages/AdminHomePage";
 import ThesisInfoLayout from "../layout/ThesisInfoLayout";
 import AdminLayout from "../layout/AdminLayout";
 import AccountManagementPage from "../pages/adminPages/AccountManagementPage";
@@ -18,7 +17,6 @@ import TopicSuggestionPage from "../pages/teacherPages/TopicSuggestionPage";
 import TeacherHomePage from "../pages/teacherPages/TeacherHomePage";
 import RepoManagementPage from "../pages/adminPages/RepoManagementPage";
 import TopicManagementPage from "../pages/adminPages/TopicManagementPage";
-import Test from "../pages/Test";
 import PDFViewer from "../component/forms/SubmitThesisFormComponents/PDFViewer";
 import TopicInfo from "../pages/teacherPages/topic/TopicInfo";
 import DiffViewerPage from "../component/pageComponents/thesisInfoPage/DiffViewerPage";
@@ -32,6 +30,7 @@ import ProgressPage from "../pages/teacherPages/progress/ProgressPage";
 import ProgressDetailPage from "../pages/teacherPages/progress/ProgressDetailPage";
 import ProgressPageStudent from "../pages/studentPages/progress/ProgressDetailPage";
 import ArrangeCalendarPage from "../pages/adminPages/ArrangeCalendarPage";
+import NotFound from "../pages/NotFound";
 
 const Router = createBrowserRouter([
   {
@@ -252,20 +251,16 @@ const Router = createBrowserRouter([
     ),
   },
   {
-    path: "/test",
-    element: (
-      <AdminLayout>
-        <Test />
-      </AdminLayout>
-    ),
-  },
-  {
     path: "/pdfviewer",
     element: (
       <AdminLayout>
         <PDFViewer></PDFViewer>
       </AdminLayout>
     ),
+  },
+  {
+    path: "*",
+    element: <NotFound></NotFound>,
   },
 ]);
 

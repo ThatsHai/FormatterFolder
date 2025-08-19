@@ -12,7 +12,8 @@ const Header = () => {
   const navigate = useNavigate();
   const userData = useSelector((state) => state.auth.user);
   if (loading) return null;
-  if (!userData) {
+  console.log(userData.role.name)
+  if (!userData || !userData?.role) {
     alert("Phiên đăng nhập hết hạn");
     navigate("/login");
   } else {

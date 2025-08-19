@@ -14,6 +14,8 @@ import dayjs from "dayjs";
 import SuccessPopup from "../../component/SuccessPopup";
 import ConfirmationPopup from "../../component/ConfirmationPopup";
 import Tooltip from "@mui/material/Tooltip";
+import useBootstrapUser from "../../hook/useBootstrapUser";
+import { useNavigate } from "react-router";
 
 const TopicSuggestionPage = ({
   handleFormToggle = () => {},
@@ -294,6 +296,15 @@ const TopicSuggestionPage = ({
     setDisplaySuccessPopup(false);
     onSuccess();
   };
+
+  const { loading } = useBootstrapUser(); // hydrates redux on mount
+  const userData = useSelector((state) => state.auth.user);
+  const navigate = useNavigate();
+
+  if (loading) return null;
+  if (userData.role.name !== "TEACHER") {
+    navigate("/notFound");
+  }
 
   return (
     <div className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-black bg-opacity-50 p-6">

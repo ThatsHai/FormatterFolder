@@ -4,6 +4,9 @@ import DisplayObjectInfo from "./repoManagmentPage/DisplayObjectInfo";
 import AddRepoForm from "./repoManagmentPage/AddRepoForm";
 import PropTypes from "prop-types";
 import api from "../../services/api";
+import useBootstrapUser from "../../hook/useBootstrapUser";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router";
 
 const RepoManagementPage = () => {
   const [objectInfo, setObjectInfo] = useState({});
@@ -66,6 +69,15 @@ const RepoManagementPage = () => {
     };
     setObjectInfo(object);
   };
+
+  const { loading } = useBootstrapUser(); // hydrates redux on mount
+  const userData = useSelector((state) => state.auth.user);
+  const navigate = useNavigate();
+
+  if (loading) return null;
+  if (userData.role.name !== "ADMIN") {
+    navigate("/notFound");
+  }
 
   return (
     <div className="mb-4">

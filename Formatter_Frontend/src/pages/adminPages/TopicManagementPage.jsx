@@ -5,6 +5,9 @@ import PageNumberFooter from "../../component/PageNumberFooter";
 import TopicQuery from "./topicManagementPage/TopicQuery";
 import NumberInput from "../../component/NumberInput";
 import PropTypes from "prop-types";
+import useBootstrapUser from "../../hook/useBootstrapUser";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router";
 
 const TopicManagementPageContent = ({
   tempMaxTopics = [],
@@ -108,6 +111,15 @@ const TopicManagementPageContent = ({
       }
     });
   };
+
+  const { loading } = useBootstrapUser(); // hydrates redux on mount
+  const userData = useSelector((state) => state.auth.user);
+  const navigate = useNavigate();
+
+  if (loading) return null;
+  if (userData.role.name !== "ADMIN") {
+    navigate("/notFound");
+  }
 
   if (!topicsGroupByTeacher || topicsGroupByTeacher.length === 0) {
     return (
@@ -305,12 +317,14 @@ const TopicManagementPageContent = ({
           setCurrentPage={setCurrentPage}
         ></PageNumberFooter>
         <div className="w-full flex my-2 justify-end">
-          {semester !== "Cả năm" && semester !== "" && <button
-            className="text-lg bg-darkBlue px-4 py-1 rounded-md text-white"
-            onClick={handleSubmit}
-          >
-            Lưu
-          </button>}
+          {semester !== "Cả năm" && semester !== "" && (
+            <button
+              className="text-lg bg-darkBlue px-4 py-1 rounded-md text-white"
+              onClick={handleSubmit}
+            >
+              Lưu
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -7,6 +7,9 @@ import PageNumberFooter from "../../component/PageNumberFooter";
 import api from "../../services/api";
 import { Collapse, Typography } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"; // from MUI
+import useBootstrapUser from "../../hook/useBootstrapUser";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router";
 
 const truncateWords = (str, charLimit, end = "…") => {
   if (!str) return "";
@@ -441,9 +444,12 @@ const TeacherNotificationPage = ({ userData }) => {
   // const { loading } = useBootstrapUser(); // hydrates redux on mount
   const user = userData;
   const role = user?.role; // safe access
-
+  const navigate = useNavigate();
   // if (loading) return null;
   if (!role) return null;
+  if (role.name !== "TEACHER") {
+    navigate("/notFound");
+  }
   if (!user.userId) return null;
 
   return (

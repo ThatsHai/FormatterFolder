@@ -8,6 +8,9 @@ import { ExpandMore, ExpandLess } from "@mui/icons-material";
 import InputMask from "react-input-mask";
 import { Tooltip } from "@mui/material";
 import { useRef } from "react";
+import useBootstrapUser from "../../hook/useBootstrapUser";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router";
 
 const CouncilTeachersInput = ({
   value = ["", "", ""],
@@ -424,10 +427,6 @@ const ArrangeCalendar = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [teachers, setTeachers] = useState([]);
 
-  useEffect(() => {
-    handleSearch();
-  }, [currentPage]);
-
   const handleSearch = async () => {
     if (schoolYear) {
       try {
@@ -475,6 +474,19 @@ const ArrangeCalendar = () => {
       }
     }
   };
+
+  useEffect(() => {
+    handleSearch();
+  }, [currentPage]);
+
+  const { loading } = useBootstrapUser(); // hydrates redux on mount
+  const userData = useSelector((state) => state.auth.user);
+  const navigate = useNavigate();
+
+  if (loading) return null;
+  if (userData.role.name !== "ADMIN") {
+    navigate("/notFound");
+  }
 
   return (
     <div className="flex justify-center mb-6">
