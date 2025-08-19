@@ -714,7 +714,6 @@ public class FormRecordService {
             System.out.println(key);
         }
 
-        
         PDFDesignUtils.DesignData data = new PDFDesignUtils.DesignData();
         data.title = design.getTitle();
         data.description = design.getDescription();
@@ -733,7 +732,6 @@ public class FormRecordService {
                     String placeholder = safe(m.group(1)).trim();
                     value = placeholderValueMap.getOrDefault(placeholder, "");
                     if (c.fieldType.equals("TABLE")) {
-                        System.out.println(ConvertPlaceholderInFormRecord.convertToHtmlTableCompact(placeholder));
                         placeholder = ConvertPlaceholderInFormRecord.convertToHtmlTableCompact(placeholder);
                         value = placeholderValueMap.getOrDefault(placeholder, "");
                     }
@@ -744,8 +742,6 @@ public class FormRecordService {
             } else {
                 finalText = cell.getText();
             }
-
-            System.out.println("Cell finalText: " + finalText);
 
             c.rawText = finalText;
             c.styledTexts = HtmlToStyledTextParser.parseHtml(finalText);

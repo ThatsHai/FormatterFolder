@@ -66,21 +66,35 @@ public class ConvertPlaceholderInFormRecord {
         Student student = formRecord.getStudent();
         if (student != null) {
             String studentName = Objects.toString(student.getName(), "");
+            String studentId = Objects.toString(student.getUserId(), "");
             String studentEmail = Objects.toString(student.getEmail(), "");
             String studentClass = "";
             String studentMajor = "";
+            String studentDepartment = "";
+            String studentFaculty = "";
 
             if (student.getStudentClass() != null) {
                 studentClass = Objects.toString(student.getStudentClass().getStudentClassName(), "");
                 if (student.getStudentClass().getMajor() != null) {
                     studentMajor = Objects.toString(student.getStudentClass().getMajor().getMajorName(), "");
+                    if (student.getStudentClass().getMajor().getDepartment() != null) {
+                        studentDepartment = Objects.toString(student.getStudentClass().getMajor()
+                                .getDepartment().getDepartmentName(), "");
+                        if (student.getStudentClass().getMajor().getDepartment().getFaculty() != null) {
+                            studentFaculty = Objects.toString(student.getStudentClass().getMajor()
+                                    .getDepartment().getFaculty().getFacultyName(), "");
+                        }
+                    }
                 }
             }
 
             map.put("Họ và tên sinh viên", studentName);
+            map.put("MSSV", studentId);
             map.put("Email sinh viên", studentEmail);
             map.put("Lớp sinh viên", studentClass);
             map.put("Ngành học sinh viên", studentMajor);
+            map.put("Khoa/Bộ môn sinh viên", studentDepartment);
+            map.put("Trường/Viện/Khoa sinh viên", studentFaculty);
         }
 
         return map;

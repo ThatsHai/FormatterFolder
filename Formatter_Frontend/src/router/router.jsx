@@ -111,7 +111,7 @@ const Router = createBrowserRouter([
     path: "/admin",
     element: (
       <AdminLayout>
-        <AdminHomePage />
+        <FormManagementPage />
       </AdminLayout>
     ),
   },

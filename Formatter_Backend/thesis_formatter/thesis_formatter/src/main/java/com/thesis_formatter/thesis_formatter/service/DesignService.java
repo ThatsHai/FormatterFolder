@@ -11,6 +11,7 @@ import com.thesis_formatter.thesis_formatter.exception.AppException;
 import com.thesis_formatter.thesis_formatter.repo.DesignRepo;
 import com.thesis_formatter.thesis_formatter.repo.FormRecordRepo;
 import com.thesis_formatter.thesis_formatter.repo.FormRepo;
+import com.thesis_formatter.thesis_formatter.utils.ConvertPlaceholderInFormRecord;
 import com.thesis_formatter.thesis_formatter.utils.PDFDesignUtils;
 import com.thesis_formatter.thesis_formatter.utils.HtmlToStyledTextParser;
 import lombok.AccessLevel;
@@ -33,7 +34,11 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -75,48 +80,95 @@ public class DesignService {
     }
 
 
-    public void generateDesignPdf(String designId) {
-        Design design = designRepo.findById(designId)
-                .orElseThrow(() -> new RuntimeException("Design not found"));
+//    public void generateDesignPdf(String designId) {
+//        Design design = designRepo.findById(designId)
+//                .orElseThrow(() -> new RuntimeException("Design not found"));
+//
+//        PDFDesignUtils.DesignData data = new PDFDesignUtils.DesignData();
+//        data.title = design.getTitle();
+//        data.description = design.getDescription();
+//        data.cells = design.getCells().stream().map(cell -> {
+//            PDFDesignUtils.CellData c = new PDFDesignUtils.CellData();
+//            c.fromDrag = cell.isFromDrag();
+//            c.fromDataSource = cell.isFromDataSource();
+//            // Convert HTML to styled text list
+//            String finalText;
+//
+//            if (c.fromDrag) {
+//                finalText = "";
+//            } else if (c.fromDataSource) {
+//                finalText = cell.getText().replaceAll("\\$\\{\\{.*?}}", ""); // Remove all placeholders
+//            } else {
+//                finalText = cell.getText();
+//            }
+//
+//            c.styledTexts = HtmlToStyledTextParser.parseHtml(finalText);
+//            c.colSpan = cell.getColSpan();
+//            c.rowSpan = cell.getRowSpan();
+//            c.topPos = cell.getTopPos();
+//            c.leftPos = cell.getLeftPos();
+//            c.fieldType = cell.getFieldType();
+//            return c;
+//        }).collect(Collectors.toList());
+//
+//        String fileName = "design-" + designId + ".pdf";
+//        try {
+//            PDFDesignUtils.generatePdfFromDesign(data, fileName, "./user_resource/pdf_design/");
+//        } catch (Exception e) {
+//            throw new RuntimeException("PDF generation failed", e);
+//        }
+//    }
 
+    public void generateDesignPdf(Design design) {
         PDFDesignUtils.DesignData data = new PDFDesignUtils.DesignData();
         data.title = design.getTitle();
         data.description = design.getDescription();
+
         data.cells = design.getCells().stream().map(cell -> {
             PDFDesignUtils.CellData c = new PDFDesignUtils.CellData();
             c.fromDrag = cell.isFromDrag();
             c.fromDataSource = cell.isFromDataSource();
-            // Convert HTML to styled text list
-            String finalText;
+            c.fieldType = cell.getFieldType();
 
+            String finalText;
             if (c.fromDrag) {
+                // Always empty for dragged fields
                 finalText = "";
             } else if (c.fromDataSource) {
-                finalText = cell.getText().replaceAll("\\$\\{\\{.*?}}", ""); // Remove all placeholders
+                // Remove all placeholders for data source fields
+                finalText = cell.getText().replaceAll("\\$\\{\\{.*?}}", "");
             } else {
+                // Keep original text
                 finalText = cell.getText();
             }
 
+            c.rawText = finalText;
             c.styledTexts = HtmlToStyledTextParser.parseHtml(finalText);
+            if (c.styledTexts == null || c.styledTexts.isEmpty()) {
+                // Prevent IndexOutOfBounds later
+                c.styledTexts = Collections.emptyList();
+            }
             c.colSpan = cell.getColSpan();
             c.rowSpan = cell.getRowSpan();
             c.topPos = cell.getTopPos();
             c.leftPos = cell.getLeftPos();
-            c.fieldType = cell.getFieldType();
             return c;
         }).collect(Collectors.toList());
 
-        String fileName = "design-" + designId + ".pdf";
+        String fileName = "design-" + design.getDesignId() + ".pdf";
         try {
             PDFDesignUtils.generatePdfFromDesign(data, fileName, "./user_resource/pdf_design/");
         } catch (Exception e) {
+            e.printStackTrace(); // <-- log full stack trace
             throw new RuntimeException("PDF generation failed", e);
         }
     }
 
+
     public ResponseEntity<Resource> downloadDesign(String designId) throws IOException {
         Design design = designRepo.findById(designId).orElseThrow(() -> new RuntimeException("Design not found"));
-        generateDesignPdf(designId);
+        generateDesignPdf(design);
+
 
         Path filePath = Paths.get("user_resource/pdf_design/design-" + designId + ".pdf");
 

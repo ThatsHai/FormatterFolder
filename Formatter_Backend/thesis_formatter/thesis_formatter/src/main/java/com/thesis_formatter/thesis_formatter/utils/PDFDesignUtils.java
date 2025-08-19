@@ -116,9 +116,24 @@ public class PDFDesignUtils {
                         case "TABLE":
                             HtmlToStyledTextParser.StyledTable styledTable = HtmlToStyledTextParser.parseHtmlTable(region.rawText);
 
-                            if (styledTable != null) {
-                                // 🔹 Build an inner PdfPTable from StyledTable
-                                PdfPTable innerTable = new PdfPTable(styledTable.rows.get(0).size());
+                            if (styledTable != null && styledTable.rows != null && !styledTable.rows.isEmpty()) {
+                                // 🔹 Outer vertical layout (title + table)
+                                PdfPTable containerTable = new PdfPTable(1);
+                                containerTable.setWidthPercentage(100);
+
+                                // --- Add title if exists ---
+                                if (styledTable.title != null && !styledTable.title.isEmpty()) {
+                                    Phrase titlePhrase = new Phrase(styledTable.title, unicodeFontItalic);
+                                    PdfPCell titleCell = new PdfPCell(titlePhrase);
+                                    titleCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                                    titleCell.setBorder(Rectangle.NO_BORDER);
+                                    titleCell.setPaddingBottom(5f);
+                                    containerTable.addCell(titleCell);
+                                }
+
+                                // --- Build the actual inner table ---
+                                int colCount = styledTable.rows.get(0).size(); // ✅ Safe now
+                                PdfPTable innerTable = new PdfPTable(colCount);
                                 innerTable.setWidthPercentage(100);
 
                                 for (List<List<HtmlToStyledTextParser.StyledText>> rowCells : styledTable.rows) {
@@ -131,8 +146,13 @@ public class PDFDesignUtils {
                                     }
                                 }
 
-                                // 🔹 Outer cell that holds the entire table
-                                PdfPCell outerCell = new PdfPCell(innerTable);
+                                // --- Put inner table into container ---
+                                PdfPCell tableCell = new PdfPCell(innerTable);
+                                tableCell.setBorder(Rectangle.NO_BORDER);
+                                containerTable.addCell(tableCell);
+
+                                // --- Now wrap container into the grid cell ---
+                                PdfPCell outerCell = new PdfPCell(containerTable);
                                 outerCell.setColspan(span);
                                 outerCell.setBorder(Rectangle.NO_BORDER);
 
@@ -152,7 +172,7 @@ public class PDFDesignUtils {
                                 col += span;
                                 continue; // 🔴 Skip default phrase logic
                             } else {
-                                phrase = new Phrase("Bảng trống", unicodeFontItalic);
+                                phrase = new Phrase("Bảng trống", unicodeFontItalic); // fallback
                             }
                             break;
 

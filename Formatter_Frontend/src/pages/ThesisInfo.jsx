@@ -43,6 +43,12 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
     };
     fetchRecord();
   }, [formRecordId, refreshCounter]);
+
+  const stripPrefix = (value) => {
+    const parts = value.split(":::");
+    return parts.length > 1 ? parts.slice(1).join(":::") : value;
+  };
+
   const applyTailwindToTable = (html) => {
     // Thêm &nbsp; để giữ chiều cao ô trống
     const filledHTML = html.replace(/<td>\s*<\/td>/g, "<td>&nbsp;</td>");
@@ -254,7 +260,8 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
               .map((field, index) => (
                 <div className="font-textFont text-lg mb-8 px-10" key={index}>
                   <h3 className="text-black font-semibold mb-3">
-                    {index + 1}. {field.formField?.fieldType === "TABLE"
+                    {index + 1}.{" "}
+                    {field.formField?.fieldType === "TABLE"
                       ? (() => {
                           const [q, raw = ""] = (
                             field.formField?.fieldName || ""
@@ -293,13 +300,15 @@ const ThesisInfo = ({ onDecline = () => {} }) => {
                   {field.formField.fieldType === "QUILL_DATA" ? (
                     <div
                       className="rounded-md px-3 py-2 overflow-x-auto border"
-                      dangerouslySetInnerHTML={{ __html: field.value }}
+                      dangerouslySetInnerHTML={{
+                        __html: stripPrefix(field.value),
+                      }}
                     />
                   ) : field.formField.fieldType === "TABLE" ? (
                     <div
                       className="overflow-x-auto mt-2"
                       dangerouslySetInnerHTML={{
-                        __html: applyTailwindToTable(field.value),
+                        __html: applyTailwindToTable(stripPrefix(field.value)),
                       }}
                     />
                   ) : (
