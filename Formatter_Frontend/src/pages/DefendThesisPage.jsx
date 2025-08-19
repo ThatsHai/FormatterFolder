@@ -1,11 +1,11 @@
 import dayjs from "dayjs";
 import { Link } from "react-router";
 import { useEffect, useState } from "react";
-import api from "../../services/api";
-import useBootstrapUser from "../../hook/useBootstrapUser";
+import api from "../services/api";
+import useBootstrapUser from "../hook/useBootstrapUser";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
-import NumberInput from "../../component/NumberInput";
+import NumberInput from "../component/NumberInput";
 
 const QueryFields = ({
   semester,
@@ -245,16 +245,17 @@ const StudentTopicTable = () => {
   );
 };
 
-const AdminDefendThesisPage = () => {
+const DefenseThesisPage = () => {
   const { loading } = useBootstrapUser(); // hydrates redux on mount
   const userData = useSelector((state) => state.auth.user);
   const navigate = useNavigate();
 
   if (loading) return null;
-  if (userData.role.name !== "ADMIN") {
+  if (userData.role.name !== "TEACHER") {
+    console.log(userData.role.name)
     navigate("/notFound");
   }
   return <StudentTopicTable></StudentTopicTable>;
 };
 
-export default AdminDefendThesisPage;
+export default DefenseThesisPage;

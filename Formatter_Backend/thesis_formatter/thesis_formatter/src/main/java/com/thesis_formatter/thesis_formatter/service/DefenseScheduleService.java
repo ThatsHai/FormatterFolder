@@ -6,6 +6,7 @@ import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.DefenseScheduleResponse;
 import com.thesis_formatter.thesis_formatter.entity.*;
 import com.thesis_formatter.thesis_formatter.enums.ErrorCode;
+import com.thesis_formatter.thesis_formatter.enums.Semester;
 import com.thesis_formatter.thesis_formatter.exception.AppException;
 import com.thesis_formatter.thesis_formatter.mapper.DefenseScheduleMapper;
 import com.thesis_formatter.thesis_formatter.repo.DefenseScheduleRepo;
@@ -146,5 +147,14 @@ public class DefenseScheduleService {
                 .build();
     }
 
+    public APIResponse<List<DefenseScheduleResponse>> getBySemesterAndYear(Semester semester, String year) {
+        List<DefenseSchedule> responseList = defenseScheduleRepo.findByFormRecord_Topic_SemesterAndFormRecord_Topic_Year(semester, year);
+        List<DefenseScheduleResponse> responses = defenseScheduleMapper.toResponses(responseList);
+        return APIResponse.<List<DefenseScheduleResponse>>builder()
+                .code("200")
+                .result(responses)
+                .build();
+
+    }
 }
 

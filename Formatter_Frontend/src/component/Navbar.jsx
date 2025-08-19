@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
+import { Link } from "react-router";
 import useBootstrapUser from "../hook/useBootstrapUser";
 import AdminNavbar from "../pages/adminPages/adminComponents/AdminNavbar";
 
@@ -41,7 +42,8 @@ const Navbar = () => {
       >
         Đề cương
       </button>
-      <button className="hover:bg-gray border border-transparent hover:border-black p-2 px-4 my-1 rounded-lg"
+      <button
+        className="hover:bg-gray border border-transparent hover:border-black p-2 px-4 my-1 rounded-lg"
         onClick={() => handleClick("/progresses")}
       >
         Tiến độ
@@ -52,6 +54,11 @@ const Navbar = () => {
           onClick={() => handleClick("/topics")}
         >
           Đề tài gợi ý
+        </button>
+      )}
+      {user.role.name && user.role.name === "TEACHER" && (
+        <button className="hover:bg-gray border border-transparent hover:border-black p-2 px-4 my-1 rounded-lg">
+          <Link to={"/defenseSchedules"}>Xem tổng lịch</Link>
         </button>
       )}
     </div>

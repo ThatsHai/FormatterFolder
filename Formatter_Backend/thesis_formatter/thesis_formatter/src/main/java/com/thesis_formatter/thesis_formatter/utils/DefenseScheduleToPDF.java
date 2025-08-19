@@ -45,6 +45,12 @@ public class DefenseScheduleToPDF {
         addCell(table, "Thời gian", boldFont, Element.ALIGN_CENTER);
         addCell(table, "Địa điểm", boldFont, Element.ALIGN_CENTER);
 
+        System.out.println("Requests size: " + requests.size());
+        for (SchedulePDFRequest r : requests) {
+            System.out.println(r);
+        }
+
+        int index = 1;
         for (SchedulePDFRequest request : requests) {
             String studentId = request.getStudentId();
             String studentName = request.getStudentName();
@@ -59,6 +65,7 @@ public class DefenseScheduleToPDF {
             String date = splitTime[1];
             String timeDisplay = hour + "\n" + date;
 
+            addCell(table, String.valueOf(index++), normalFont, Element.ALIGN_CENTER); // <-- STT
             addCell(table, studentId, normalFont, Element.ALIGN_CENTER);
             addCell(table, studentName, normalFont, Element.ALIGN_LEFT);
             addCell(table, topicName, normalFont, Element.ALIGN_LEFT);
@@ -67,6 +74,7 @@ public class DefenseScheduleToPDF {
             addCell(table, timeDisplay, normalFont, Element.ALIGN_CENTER);
             addCell(table, place, normalFont, Element.ALIGN_CENTER);
         }
+
 
         document.add(table);
         document.close();

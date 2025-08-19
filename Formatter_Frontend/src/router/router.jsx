@@ -20,6 +20,7 @@ import TopicManagementPage from "../pages/adminPages/TopicManagementPage";
 import PDFViewer from "../component/forms/SubmitThesisFormComponents/PDFViewer";
 import TopicInfo from "../pages/teacherPages/topic/TopicInfo";
 import DiffViewerPage from "../component/pageComponents/thesisInfoPage/DiffViewerPage";
+import DefenseThesisPage from "../pages/DefendThesisPage";
 import TopicContent from "../pages/teacherPages/topic/TopicContent";
 import NotificationPage from "../pages/NotificationPage";
 import ProfilePage from "../pages/ProfilePage";
@@ -185,7 +186,7 @@ const Router = createBrowserRouter([
         <AdminDefendThesisPage />
       </AdminLayout>
     ),
-  },
+  },  
   {
     path: "/admin/defenseSchedules/create",
     element: (
@@ -256,6 +257,14 @@ const Router = createBrowserRouter([
       <AdminLayout>
         <PDFViewer></PDFViewer>
       </AdminLayout>
+    ),
+  },
+  {
+    path: "/defenseSchedules",
+    element: (
+      <DefaultLayout>
+        <DefenseThesisPage></DefenseThesisPage>
+      </DefaultLayout>
     ),
   },
   {

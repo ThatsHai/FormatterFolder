@@ -5,6 +5,7 @@ import com.thesis_formatter.thesis_formatter.dto.request.SchedulePDFRequest;
 import com.thesis_formatter.thesis_formatter.dto.response.APIResponse;
 import com.thesis_formatter.thesis_formatter.dto.response.DefenseScheduleResponse;
 import com.thesis_formatter.thesis_formatter.entity.DefenseSchedule;
+import com.thesis_formatter.thesis_formatter.enums.Semester;
 import com.thesis_formatter.thesis_formatter.service.DefenseScheduleService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -41,5 +42,10 @@ public class DefenseScheduleController {
     @PostMapping("/getByFormRecordIds")
     public APIResponse<List<DefenseScheduleResponse>> getDefenseScheduleByFormRecordIds(@RequestBody List<String> formRecordIds) {
         return defenseScheduleService.getByFormRecordIds(formRecordIds);
+    }
+
+    @GetMapping("/getBySemesterAndYear")
+    public APIResponse<List<DefenseScheduleResponse>> getDefenseScheduleBySemesterAndYear(@RequestParam Semester semester, @RequestParam String year) {
+        return defenseScheduleService.getBySemesterAndYear(semester, year);
     }
 }
