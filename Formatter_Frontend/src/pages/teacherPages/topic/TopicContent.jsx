@@ -55,7 +55,7 @@ const TopicContent = () => {
   const navigate = useNavigate();
 
   if (loading) return null;
-  if (userData.role.name !== "ADMIN") {
+  if (userData.role.name !== "TEACHER") {
     navigate("/notFound");
   }
 
