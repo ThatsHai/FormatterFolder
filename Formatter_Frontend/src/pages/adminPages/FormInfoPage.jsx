@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import api from "../../services/api";
 import DesignsListWindow from "../../component/DesignListWindow";
+import useBootstrapUser from "../../hook/useBootstrapUser";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router";
 
 const fieldTypeLabels = {
   SHORT_ANSWER: "Trả lời ngắn",
@@ -45,6 +48,15 @@ const FormInfoPage = () => {
     }
   }, [form]);
 
+  const { loading } = useBootstrapUser(); // hydrates redux on mount
+  const userData = useSelector((state) => state.auth.user);
+  const navigate = useNavigate();
+
+  if (loading) return null;
+  if (userData.role.name !== "ADMIN") {
+    navigate("/notFound");
+  }
+
   return (
     <div className="p-6">
       <Link to="/admin/forms">
@@ -86,8 +98,44 @@ const FormInfoPage = () => {
                     ({ formFieldId, fieldName, description, fieldType }) => (
                       <tr key={formFieldId} className="hover:bg-gray-50">
                         <td className="border border-gray-300 px-4 py-2">
-                          {fieldName}
+                          {fieldType === "TABLE"
+                            ? (() => {
+                                const [q, raw = ""] = (fieldName || "").split(
+                                  ":::"
+                                );
+                                const question = (q || "").trim();
+                                if (question) return question;
+
+                                // Extract headers from HTML <th>
+                                const headers = [];
+                                const thRegex = /<th\b[^>]*>(.*?)<\/th>/gi;
+                                let m;
+                                while ((m = thRegex.exec(raw)) !== null) {
+                                  headers.push(
+                                    m[1].replace(/<[^>]+>/g, "").trim()
+                                  );
+                                }
+
+                                return (
+                                  <table className="inline-table border border-gray-400 border-collapse text-sm max-w-xs">
+                                    <thead>
+                                      <tr>
+                                        {headers.map((header, idx) => (
+                                          <th
+                                            key={idx}
+                                            className="border border-gray-400 px-2 py-1 font-semibold"
+                                          >
+                                            {header}
+                                          </th>
+                                        ))}
+                                      </tr>
+                                    </thead>
+                                  </table>
+                                );
+                              })()
+                            : fieldName}
                         </td>
+
                         <td className="border border-gray-300 px-4 py-2">
                           {description || (
                             <span className="italic text-gray-400">
@@ -139,4 +187,3 @@ const FormInfoPage = () => {
 };
 
 export default FormInfoPage;
-

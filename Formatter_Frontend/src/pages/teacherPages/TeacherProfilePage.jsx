@@ -7,6 +7,7 @@ import NumberInput from "../../component/NumberInput";
 import PropTypes from "prop-types";
 import PasswordInputForm from "../../component/pageComponents/profilePage/PasswordInputForm";
 import LogoutButton from "../../component/LogoutButton";
+import useBootstrapUser from "../../hook/useBootstrapUser";
 
 const TeacherProfilePage = ({ userData }) => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -76,6 +77,9 @@ const TeacherProfilePage = ({ userData }) => {
     ]).isRequired,
   };
 
+  const { loading } = useBootstrapUser(); // hydrates redux on mount
+  if(loading) return null;
+
   return (
     <div className="">
       <div className="p-4 bg-bgGray min-h-screen font-textFont">
@@ -107,8 +111,8 @@ const TeacherProfilePage = ({ userData }) => {
                     label="Bộ môn"
                     value={userData.department?.departmentName || "N/A"}
                   />
-                  <Field label="Học vị" value={userData.degree} />
-                  <Field label="Chức vụ" value={userData.position} />
+                  <Field label="Học hàm học vị" value={userData.degree || "Chưa có dữ liệu"} />
+                  <Field label="Vị trí công tác" value={userData.position || "Chưa có dữ liệu"} />
                 </div>
               </div>
             </div>

@@ -90,12 +90,34 @@ const QuestionFrame = ({ setForm, formField, emptyFields }) => {
 
   const handleFieldDataChange = (e) => {
     const { name, value } = e.target;
+    // setForm((prevForm) => {
+    //   const updatedFields = prevForm.formFields.map((field) =>
+    //     field.formFieldId === formField.formFieldId
+    //       ? { ...field, [name]: value }
+    //       : field
+    //   );
+    //   return { ...prevForm, formFields: updatedFields };
+    // });
     setForm((prevForm) => {
-      const updatedFields = prevForm.formFields.map((field) =>
-        field.formFieldId === formField.formFieldId
-          ? { ...field, [name]: value }
-          : field
-      );
+      const updatedFields = prevForm.formFields.map((field) => {
+        if (field.formFieldId !== formField.formFieldId) return field;
+
+        // if (field.fieldType === "TABLE" && name === "fieldName") {
+        //   const parts = (field.fieldName || "").split(":::");
+        //   const html = parts[1] || "";
+        //   return { ...field, fieldName: `${value}:::${html}` };
+        // }
+        
+        if (field.fieldType === "TABLE" && name === "fieldName") {
+          const [questionName = "", html = ""] = (field.fieldName || "").split(":::");
+          return {
+            ...field,
+            fieldName: `${value || ""}:::${html || ""}`,
+          };
+        }        
+
+        return { ...field, [name]: value };
+      });
       return { ...prevForm, formFields: updatedFields };
     });
   };
@@ -193,7 +215,7 @@ const QuestionFrame = ({ setForm, formField, emptyFields }) => {
                 setForm((prev) => {
                   const updatedFields = prev.formFields.map((field) =>
                     field.formFieldId === formField.formFieldId
-                      ? { ...field, fieldName: html }
+                      ? { ...field, tableHtml: html } // keep separate while editing
                       : field
                   );
                   return { ...prev, formFields: updatedFields };
@@ -233,7 +255,7 @@ const QuestionFrame = ({ setForm, formField, emptyFields }) => {
   return (
     <div className="bg-white w-full p-6 pb-3 rounded-md shadow-md border border-lightGray font-textFont">
       <div className="grid grid-cols-3 gap-3 py-1">
-        <input
+        {/* <input
           className="border-b-2 placeholder:text-gray placeholder:font-semibold bg-lightGray border-gray rounded-md col-span-2 p-1 px-3 focus:outline-none text-xl"
           placeholder="Câu hỏi"
           onChange={handleFieldDataChange}
@@ -243,7 +265,17 @@ const QuestionFrame = ({ setForm, formField, emptyFields }) => {
               ? "Không thể đặt câu hỏi cho dạng bảng"
               : formField.fieldName || ""
           }
-          disabled={selectedMethod === "Bảng"}
+          // disabled={selectedMethod === "Bảng"}
+        /> */}
+        <input
+          placeholder="Câu hỏi"
+          onChange={handleFieldDataChange}
+          name="fieldName"
+          value={
+            formField.fieldType === "TABLE"
+              ? formField.fieldName?.split(":::")[0] || ""
+              : formField.fieldName || ""
+          }
         />
         <select
           className="border border-lightGray focus:outline-none p-1 px-3 rounded-md"

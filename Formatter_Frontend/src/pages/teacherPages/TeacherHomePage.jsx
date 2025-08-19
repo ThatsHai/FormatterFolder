@@ -6,6 +6,7 @@ import ContentHomepage from "../../component/pageComponents/homepage/ContentHome
 import useBootstrapUser from "../../hook/useBootstrapUser"
 import SuccessPopup from "../../component/SuccessPopup";
 import api from "../../services/api";
+import { useSelector } from "react-redux";
 
 const TeacherHomePage = () => {
   const [thesisFormOpen, setIsThesisFormOpen] = useState(false);
@@ -14,7 +15,11 @@ const TeacherHomePage = () => {
   const navigate = useNavigate();
 
   const { loading } = useBootstrapUser(); // hydrates redux on mount
+  const userData = useSelector((state) => state.auth.user);
   if (loading) return null;
+  if (userData.role.name !== "ADMIN") {
+    navigate("/notFound");
+  }
 
   const handleFormToggle = async () => {
     setIsThesisFormOpen((prev) => !prev);
@@ -28,8 +33,9 @@ const TeacherHomePage = () => {
       alert("Phiên đăng nhập hết hạn");
       navigate("/login");
     }
-    
   };
+
+  
 
   return (
     <div className="pt-6">

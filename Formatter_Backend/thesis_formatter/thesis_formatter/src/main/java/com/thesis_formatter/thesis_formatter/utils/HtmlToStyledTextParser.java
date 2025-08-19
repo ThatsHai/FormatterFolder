@@ -35,8 +35,8 @@ public class HtmlToStyledTextParser {
         return result;
     }
 
-    private static void traverse(Node node, boolean isBold, boolean isItalic, List<StyledText> result,
-                                 ListType currentListType, int itemIndex) {
+    private static void traverse(Node node, boolean isBold, boolean isItalic,
+                                 List<StyledText> result, ListType currentListType, int itemIndex) {
 
         if (node instanceof TextNode) {
             String text = ((TextNode) node).text();
@@ -50,22 +50,99 @@ public class HtmlToStyledTextParser {
             boolean italic = isItalic || child.nodeName().equalsIgnoreCase("em") || child.nodeName().equalsIgnoreCase("i");
 
             switch (child.nodeName().toLowerCase()) {
-                case "ul":
-                    traverse(child, bold, italic, result, ListType.UL, 0);
-                    break;
                 case "ol":
-                    traverse(child, bold, italic, result, ListType.OL, 0);
+                    int olIndex = 0;
+                    for (Node olChild : child.childNodes()) {
+                        if (olChild.nodeName().equalsIgnoreCase("li")) {
+                            String prefix = (olIndex + 1) + ". ";
+                            result.add(new StyledText("\n" + prefix, false, false));
+                            traverse(olChild, bold, italic, result, ListType.OL, olIndex + 1);
+                            olIndex++;
+                        } else {
+                            traverse(olChild, bold, italic, result, ListType.OL, olIndex);
+                        }
+                    }
                     break;
-                case "li":
-                    String prefix = currentListType == ListType.UL ? "• " :
-                            currentListType == ListType.OL ? (itemIndex + 1) + ". " : "";
-                    result.add(new StyledText("\n" + prefix, false, false));
-                    traverse(child, bold, italic, result, currentListType,
-                            currentListType == ListType.OL ? itemIndex + 1 : itemIndex);
+                case "ul":
+                    for (Node ulChild : child.childNodes()) {
+                        if (ulChild.nodeName().equalsIgnoreCase("li")) {
+                            result.add(new StyledText("\n• ", false, false));
+                            traverse(ulChild, bold, italic, result, ListType.UL, 0);
+                        } else {
+                            traverse(ulChild, bold, italic, result, ListType.UL, 0);
+                        }
+                    }
                     break;
+
                 default:
                     traverse(child, bold, italic, result, currentListType, itemIndex);
             }
         }
     }
+
+    // ✅ StyledTable is nested here
+    public static class StyledTable {
+        public String title;  // ✅ optional table title
+        public List<List<List<StyledText>>> rows = new ArrayList<>();
+        // rows -> row -> cell -> styled text parts
+    }
+
+    // ✅ Table parsing reuses traverse()
+    public static StyledTable parseHtmlTable(String html) {
+        StyledTable styledTable = new StyledTable();
+
+        // --- Step 1: extract title if exists ---
+        String title = null;
+        String tableHtml = html;
+        int sepIndex = html.indexOf(":::");
+        if (sepIndex != -1) {
+            title = html.substring(0, sepIndex).trim();
+            tableHtml = html.substring(sepIndex + 3); // rest after ':::'
+        }
+        styledTable.title = title;
+
+        // --- Step 2: parse the table HTML ---
+        Element body = Jsoup.parse(tableHtml).body();
+        Element table = body.selectFirst("table");
+        if (table == null) return styledTable; // return with only title if no table
+
+        for (Element row : table.select("tr")) {
+            List<List<StyledText>> styledRow = new ArrayList<>();
+            for (Element cell : row.select("th, td")) {
+                List<StyledText> cellTexts = new ArrayList<>();
+                traverse(cell, false, false, cellTexts, ListType.NONE, 0);
+                styledRow.add(cellTexts);
+            }
+            styledTable.rows.add(styledRow);
+        }
+
+        return styledTable;
+    }
+
+
+//    public static void printStyledTable(StyledTable styledTable) {
+//        if (styledTable == null) {
+//            System.out.println("❌ No table found.");
+//            return;
+//        }
+//
+//        int rowIndex = 0;
+//        for (List<List<StyledText>> row : styledTable.rows) {
+//            System.out.println("Row " + rowIndex + ":");
+//            int colIndex = 0;
+//            for (List<StyledText> cell : row) {
+//                System.out.print("  Cell " + colIndex + ": ");
+//                for (StyledText st : cell) {
+//                    String flags = "";
+//                    if (st.bold) flags += "[B]";
+//                    if (st.italic) flags += "[I]";
+//                    System.out.print(flags + st.text + " ");
+//                }
+//                System.out.println();
+//                colIndex++;
+//            }
+//            rowIndex++;
+//        }
+//    }
+
 }

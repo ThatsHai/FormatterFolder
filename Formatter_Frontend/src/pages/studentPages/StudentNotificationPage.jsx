@@ -4,6 +4,7 @@ import PageNumberFooter from "../../component/PageNumberFooter";
 import api from "../../services/api";
 import { Collapse, Typography } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"; // from MUI
+import useBootstrapUser from "../../hook/useBootstrapUser";
 
 const truncateWords = (str, charLimit, end = "…") => {
   if (!str) return "";
@@ -50,6 +51,9 @@ const MailList = ({
   useEffect(() => {
     fetchMail();
   }, [currentPage, userId, mailUrl]);
+
+  const { loading } = useBootstrapUser(); // hydrates redux on mount
+    if(loading) return null;
 
   return (
     <>

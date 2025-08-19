@@ -5,6 +5,9 @@ import RightSidebar from "./designPage/RightSideBar";
 import ConfirmationPopup from "../../component/ConfirmationPopup";
 import PropTypes from "prop-types";
 import { useLocation } from "react-router";
+import useBootstrapUser from "../../hook/useBootstrapUser";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router";
 
 const Tooltip = () => {
   const [displayTooltip, setDisplayToolTip] = useState(false);
@@ -100,14 +103,14 @@ const DesignMainContent = ({ formData, fetchFormInfo }) => {
   };
 
   const handleSendFormData = async () => {
-    // console.log(designInfo);
-    // return;
     try {
       if (Object.keys(formData).length === 0) {
         await fetchFormInfo();
       }
 
-      console.log(formData);
+      // console.log(designInfo);
+      // return;
+      // console.log(formData);
 
       const latestDesignInfo = { ...designInfo, form: formData };
       const result = await api.post("/designs", latestDesignInfo);
@@ -194,14 +197,23 @@ const FormDesignCreationPage = () => {
   const formId = location.pathname.split("/").pop();
   const [formData, setFormData] = useState();
 
+  useEffect(() => {
+    fetchFormInfo();
+  }, [formId]);
+
   const fetchFormInfo = async () => {
     const result = await api.get(`/forms/${formId}`);
     setFormData(result.data.result);
   };
 
-  useEffect(() => {
-    fetchFormInfo();
-  }, [formId]);
+  const { loading } = useBootstrapUser(); // hydrates redux on mount
+  const userData = useSelector((state) => state.auth.user);
+  const navigate = useNavigate();
+
+  if (loading) return null;
+  if (userData.role.name !== "ADMIN") {
+    navigate("/notFound");
+  }
 
   return (
     <div className="p-6">

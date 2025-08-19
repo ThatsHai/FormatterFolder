@@ -6,6 +6,7 @@ import SubmitThesisForm from "../../component/forms/SubmitThesisForm";
 import ContentHomepage from "../../component/pageComponents/homepage/ContentHomepage";
 // import SuccessPopup from "../../component/SuccessPopup";
 import api from "../../services/api";
+import { useSelector } from "react-redux";
 
 const StudentHomePage = () => {
   const [thesisFormOpen, setIsThesisFormOpen] = useState(false);
@@ -13,15 +14,13 @@ const StudentHomePage = () => {
   const navigate = useNavigate();
 
   const { loading } = useBootstrapUser(); // hydrates redux on mount
+  const userData = useSelector((state) => state.auth.user);
   if (loading) return null;
+  if (userData.role.name !== "STUDENT") {
+    navigate("/notFound");
+  }
 
   const handleFormToggle = async () => {
-    // const result = await api.get("/myInfo");
-    // const userId = result.data.result.userId;
-    // if (userId === "") {
-    //   alert("Phiên đăng nhập hết hạn");
-    //   navigate("/login");
-    // }
     setIsThesisFormOpen((prev) => !prev);
   };
 

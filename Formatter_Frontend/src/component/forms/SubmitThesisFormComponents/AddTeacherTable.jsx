@@ -3,20 +3,7 @@ import { useState } from "react";
 import React from "react";
 
 const AddTeacherTable = ({ formData, setFormData }) => {
-  const [teacherList, setTeacherList] = useState([
-    {
-      Khoa: "Trường CNTT",
-      MaBM: "Khoa CNTT",
-      TenCB: "Nguyen V",
-      MaCB: "0111",
-    },
-    {
-      Khoa: "Trường CNTT",
-      MaBM: "Khoa CNTT",
-      TenCB: "Nguyen V",
-      MaCB: "0123",
-    },
-  ]);
+  const [teacherList, setTeacherList] = useState([]);
   const handleSearch = () => {
     if (teacherList) {
       return teacherList;
@@ -40,8 +27,6 @@ const AddTeacherTable = ({ formData, setFormData }) => {
       }));
     }
   };
-
-  
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-lightGray rounded-md mb-2">
@@ -104,29 +89,30 @@ const AddTeacherTable = ({ formData, setFormData }) => {
             <label className="font-semibold">Tên CB</label>
             <label className="font-semibold size">Chọn</label>
 
-            {formData.teacherList.length > 0 && teacherList.map((teacher, index) => (
-              <React.Fragment key={index}>
-                <p>{teacher.MaCB}</p>
-                <p>{teacher.TenCB}</p>
-                <div className="flex items-center justify-center">
-                  <input
-                    type="checkbox"
-                    className="size-5"
-                    onChange={(e) =>
-                      handleCheckboxChanged(teacher, e.target.checked)
-                    }
-                    checked={formData.teachersList.some(
-                      (t) => t.MaCB === teacher.MaCB
-                    )}
-                    disabled={
-                      !formData.teachersList.some(
+            {formData.teacherList.length > 0 &&
+              teacherList.map((teacher, index) => (
+                <React.Fragment key={index}>
+                  <p>{teacher.MaCB}</p>
+                  <p>{teacher.TenCB}</p>
+                  <div className="flex items-center justify-center">
+                    <input
+                      type="checkbox"
+                      className="size-5"
+                      onChange={(e) =>
+                        handleCheckboxChanged(teacher, e.target.checked)
+                      }
+                      checked={formData.teachersList.some(
                         (t) => t.MaCB === teacher.MaCB
-                      ) && formData.teachersList.length >= 2
-                    }
-                  />
-                </div>
-              </React.Fragment>
-            ))}
+                      )}
+                      disabled={
+                        !formData.teachersList.some(
+                          (t) => t.MaCB === teacher.MaCB
+                        ) && formData.teachersList.length >= 2
+                      }
+                    />
+                  </div>
+                </React.Fragment>
+              ))}
           </div>
           {formData.teachersList.length >= 2 && (
             <p className="text-redError">Chỉ có thể có tối đa 2 CBHD</p>
@@ -142,4 +128,4 @@ export default AddTeacherTable;
 AddTeacherTable.propTypes = {
   formData: PropTypes.object,
   setFormData: PropTypes.func,
-}
+};

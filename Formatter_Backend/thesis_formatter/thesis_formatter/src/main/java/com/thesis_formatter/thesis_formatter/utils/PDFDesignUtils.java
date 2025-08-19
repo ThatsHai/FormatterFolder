@@ -12,6 +12,7 @@ public class PDFDesignUtils {
 
     public static class CellData {
         public List<HtmlToStyledTextParser.StyledText> styledTexts;
+        public String rawText;
         public int colSpan;
         public int rowSpan;
         public int topPos;
@@ -100,19 +101,88 @@ public class PDFDesignUtils {
                         case "DATE":
                             phrase = new Phrase("__/__/____", unicodeFont);
                             break;
+
                         case "BULLETS":
-                            phrase = new Phrase("• First item\n• Second item", unicodeFont);
+                            List<HtmlToStyledTextParser.StyledText> parsed = HtmlToStyledTextParser.parseHtml(region.rawText);
+                            if (!parsed.isEmpty() && parsed.get(0).text != null) {
+                                parsed.get(0).text = parsed.get(0).text.replaceFirst("^[\\n\\r]+", "");
+                            }
+                            phrase = buildFormattedPhrase(
+                                    parsed,
+                                    unicodeFont, unicodeFontBold, unicodeFontItalic
+                            );
                             break;
+
                         case "TABLE":
-                            phrase = new Phrase("[ Embedded table ]", unicodeFontItalic); // Placeholder for now
+                            HtmlToStyledTextParser.StyledTable styledTable = HtmlToStyledTextParser.parseHtmlTable(region.rawText);
+
+                            if (styledTable != null && styledTable.rows != null && !styledTable.rows.isEmpty()) {
+                                // 🔹 Outer vertical layout (title + table)
+                                PdfPTable containerTable = new PdfPTable(1);
+                                containerTable.setWidthPercentage(100);
+
+                                // --- Add title if exists ---
+                                if (styledTable.title != null && !styledTable.title.isEmpty()) {
+                                    Phrase titlePhrase = new Phrase(styledTable.title, unicodeFontItalic);
+                                    PdfPCell titleCell = new PdfPCell(titlePhrase);
+                                    titleCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                                    titleCell.setBorder(Rectangle.NO_BORDER);
+                                    titleCell.setPaddingBottom(5f);
+                                    containerTable.addCell(titleCell);
+                                }
+
+                                // --- Build the actual inner table ---
+                                int colCount = styledTable.rows.get(0).size(); // ✅ Safe now
+                                PdfPTable innerTable = new PdfPTable(colCount);
+                                innerTable.setWidthPercentage(100);
+
+                                for (List<List<HtmlToStyledTextParser.StyledText>> rowCells : styledTable.rows) {
+                                    for (List<HtmlToStyledTextParser.StyledText> cellTexts : rowCells) {
+                                        Phrase cellPhrase = buildFormattedPhrase(cellTexts, unicodeFont, unicodeFontBold, unicodeFontItalic);
+                                        PdfPCell innerCell = new PdfPCell(cellPhrase);
+                                        innerCell.setPadding(5f);
+                                        innerCell.setBorder(Rectangle.BOX);
+                                        innerTable.addCell(innerCell);
+                                    }
+                                }
+
+                                // --- Put inner table into container ---
+                                PdfPCell tableCell = new PdfPCell(innerTable);
+                                tableCell.setBorder(Rectangle.NO_BORDER);
+                                containerTable.addCell(tableCell);
+
+                                // --- Now wrap container into the grid cell ---
+                                PdfPCell outerCell = new PdfPCell(containerTable);
+                                outerCell.setColspan(span);
+                                outerCell.setBorder(Rectangle.NO_BORDER);
+
+                                int sr = region.topPos;
+                                int er = sr + region.rowSpan - 1;
+                                int sc = region.leftPos;
+                                int ec = sc + region.colSpan - 1;
+
+                                if (row == sr) outerCell.enableBorderSide(Rectangle.TOP);
+                                if (row == er) outerCell.enableBorderSide(Rectangle.BOTTOM);
+                                if (col == sc) outerCell.enableBorderSide(Rectangle.LEFT);
+                                if (col + span - 1 == ec) outerCell.enableBorderSide(Rectangle.RIGHT);
+
+                                outerCell.setPaddingBottom(0f);
+
+                                table.addCell(outerCell);
+                                col += span;
+                                continue; // 🔴 Skip default phrase logic
+                            } else {
+                                phrase = new Phrase("Bảng trống", unicodeFontItalic); // fallback
+                            }
                             break;
+
                         case "TEXT":
                         default:
                             phrase = buildFormattedPhrase(region.styledTexts, unicodeFont, unicodeFontBold, unicodeFontItalic);
                             break;
                     }
 
-
+                    //Tuỳ chỉnh định dạng và padding cell
                     PdfPCell cell = new PdfPCell(phrase);
                     cell.setColspan(span);
                     cell.setBorder(Rectangle.NO_BORDER);
@@ -126,7 +196,11 @@ public class PDFDesignUtils {
                     if (row == er) cell.enableBorderSide(Rectangle.BOTTOM);
                     if (col == sc) cell.enableBorderSide(Rectangle.LEFT);
                     if (col + span - 1 == ec) cell.enableBorderSide(Rectangle.RIGHT);
-
+                    if (region.fieldType.equals("BULLETS")) {
+                        cell.setPaddingLeft(15f);
+                    } else {
+                        cell.setPaddingLeft(5f);
+                    }
                     cell.setPaddingBottom(5f);
                     table.addCell(cell);
                     col += span;
@@ -160,6 +234,7 @@ public class PDFDesignUtils {
         document.close();
     }
 
+    //Xử lý in đậm và nghiêng
     private static Phrase buildFormattedPhrase(List<HtmlToStyledTextParser.StyledText> styledTexts,
                                                Font normalFont, Font boldFont, Font italicFont) {
         Phrase phrase = new Phrase();

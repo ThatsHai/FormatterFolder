@@ -1,9 +1,18 @@
 import FormContent from "./formManagementPage/FormContent";
 import Button from "../../component/Button";
 import { useNavigate } from "react-router-dom";
+import useBootstrapUser from "../../hook/useBootstrapUser";
+import { useSelector } from "react-redux";
 
 const FormManagementPage = () => {
   const navigate = useNavigate();
+  const { loading } = useBootstrapUser(); // hydrates redux on mount
+  const userData = useSelector((state) => state.auth.user);
+  if (loading) return null;
+  if (userData.role.name !== "ADMIN") {
+    navigate("/notFound");
+  }
+  
   return (
     <div className="">
       <div className="flex justify-end">

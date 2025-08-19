@@ -6,6 +6,8 @@ import { useSelector } from "react-redux";
 import Button from "../../../component/Button";
 import TopicForm from "../TopicSuggestionPage";
 import { useNavigate } from "react-router-dom";
+import useBootstrapUser from "../../../hook/useBootstrapUser";
+
 const TopicCard = ({ topic }) => {
   const navigate = useNavigate();
   return (
@@ -47,6 +49,15 @@ const TopicContent = () => {
     };
     result();
   }, [refreshTrigger, user]);
+
+  const { loading } = useBootstrapUser(); // hydrates redux on mount
+  const userData = useSelector((state) => state.auth.user);
+  const navigate = useNavigate();
+
+  if (loading) return null;
+  if (userData.role.name !== "ADMIN") {
+    navigate("/notFound");
+  }
 
   const handleFormToggle = async () => {
     setIsTopicFormOpen((prev) => !prev);

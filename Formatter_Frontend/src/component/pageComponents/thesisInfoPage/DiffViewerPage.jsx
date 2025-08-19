@@ -37,9 +37,10 @@ const DiffViewerPage = () => {
           setDiffs(res.data.result);
         });
     }
+    console.log(diffs)
   }, [formRecordId, selectedVersion]);
 
-  const submitData = async() => {
+  const submitData = async () => {
     await api
       .post(`/formRecords/${formRecordId}/restore/${selectedVersion}`)
       .then(() => {
@@ -58,8 +59,7 @@ const DiffViewerPage = () => {
         console.error(err);
         alert("Khôi phục thất bại!");
       });
-
-  }
+  };
   const onSuccessPopupClosed = () => {
     setShowConfirmPopup(false);
     setDisplaySuccessPopup(false);
@@ -96,9 +96,7 @@ const DiffViewerPage = () => {
       {showConfirmPopup && (
         <ConfirmationPopup
           isOpen={true}
-          text={
-          "Bạn chắc chắn muốn khôi phục phiên bản này?"
-          }
+          text={"Bạn chắc chắn muốn khôi phục phiên bản này?"}
           onConfirm={() => {
             setShowConfirmPopup(false);
             submitData();

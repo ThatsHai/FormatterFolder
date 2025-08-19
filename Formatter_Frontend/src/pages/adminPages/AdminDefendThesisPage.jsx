@@ -2,6 +2,9 @@ import dayjs from "dayjs";
 import { Link } from "react-router";
 import { useEffect, useState } from "react";
 import api from "../../services/api";
+import useBootstrapUser from "../../hook/useBootstrapUser";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router";
 
 const StudentTopicTable = () => {
   const [data, setData] = useState([]);
@@ -139,6 +142,14 @@ const StudentTopicTable = () => {
 };
 
 const AdminDefendThesisPage = () => {
+  const { loading } = useBootstrapUser(); // hydrates redux on mount
+  const userData = useSelector((state) => state.auth.user);
+  const navigate = useNavigate();
+
+  if (loading) return null;
+  if (userData.role.name !== "ADMIN") {
+    navigate("/notFound");
+  }
   return <StudentTopicTable></StudentTopicTable>;
 };
 

@@ -20,7 +20,9 @@ const GridBoard = ({
   const [rowSize, setRowSize] = useState(row);
   const [colSize, setColSize] = useState(col);
 
-  useEffect(() => console.log(focusedIndex), [focusedIndex]);
+  useEffect(() => {
+    console.log(mergeRegions);
+  }, [mergeRegions]);
 
   useEffect(() => {
     setMergeRegions((prevRegions) => {
@@ -267,8 +269,6 @@ const GridBoard = ({
   const handlePrintData = () => {
     const data = generateOptimizedCellData();
     data.reverse();
-    // console.log("Grid Print Data:", data);
-    // data.pop();
     onUpdateDesignInfo("cells", data);
     data.reverse();
     console.log("Grid Print Data:", data);
@@ -424,15 +424,63 @@ const GridBoard = ({
               e.preventDefault();
               const data = e.dataTransfer.getData("text/plain");
               if (!data) return;
+
               const droppedField = JSON.parse(data);
+
+              // Đảm bảo bảng phải dài hết cột
+              if (
+                droppedField.fieldType === "TABLE" &&
+                region.top !== 0 &&
+                region.width !== col
+              ) {
+                alert("Dữ liệu bảng chỉ có thể chiếm hết chiều dài bảng");
+                return;
+              }
+
+              let textToInsert = droppedField.fieldName;
+
+              if (droppedField.fieldType === "TABLE") {
+                try {
+                  // Check if it has a prefix like "questionName:::"
+                  let prefix = "";
+                  let htmlContent = droppedField.fieldName;
+                  const splitIndex = droppedField.fieldName.indexOf(":::");
+                  if (splitIndex !== -1) {
+                    prefix = droppedField.fieldName.substring(
+                      0,
+                      splitIndex + 3
+                    ); // include :::
+                    htmlContent = droppedField.fieldName.substring(
+                      splitIndex + 3
+                    );
+                  }
+
+                  // Parse the HTML part
+                  const parser = new DOMParser();
+                  const doc = parser.parseFromString(htmlContent, "text/html");
+
+                  // Wrap each <th> content with ||
+                  const ths = doc.querySelectorAll("th");
+                  ths.forEach((th) => {
+                    th.textContent = `||${th.textContent}||`;
+                  });
+
+                  // Combine prefix + modified table HTML
+                  textToInsert =
+                    prefix +
+                    (doc.querySelector("table")?.outerHTML || htmlContent);
+                } catch (err) {
+                  console.error("Failed to parse table HTML", err);
+                }
+              }
 
               setMergeRegions((prev) => {
                 const copy = [...prev];
                 copy[index] = {
                   ...copy[index],
-                  text: "Dữ liệu từ ${{" + droppedField.fieldName + "}}",
+                  text: "Dữ liệu từ ${{" + textToInsert + "}}",
                   fromDrag: true,
-                  fieldType: droppedField.fieldType || "TEXT", 
+                  fieldType: droppedField.fieldType || "TEXT",
                 };
                 return copy;
               });

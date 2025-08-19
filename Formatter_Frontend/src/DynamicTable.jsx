@@ -6,6 +6,7 @@ const DynamicTable = ({ html, value, handleChange, name }) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(value || html, "text/html");
 
+    console.log(html);
     const headers = Array.from(doc.querySelectorAll("table thead th")).map(
       (th) => th.textContent.trim()
     );
@@ -55,10 +56,12 @@ const DynamicTable = ({ html, value, handleChange, name }) => {
 
   const emitChange = (updatedRows) => {
     const htmlValue = generateTableHTML(updatedRows);
+    const prefix = html.split(":::")[0] || "";
+    const attachQuestion = prefix + (":::") + htmlValue;
     const syntheticEvent = {
       target: {
         name,
-        value: htmlValue,
+        value: attachQuestion,
       },
     };
     handleChange(syntheticEvent);
@@ -117,6 +120,9 @@ const DynamicTable = ({ html, value, handleChange, name }) => {
   return (
     <div className="p-4 relative">
       <div className="flex justify-end mb-2 relative">
+        <p className="font-semibold text-lg w-[100%] text-left">
+          {html.split(":::")[0] || ""}
+        </p>
         <div className="group relative cursor-pointer">
           <span className="text-blue-600 text-sm">ℹ️</span>
           <div className="absolute right-0 top-full mt-1 w-64 bg-white border border-gray-300 rounded shadow-md p-2 text-sm text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50">

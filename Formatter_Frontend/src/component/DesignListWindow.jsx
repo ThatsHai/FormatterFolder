@@ -132,7 +132,7 @@ const DesignsListWindow = ({
 
         <h2 className="text-lg font-semibold mb-4">{text}</h2>
 
-        <div className="w-full justify-center items-center gap-5 min-h-[320px]">
+        <div className="w-full justify-center items-center gap-5 min-h-[340px]">
           {designsList.map((design) => (
             <div key={design.designId} className="border px-2 rounded-md my-2">
               <p className="font-semibold text-left pt-1">{design.title}</p>

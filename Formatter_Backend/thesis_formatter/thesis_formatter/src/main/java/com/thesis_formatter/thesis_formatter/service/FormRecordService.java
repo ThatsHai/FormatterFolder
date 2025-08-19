@@ -10,6 +10,7 @@ import com.thesis_formatter.thesis_formatter.enums.TopicStatus;
 import com.thesis_formatter.thesis_formatter.exception.AppException;
 import com.thesis_formatter.thesis_formatter.mapper.FormRecordMapper;
 import com.thesis_formatter.thesis_formatter.repo.*;
+import com.thesis_formatter.thesis_formatter.utils.ConvertPlaceholderInFormRecord;
 import com.thesis_formatter.thesis_formatter.utils.HtmlToStyledTextParser;
 import com.thesis_formatter.thesis_formatter.utils.PDFDesignUtils;
 import jakarta.mail.MessagingException;
@@ -742,12 +743,10 @@ public class FormRecordService {
 
 
     public void generateFormRecordPdf(FormRecord formRecord, Design design) {
-        // Step 1: Build lookup map: placeholder name ➜ field value
-        Map<String, String> placeholderValueMap = formRecord.getFormRecordFields().stream()
-                .collect(Collectors.toMap(
-                        f -> f.getFormField().getFieldName(), // placeholder key
-                        f -> f.getValue()                    // value to insert
-                ));
+        Map<String, String> placeholderValueMap = ConvertPlaceholderInFormRecord.buildPlaceholderValueMap(formRecord);
+        for (String key : placeholderValueMap.keySet()) {
+            System.out.println(key);
+        }
 
         PDFDesignUtils.DesignData data = new PDFDesignUtils.DesignData();
         data.title = design.getTitle();
@@ -757,40 +756,37 @@ public class FormRecordService {
             PDFDesignUtils.CellData c = new PDFDesignUtils.CellData();
             c.fromDrag = cell.isFromDrag();
             c.fromDataSource = cell.isFromDataSource();
+            c.fieldType = cell.getFieldType();
 
-            String finalText = "";
-
+            String finalText;
             if (c.fromDrag) {
-                // Extract the first placeholder inside ${{ }}
-                Pattern pattern = Pattern.compile("\\$\\{\\{(.*?)}}");
-                Matcher matcher = pattern.matcher(cell.getText());
-
-                if (matcher.find()) {
-                    String placeholder = matcher.group(1).trim();
-                    finalText = placeholderValueMap.getOrDefault(placeholder, "");
+                Matcher m = Pattern.compile("\\$\\{\\{(.*?)}}").matcher(cell.getText());
+                String value = "";
+                if (m.find()) {
+                    String placeholder = safe(m.group(1)).trim();
+                    value = placeholderValueMap.getOrDefault(placeholder, "");
+                    if (c.fieldType.equals("TABLE")) {
+                        placeholder = ConvertPlaceholderInFormRecord.convertToHtmlTableCompact(placeholder);
+                        value = placeholderValueMap.getOrDefault(placeholder, "");
+                    }
                 }
-
-                System.out.println("c text: " + cell.getText());
-                System.out.println("Noi dung: " + finalText);
+                finalText = value;
             } else if (c.fromDataSource) {
-                // If fromDataSource: replace all placeholders with field values
                 finalText = replacePlaceholders(cell.getText(), placeholderValueMap);
-
             } else {
                 finalText = cell.getText();
             }
 
+            c.rawText = finalText;
             c.styledTexts = HtmlToStyledTextParser.parseHtml(finalText);
             c.colSpan = cell.getColSpan();
             c.rowSpan = cell.getRowSpan();
             c.topPos = cell.getTopPos();
             c.leftPos = cell.getLeftPos();
-
             return c;
         }).collect(Collectors.toList());
 
         String fileName = "formRecord-" + formRecord.getFormRecordId() + ".pdf";
-
         try {
             PDFDesignUtils.generatePdfFromDesign(data, fileName, "./user_resource/pdf_formRecord/");
         } catch (Exception e) {
@@ -798,6 +794,10 @@ public class FormRecordService {
         }
     }
 
+    // Small helper to avoid NPEs
+    private static String safe(String s) {
+        return s == null ? "" : s;
+    }
 
     public ResponseEntity<Resource> downloadFormRecordPdf(String formRecordId, String designId, String version) throws MalformedURLException {
         FormRecord formRecord = getFormRecordByIdAndVersion(formRecordId, version);

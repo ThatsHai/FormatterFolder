@@ -107,7 +107,7 @@ const Login = () => {
       if (errorMessage === "Incorrect password") {
         setError("Mã số hoặc mật khẩu không chính xác");
       } else {
-        setError(errorMessage);
+        setError("Không tìm thấy người dùng.");
       }
     }
   };

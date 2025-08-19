@@ -137,6 +137,23 @@ const StudentInfoDiv = () => {
                 "text/plain",
                 JSON.stringify({
                   formFieldId: 0,
+                  fieldName: "MSSV",
+                })
+              );
+            }}
+          >
+            <div className="flex">
+              <p>MSSV</p>
+            </div>
+          </div>
+          <div
+            className="border p-2 rounded-md cursor-move"
+            draggable
+            onDragStart={(e) => {
+              e.dataTransfer.setData(
+                "text/plain",
+                JSON.stringify({
+                  formFieldId: 0,
                   fieldName: "Email sinh viên",
                 })
               );
@@ -144,6 +161,40 @@ const StudentInfoDiv = () => {
           >
             <div className="flex">
               <p>Email sinh viên</p>
+            </div>
+          </div>
+          <div
+            className="border p-2 rounded-md cursor-move"
+            draggable
+            onDragStart={(e) => {
+              e.dataTransfer.setData(
+                "text/plain",
+                JSON.stringify({
+                  formFieldId: 0,
+                  fieldName: "Trường/Viện/Khoa sinh viên",
+                })
+              );
+            }}
+          >
+            <div className="flex">
+              <p>Trường/Viện/Khoa sinh viên</p>
+            </div>
+          </div>
+          <div
+            className="border p-2 rounded-md cursor-move"
+            draggable
+            onDragStart={(e) => {
+              e.dataTransfer.setData(
+                "text/plain",
+                JSON.stringify({
+                  formFieldId: 0,
+                  fieldName: "Khoa/Bộ môn sinh viên",
+                })
+              );
+            }}
+          >
+            <div className="flex">
+              <p>Khoa/Bộ môn sinh viên</p>
             </div>
           </div>
           <div
@@ -225,7 +276,42 @@ const Fields = ({ formData }) => {
                 }}
               >
                 <div className="flex">
-                  <p>{formField.fieldName}</p>
+                  <p>
+                    {formField.fieldType === "TABLE"
+                      ? (() => {
+                          const [q, raw = ""] = (
+                            formField.fieldName || ""
+                          ).split(":::");
+                          const question = (q || "").trim();
+                          if (question) return question;
+
+                          // Extract headers from HTML <th>
+                          const headers = [];
+                          const thRegex = /<th\b[^>]*>(.*?)<\/th>/gi;
+                          let m;
+                          while ((m = thRegex.exec(raw)) !== null) {
+                            headers.push(m[1].replace(/<[^>]+>/g, "").trim());
+                          }
+
+                          return (
+                            <table className="inline-table border border-gray-400 border-collapse text-sm max-w-xs">
+                              <thead>
+                                <tr>
+                                  {headers.map((header, idx) => (
+                                    <th
+                                      key={idx}
+                                      className="border border-gray-400 px-2 py-1 font-semibold"
+                                    >
+                                      {header}
+                                    </th>
+                                  ))}
+                                </tr>
+                              </thead>
+                            </table>
+                          );
+                        })()
+                      : formField.fieldName}
+                  </p>
                 </div>
                 <p className="text-sm text-gray">
                   {formField.description || "Không có mô tả"}

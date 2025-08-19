@@ -9,6 +9,7 @@ import { Collapse, Typography } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"; // from MUI
 import useBootstrapUser from "../../hook/useBootstrapUser";
 import { useSelector } from "react-redux";
+import { Navigate, useNavigate } from "react-router";
 
 const truncateWords = (str, charLimit, end = "…") => {
   if (!str) return "";
@@ -246,7 +247,14 @@ const Composer = ({
       } catch (error) {
         console.log(error);
         if (error.response.data.code == 400) {
-          alert("Không có khoa đang tìm!");
+          if (
+            error.response.data.message ==
+            "Không có giáo viên ứng với mã khoa truyền vào"
+          ) {
+            alert("Không có giáo viên thuộc khoa.");
+          } else {
+            alert("Không có khoa đang tìm!");
+          }
         } else {
           alert("Lỗi không gửi được thư, vui lòng thử lại sau.");
         }
@@ -590,11 +598,15 @@ const AdminNotificationPage = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const { loading } = useBootstrapUser(); // hydrates redux on mount
   const user = useSelector((state) => state.auth.user);
+  const navigate = useNavigate();
   const role = user?.role; // safe access
-  console.log(user);
   if (loading) return null;
   if (!role) return null;
   if (!user.userId) return null;
+
+  if (user.role.name !== "ADMIN") {
+    navigate("/notFound");
+  }
 
   return (
     <div className="flex pt-2">

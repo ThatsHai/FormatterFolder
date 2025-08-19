@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import TeachersTable from "./accountManagementPage/TeachersTable";
 import TeacherQuery from "./accountManagementPage/TeacherQuery";
+import useBootstrapUser from "../../hook/useBootstrapUser";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router";
 import StudentQuery from "./accountManagementPage/StudentQuery";
 import StudentsTable from "./accountManagementPage/StudentsTable";
 import AddTeacherForm from "./accountManagementPage/AddTeacherForm";
@@ -185,6 +188,14 @@ const ManagementTabs = ({ selectedTab, setSelectedTab }) => {
 
 const AccountManagementPage = () => {
   const [selectedTab, setSelectedTab] = useState("teacher");
+  const { loading } = useBootstrapUser(); // hydrates redux on mount
+  const userData = useSelector((state) => state.auth.user);
+  const navigate = useNavigate();
+
+  if (loading) return null;
+  if (userData.role.name !== "ADMIN") {
+    navigate("/notFound");
+  }
 
   return (
     <div className="flex">
